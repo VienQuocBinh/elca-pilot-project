@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface EmployerService {
     List<EmployerResponseDto> getEmployers();
+
+    EmployerResponseDto getEmployerById(long id);
 }

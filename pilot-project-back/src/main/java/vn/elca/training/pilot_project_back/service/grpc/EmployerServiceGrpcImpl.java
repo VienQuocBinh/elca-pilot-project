@@ -19,7 +19,9 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
 
     @Override
     public void getEmployerById(EmployerId request, StreamObserver<EmployerResponse> responseObserver) {
-        super.getEmployerById(request, responseObserver);
+        EmployerResponseDto employerById = employerService.getEmployerById(request.getId());
+        responseObserver.onNext(employerMapper.dtoToProtoResponse(employerById));
+        responseObserver.onCompleted();
     }
 
     @Override
