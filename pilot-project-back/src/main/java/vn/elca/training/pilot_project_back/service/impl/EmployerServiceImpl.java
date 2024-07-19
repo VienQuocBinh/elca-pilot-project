@@ -20,6 +20,6 @@ public class EmployerServiceImpl implements EmployerService {
 
     @Override
     public List<EmployerResponseDto> getEmployers() {
-        return employerRepository.findAll().stream().map(employerMapper::toResponseDto).collect(Collectors.toList());
+        return employerRepository.findAll().stream().map(employerMapper::entityToResponseDto).collect(Collectors.toList());
     }
 }

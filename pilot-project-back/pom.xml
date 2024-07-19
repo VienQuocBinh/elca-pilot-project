@@ -102,7 +102,7 @@
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
-       
+
         <dependency>
             <groupId>vn.elca.training</groupId>
             <artifactId>grpc-proto</artifactId>
@@ -150,8 +150,6 @@
                     </annotationProcessorPaths>
                     <compilerArgs>
                         <compilerArg>-Amapstruct.defaultComponentModel=spring</compilerArg>
-                        <compilerArg>-Amapstruct.unmappedTargetPolicy=IGNORE</compilerArg>
-                        <compilerArg>-Amapstruct.disableBuilders=true</compilerArg>
                     </compilerArgs>
                 </configuration>
             </plugin>
