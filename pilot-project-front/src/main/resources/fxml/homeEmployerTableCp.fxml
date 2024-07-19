@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      xmlns="http://javafx.com/javafx">
+    <GridPane>
+        <columnConstraints>
+            <ColumnConstraints hgrow="ALWAYS" percentWidth="100"/>
+        </columnConstraints>
+        <TableView fx:id="tbvEmployer" GridPane.rowIndex="0" GridPane.columnIndex="0">
+            <columns>
+                <TableColumn fx:id="fundTypeCol" text="%pensionType" prefWidth="150">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="pensionType"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn fx:id="numberCol" text="%number" prefWidth="120">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="number"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn fx:id="ideNumberCol" text="%ideNumber" prefWidth="150">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="ideNumber"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn fx:id="nameCol" text="%name" prefWidth="150">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="name"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn fx:id="createdDateCol" text="%createdDate" prefWidth="100">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="createdDate"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn fx:id="expiredDateCol" text="%expiredDate" prefWidth="100">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="expiredDate"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn fx:id="actionCol" prefWidth="200"/>
+            </columns>
+        </TableView>
+    </GridPane>
+</VBox>

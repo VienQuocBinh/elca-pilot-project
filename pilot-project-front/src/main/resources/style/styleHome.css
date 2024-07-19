@@ -1,0 +1,16 @@
+.mainContainer {
+    -fx-padding: 30px;
+    -fx-spacing: 20px;
+}
+
+.search-employer-box {
+    -fx-border-width: 1px;
+    -fx-border-color: black;
+    -fx-border-style: solid;
+    -fx-padding: 20px;
+}
+
+.delete-button {
+    -fx-background-color: #ff5c33;
+    -fx-text-fill: white;
+}
