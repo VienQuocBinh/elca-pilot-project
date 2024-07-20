@@ -12,6 +12,7 @@ import vn.elca.training.pilot_project_back.listener.EmployerListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
@@ -35,6 +36,8 @@ public class Employer extends BaseEntity {
     @NotNull
     private String number;
     @NotNull
+    @Length(max = 36)
+    @Pattern(regexp = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}")
     private String ideNumber;
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
