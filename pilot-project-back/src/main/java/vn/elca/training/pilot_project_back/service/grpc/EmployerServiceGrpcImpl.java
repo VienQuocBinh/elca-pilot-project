@@ -10,6 +10,7 @@ import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 import vn.elca.training.pilot_project_back.exception.handler.GrpcExceptionHandler;
 import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
+import vn.elca.training.proto.employer.EmployerCreateRequest;
 import vn.elca.training.proto.employer.EmployerId;
 import vn.elca.training.proto.employer.EmployerListResponse;
 import vn.elca.training.proto.employer.EmployerResponse;
@@ -30,7 +31,7 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     public void getEmployerById(EmployerId request, StreamObserver<EmployerResponse> responseObserver) {
         try {
             EmployerResponseDto employerById = employerService.getEmployerById(request.getId());
-            responseObserver.onNext(employerMapper.dtoToProtoResponse(employerById));
+            responseObserver.onNext(employerMapper.mapResponseDtoToResponseProto(employerById));
             responseObserver.onCompleted();
         } catch (EntityNotFoundException e) {
             log.error(e.getMessage());
@@ -42,11 +43,22 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     public void getEmployers(Empty request, StreamObserver<EmployerListResponse> responseObserver) {
         List<EmployerResponseDto> employers = employerService.getEmployers();
         List<EmployerResponse> responses = employers.stream()
-                .map(employerMapper::dtoToProtoResponse)
+                .map(employerMapper::mapResponseDtoToResponseProto)
                 .collect(Collectors.toList());
         responseObserver.onNext(EmployerListResponse.newBuilder()
                 .addAllEmployers(responses)
                 .build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void createEmployer(EmployerCreateRequest request, StreamObserver<EmployerResponse> responseObserver) {
+        try {
+            EmployerResponseDto employer = employerService.createEmployer(employerMapper.mapCreateRequestProtoToCreateRequestDto(request));
+            responseObserver.onNext(employerMapper.mapResponseDtoToResponseProto(employer));
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(GrpcExceptionHandler.handleException(e));
+        }
     }
 }

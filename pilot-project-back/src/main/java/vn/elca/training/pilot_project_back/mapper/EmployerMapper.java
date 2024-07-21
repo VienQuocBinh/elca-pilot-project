@@ -6,11 +6,14 @@ import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import vn.elca.training.pilot_project_back.constant.PensionType;
+import vn.elca.training.pilot_project_back.dto.EmployerCreateRequestDto;
 import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
 import vn.elca.training.pilot_project_back.entity.Employer;
+import vn.elca.training.proto.employer.EmployerCreateRequest;
 import vn.elca.training.proto.employer.EmployerResponse;
 import vn.elca.training.proto.employer.PensionTypeProto;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -20,15 +23,21 @@ public abstract class EmployerMapper {
     @Autowired
     private SimpleDateFormat simpleDateFormat;
 
-    public abstract EmployerResponseDto entityToResponseDto(Employer employer);
+    public abstract EmployerResponseDto mapEntityToResponseDto(Employer employer);
+
+    public abstract Employer mapCreateDtoToEntity(EmployerCreateRequestDto employerCreateRequestDto);
+
+    @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionProtoToDto")
+    @Mapping(target = "expiredDate", source = "expiredDate", qualifiedByName = "mapStringDateToDate")
+    public abstract EmployerCreateRequestDto mapCreateRequestProtoToCreateRequestDto(EmployerCreateRequest employerCreateRequest);
 
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionDtoToProto")
-    @Mapping(target = "createdDate", source = "createdDate", qualifiedByName = "dateToString")
-    @Mapping(target = "expiredDate", source = "expiredDate", qualifiedByName = "dateToString")
-    public abstract EmployerResponse dtoToProtoResponse(EmployerResponseDto employerResponseDto);
+    @Mapping(target = "createdDate", source = "createdDate", qualifiedByName = "mapDateToString")
+    @Mapping(target = "expiredDate", source = "expiredDate", qualifiedByName = "mapDateToString")
+    public abstract EmployerResponse mapResponseDtoToResponseProto(EmployerResponseDto employerResponseDto);
 
     @Named("pensionProtoToDto")
-    public PensionType mapProtoToDto(PensionTypeProto pensionTypeProto) {
+    public PensionType mapPensionTypeProtoToDto(PensionTypeProto pensionTypeProto) {
         switch (pensionTypeProto) {
             case REGIONAL:
                 return PensionType.REGIONAL;
@@ -41,7 +50,7 @@ public abstract class EmployerMapper {
     }
 
     @Named("pensionDtoToProto")
-    public PensionTypeProto mapDtoToProto(PensionType pensionType) {
+    public PensionTypeProto mapPensionTypeDtoToProto(PensionType pensionType) {
         switch (pensionType) {
             case REGIONAL:
                 return PensionTypeProto.REGIONAL;
@@ -53,8 +62,13 @@ public abstract class EmployerMapper {
         }
     }
 
-    @Named("dateToString")
-    public String dateToString(Date date) {
+    @Named("mapDateToString")
+    public String mapDateToString(Date date) {
         return date != null ? simpleDateFormat.format(date) : "";
+    }
+
+    @Named("mapStringDateToDate")
+    public Date mapStringDateToDate(String dateString) throws ParseException {
+        return simpleDateFormat.parse(dateString);
     }
 }
