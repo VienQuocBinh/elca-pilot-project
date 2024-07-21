@@ -21,7 +21,7 @@ import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 )
 public class HomeSearchEmployerCp implements FXComponent {
     @FXML
-    private Label lbFundType;
+    private Label lbPensionType;
     @FXML
     private Label lbName;
     @FXML
@@ -53,7 +53,7 @@ public class HomeSearchEmployerCp implements FXComponent {
     @PostConstruct
     public void onPostConstruct() {
         // Binding text value according to Locale
-        lbFundType.textProperty().bind(ObservableResourceFactory.getStringBinding("fundType"));
+        lbPensionType.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
         lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
         lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
         lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));

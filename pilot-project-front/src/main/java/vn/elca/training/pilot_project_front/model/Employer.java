@@ -1,6 +1,10 @@
 package vn.elca.training.pilot_project_front.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -11,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Employer {
     private Long id;
-    private String fundType;
+    private String pensionType;
     private String name;
     private String number;
     private String ideNumber;

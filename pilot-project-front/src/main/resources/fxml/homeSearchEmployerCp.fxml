@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       xmlns="http://javafx.com/javafx"
       spacing="10"
@@ -13,7 +20,7 @@
             <ColumnConstraints hgrow="ALWAYS" percentWidth="30"/>
         </columnConstraints>
 
-        <Label fx:id="lbFundType" text="%pensionType" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Label fx:id="lbPensionType" text="%pensionType" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <ComboBox fx:id="cbFundType" GridPane.rowIndex="1" GridPane.columnIndex="0" prefWidth="350"/>
         <Label fx:id="lbNumber" text="%number" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
         <TextField fx:id="tfNumber" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="350"/>

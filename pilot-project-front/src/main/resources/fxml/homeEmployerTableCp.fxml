@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.cell.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       xmlns="http://javafx.com/javafx">
     <GridPane>
@@ -11,7 +14,7 @@
         </columnConstraints>
         <TableView fx:id="tbvEmployer" GridPane.rowIndex="0" GridPane.columnIndex="0">
             <columns>
-                <TableColumn fx:id="fundTypeCol" text="%pensionType" prefWidth="150">
+                <TableColumn fx:id="pensionTypeCol" text="%pensionType" prefWidth="150">
                     <cellValueFactory>
                         <PropertyValueFactory property="pensionType"/>
                     </cellValueFactory>
