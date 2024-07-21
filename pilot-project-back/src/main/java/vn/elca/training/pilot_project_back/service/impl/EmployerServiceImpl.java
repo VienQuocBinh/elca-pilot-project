@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
+import vn.elca.training.pilot_project_back.entity.Employer;
+import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.repository.EmployerRepository;
 import vn.elca.training.pilot_project_back.service.EmployerService;
@@ -24,7 +26,8 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
-    public EmployerResponseDto getEmployerById(long id){
-        return employerRepository.findById(id).map(employerMapper::entityToResponseDto).orElse(null);
+    public EmployerResponseDto getEmployerById(long id) throws EntityNotFoundException {
+        return employerRepository.findById(id).map(employerMapper::entityToResponseDto)
+                .orElseThrow(() -> new EntityNotFoundException(Employer.class, "id", id));
     }
 }
