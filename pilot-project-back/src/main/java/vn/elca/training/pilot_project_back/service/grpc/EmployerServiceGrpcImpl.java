@@ -6,16 +6,12 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
+import vn.elca.training.pilot_project_back.dto.EmployerSearchRequestDto;
 import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 import vn.elca.training.pilot_project_back.exception.handler.GrpcExceptionHandler;
 import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
-import vn.elca.training.proto.employer.EmployerCreateRequest;
-import vn.elca.training.proto.employer.EmployerId;
-import vn.elca.training.proto.employer.EmployerListResponse;
-import vn.elca.training.proto.employer.EmployerResponse;
-import vn.elca.training.proto.employer.EmployerServiceGrpc;
-import vn.elca.training.proto.employer.Empty;
+import vn.elca.training.proto.employer.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,15 +36,20 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     }
 
     @Override
-    public void getEmployers(Empty request, StreamObserver<EmployerListResponse> responseObserver) {
-        List<EmployerResponseDto> employers = employerService.getEmployers();
-        List<EmployerResponse> responses = employers.stream()
-                .map(employerMapper::mapResponseDtoToResponseProto)
-                .collect(Collectors.toList());
-        responseObserver.onNext(EmployerListResponse.newBuilder()
-                .addAllEmployers(responses)
-                .build());
-        responseObserver.onCompleted();
+    public void getEmployers(EmployerSearchRequest request, StreamObserver<EmployerListResponse> responseObserver) {
+        try {
+            EmployerSearchRequestDto searchRequestDto = employerMapper.mapSearchRequestProtoToDto(request);
+            List<EmployerResponseDto> employers = employerService.getEmployers(searchRequestDto);
+            List<EmployerResponse> responses = employers.stream()
+                    .map(employerMapper::mapResponseDtoToResponseProto)
+                    .collect(Collectors.toList());
+            responseObserver.onNext(EmployerListResponse.newBuilder()
+                    .addAllEmployers(responses)
+                    .build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(GrpcExceptionHandler.handleException(e));
+        }
     }
 
     @Override
