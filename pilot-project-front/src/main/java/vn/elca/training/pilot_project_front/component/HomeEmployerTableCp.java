@@ -5,12 +5,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import org.jacpfx.api.annotations.Resource;
@@ -19,6 +14,7 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
+import org.jacpfx.rcp.util.FXUtil;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.Employer;
@@ -29,6 +25,7 @@ import vn.elca.training.proto.employer.Empty;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @DeclarativeView(id = ComponentId.HOME_EMPLOYER_TABLE_CP,
@@ -38,6 +35,8 @@ import java.util.stream.Collectors;
         initialTargetLayoutId = PerspectiveId.HORIZONTAL_CONTAINER_BOT
 )
 public class HomeEmployerTableCp implements FXComponent {
+    private final Logger log = Logger.getLogger(HomeEmployerTableCp.class.getName());
+
     @Resource
     private Context context;
     @FXML
@@ -66,8 +65,8 @@ public class HomeEmployerTableCp implements FXComponent {
 
     @Override
     public Node handle(Message<Event, Object> message) throws Exception {
-        if (message.getMessageBody() instanceof String) {
-            System.out.println(message.getTypedMessageBody(String.class));
+        if (message.getMessageBody() instanceof String && !message.messageBodyEquals(FXUtil.MessageUtil.INIT)) {
+            log.info(message.getTypedMessageBody(String.class));
         } else if (message.getMessageBody() instanceof Empty) {
             // Reload the employer list
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
@@ -100,11 +99,12 @@ public class HomeEmployerTableCp implements FXComponent {
             {
                 btnDetail.setOnMouseClicked(event -> {
                     Employer employer = getTableView().getItems().get(getIndex());
-                    System.out.println("Button clicked for: " + employer);
+                    log.info("Button clicked for: " + employer);
+                    context.send(PerspectiveId.EMPLOYER_DETAIL_PERSPECTIVE, employer.getName());
                 });
                 btnDelete.setOnMouseClicked(event -> {
                     Employer employer = getTableView().getItems().get(getIndex());
-                    System.out.println("Button clicked for: " + employer);
+                    log.info("Button clicked for: " + employer);
                     Optional<ButtonType> buttonType = showConfirmDialog(employer);
                     if (buttonType.isPresent() && buttonType.get().equals(ButtonType.OK)) {
                         context.send(ComponentId.EMPLOYER_CALLBACK_CP, employer.getId());

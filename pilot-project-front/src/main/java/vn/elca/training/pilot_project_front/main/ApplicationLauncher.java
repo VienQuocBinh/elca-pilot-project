@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import org.jacpfx.minimal.launcher.JacpFXApplicationLauncher;
 import org.jacpfx.rcp.workbench.FXWorkbench;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
+import vn.elca.training.pilot_project_front.util.StageManager;
 import vn.elca.training.pilot_project_front.workbench.JacpFXWorkbench;
 
 public class ApplicationLauncher extends JacpFXApplicationLauncher {
@@ -24,6 +25,7 @@ public class ApplicationLauncher extends JacpFXApplicationLauncher {
 
     @Override
     protected void postInit(Stage stage) {
+        StageManager.setPrimaryStage(stage);
         stage.titleProperty().setValue(ObservableResourceFactory.getProperty().getString("title"));
     }
 }
