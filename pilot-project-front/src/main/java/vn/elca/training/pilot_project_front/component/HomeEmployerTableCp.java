@@ -11,16 +11,20 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
+import org.jacpfx.api.annotations.Resource;
 import org.jacpfx.api.annotations.component.DeclarativeView;
+import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
+import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.Employer;
+import vn.elca.training.proto.employer.EmployerListResponse;
+import vn.elca.training.proto.employer.EmployerSearchRequest;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @DeclarativeView(id = ComponentId.HOME_EMPLOYER_TABLE_CP,
         name = "homeEmployerTableCp",
@@ -29,24 +33,16 @@ import java.util.List;
         initialTargetLayoutId = PerspectiveId.HORIZONTAL_CONTAINER_BOT
 )
 public class HomeEmployerTableCp implements FXComponent {
+    @Resource
+    private Context context;
     @FXML
     private TableView<Employer> tbvEmployer;
     @FXML
     private TableColumn<Employer, Void> actionCol;
 
-    @Override
-    public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
-        return null;
-    }
-
-    @Override
-    public Node handle(Message<Event, Object> message) throws Exception {
-        List<Employer> employers = new ArrayList<>();
-        employers.add(new Employer(1L, "Casse", "Binh", "000123", "ide 123", LocalDate.now(), LocalDate.now()));
-        employers.add(new Employer(1L, "Casse", "Binh", "000123", "ide 123", LocalDate.now(), LocalDate.now()));
-        employers.add(new Employer(1L, "Casse", "Binh", "000123", "ide 123", LocalDate.now(), LocalDate.now()));
-        tbvEmployer.setItems(FXCollections.observableList(employers));
-
+    @PostConstruct
+    public void onPostConstruct() {
+        context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
         addButtonToTable();
         // Make TableView resize with the window. Delay the binding until the scene is available
         tbvEmployer.sceneProperty().addListener((observable, oldScene, newScene) -> {
@@ -56,6 +52,34 @@ public class HomeEmployerTableCp implements FXComponent {
             }
         });
         tbvEmployer.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
+
+    @Override
+    public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
+        return null;
+    }
+
+    @Override
+    public Node handle(Message<Event, Object> message) throws Exception {
+        if (message.getMessageBody() instanceof String) {
+            System.out.println(message.getTypedMessageBody(String.class));
+        } else if (message.getMessageBody() instanceof EmployerListResponse) {
+            EmployerListResponse listResponse = message.getTypedMessageBody(EmployerListResponse.class);
+            List<Employer> collect = listResponse.getEmployersList().stream()
+                    .map(employer -> Employer.builder()
+                            .id(employer.getId())
+                            .pensionType(employer.getPensionType())
+                            .name(employer.getName())
+                            .number(employer.getNumber())
+                            .ideNumber(employer.getIdeNumber())
+                            .createdDate(employer.getCreatedDate())
+                            .expiredDate(employer.getExpiredDate())
+                            .build())
+                    .collect(Collectors.toList());
+
+            tbvEmployer.getItems().clear();
+            tbvEmployer.setItems(FXCollections.observableList(collect));
+        }
         return null;
     }
 
