@@ -11,7 +11,13 @@ import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 import vn.elca.training.pilot_project_back.exception.handler.GrpcExceptionHandler;
 import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
-import vn.elca.training.proto.employer.*;
+import vn.elca.training.proto.employer.EmployerCreateRequest;
+import vn.elca.training.proto.employer.EmployerId;
+import vn.elca.training.proto.employer.EmployerListResponse;
+import vn.elca.training.proto.employer.EmployerResponse;
+import vn.elca.training.proto.employer.EmployerSearchRequest;
+import vn.elca.training.proto.employer.EmployerServiceGrpc;
+import vn.elca.training.proto.employer.Empty;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,6 +63,17 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
         try {
             EmployerResponseDto employer = employerService.createEmployer(employerMapper.mapCreateRequestProtoToCreateRequestDto(request));
             responseObserver.onNext(employerMapper.mapResponseDtoToResponseProto(employer));
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(GrpcExceptionHandler.handleException(e));
+        }
+    }
+
+    @Override
+    public void deleteEmployer(EmployerId request, StreamObserver<Empty> responseObserver) {
+        try {
+            employerService.deleteEmployer(request.getId());
+            responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(GrpcExceptionHandler.handleException(e));
