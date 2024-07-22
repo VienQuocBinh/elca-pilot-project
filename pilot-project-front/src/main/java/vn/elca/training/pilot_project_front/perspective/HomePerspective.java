@@ -15,7 +15,8 @@ import vn.elca.training.pilot_project_front.constant.PerspectiveId;
         name = "homePerspective",
         components = {
                 ComponentId.HOME_SEARCH_EMPLOYER_CP,
-                ComponentId.HOME_EMPLOYER_TABLE_CP
+                ComponentId.HOME_EMPLOYER_TABLE_CP,
+                ComponentId.EMPLOYER_CALLBACK_CP
         },
         viewLocation = "/fxml/homeEmployerPerspective.fxml",
         resourceBundleLocation = "bundles.languageBundle")
