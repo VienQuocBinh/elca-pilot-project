@@ -5,7 +5,9 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -20,10 +22,13 @@ import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.Employer;
+import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.proto.employer.EmployerListResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
+import vn.elca.training.proto.employer.Empty;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @DeclarativeView(id = ComponentId.HOME_EMPLOYER_TABLE_CP,
@@ -63,6 +68,9 @@ public class HomeEmployerTableCp implements FXComponent {
     public Node handle(Message<Event, Object> message) throws Exception {
         if (message.getMessageBody() instanceof String) {
             System.out.println(message.getTypedMessageBody(String.class));
+        } else if (message.getMessageBody() instanceof Empty) {
+            // Reload the employer list
+            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
         } else if (message.getMessageBody() instanceof EmployerListResponse) {
             EmployerListResponse listResponse = message.getTypedMessageBody(EmployerListResponse.class);
             List<Employer> collect = listResponse.getEmployersList().stream()
@@ -97,6 +105,10 @@ public class HomeEmployerTableCp implements FXComponent {
                 btnDelete.setOnMouseClicked(event -> {
                     Employer employer = getTableView().getItems().get(getIndex());
                     System.out.println("Button clicked for: " + employer);
+                    Optional<ButtonType> buttonType = showConfirmDialog(employer);
+                    if (buttonType.isPresent() && buttonType.get().equals(ButtonType.OK)) {
+                        context.send(ComponentId.EMPLOYER_CALLBACK_CP, employer.getId());
+                    }
                 });
                 btnDelete.getStyleClass().add("delete-button");
             }
@@ -116,4 +128,12 @@ public class HomeEmployerTableCp implements FXComponent {
         actionCol.setCellFactory(cellFactory);
     }
 
+    private Optional<ButtonType> showConfirmDialog(Employer employer) {
+        String title = ObservableResourceFactory.getProperty().getString("dialog.confirmation.delete.title");
+        String header = ObservableResourceFactory.getProperty().getString("dialog.confirmation.delete.header");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header + " \"" + employer.getName() + "\"?");
+        return alert.showAndWait();
+    }
 }
