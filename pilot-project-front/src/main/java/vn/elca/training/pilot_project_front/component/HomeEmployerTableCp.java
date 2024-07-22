@@ -22,6 +22,7 @@ import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.Employer;
+import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.proto.employer.EmployerListResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.Empty;
@@ -104,7 +105,7 @@ public class HomeEmployerTableCp implements FXComponent {
                 btnDelete.setOnMouseClicked(event -> {
                     Employer employer = getTableView().getItems().get(getIndex());
                     System.out.println("Button clicked for: " + employer);
-                    Optional<ButtonType> buttonType = showConfirmDialog();
+                    Optional<ButtonType> buttonType = showConfirmDialog(employer);
                     if (buttonType.isPresent() && buttonType.get().equals(ButtonType.OK)) {
                         context.send(ComponentId.EMPLOYER_CALLBACK_CP, employer.getId());
                     }
@@ -127,9 +128,12 @@ public class HomeEmployerTableCp implements FXComponent {
         actionCol.setCellFactory(cellFactory);
     }
 
-    private Optional<ButtonType> showConfirmDialog() {
+    private Optional<ButtonType> showConfirmDialog(Employer employer) {
+        String title = ObservableResourceFactory.getProperty().getString("dialog.confirmation.delete.title");
+        String header = ObservableResourceFactory.getProperty().getString("dialog.confirmation.delete.header");
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm deletion");
+        alert.setTitle(title);
+        alert.setHeaderText(header + " \"" + employer.getName() + "\"?");
         return alert.showAndWait();
     }
 }
