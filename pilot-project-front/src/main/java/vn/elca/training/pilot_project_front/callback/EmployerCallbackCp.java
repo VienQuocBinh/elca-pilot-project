@@ -15,9 +15,11 @@ import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.CallbackComponent;
 import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
+import vn.elca.training.proto.employer.EmployerId;
 import vn.elca.training.proto.employer.EmployerListResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.EmployerServiceGrpc;
+import vn.elca.training.proto.employer.Empty;
 
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -40,6 +42,10 @@ public class EmployerCallbackCp implements CallbackComponent {
                 EmployerListResponse employers = stub.getEmployers(message.getTypedMessageBody(EmployerSearchRequest.class));
                 context.setReturnTarget(ComponentId.HOME_EMPLOYER_TABLE_CP);
                 return employers;
+            } else if (message.getMessageBody() instanceof Long) {
+                Empty empty = stub.deleteEmployer(EmployerId.newBuilder().setId(message.getTypedMessageBody(Long.class)).build());
+                context.setReturnTarget(ComponentId.HOME_EMPLOYER_TABLE_CP);
+                return empty;
             }
         } catch (StatusRuntimeException e) {
             log.warning(e.getMessage());
