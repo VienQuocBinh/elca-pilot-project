@@ -5,6 +5,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.elca.training.pilot_project_back.constant.PensionType;
 import vn.elca.training.pilot_project_back.dto.EmployerCreateRequestDto;
 import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
 import vn.elca.training.pilot_project_back.dto.EmployerSearchRequestDto;
@@ -52,7 +53,7 @@ public class EmployerServiceImpl implements EmployerService {
         BooleanBuilder builder = new BooleanBuilder();
         QEmployer employer = QEmployer.employer;
 
-        if (searchRequest.getPensionType() != null) {
+        if (searchRequest.getPensionType() != null && !searchRequest.getPensionType().equals(PensionType.NONE)) {
             builder.and(employer.pensionType.eq(searchRequest.getPensionType()));
         }
         if (searchRequest.getName() != null && !searchRequest.getName().isEmpty()) {
