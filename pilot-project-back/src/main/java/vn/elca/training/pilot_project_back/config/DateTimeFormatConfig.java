@@ -13,6 +13,8 @@ public class DateTimeFormatConfig {
 
     @Bean
     public SimpleDateFormat simpleDateFormat() {
-        return new SimpleDateFormat(dateFormat);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+        simpleDateFormat.setLenient(false);
+        return simpleDateFormat;
     }
 }

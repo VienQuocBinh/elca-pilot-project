@@ -8,6 +8,7 @@ import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
+import vn.elca.training.pilot_project_back.exception.ValidationException;
 import vn.elca.training.pilot_project_back.exception.model.ErrorDetail;
 
 import javax.validation.ConstraintViolation;
@@ -28,8 +29,12 @@ public class GrpcExceptionHandler {
             status = Status.INVALID_ARGUMENT
                     .withDescription(buildConstraintErrors(((ConstraintViolationException) e).getConstraintViolations()))
                     .withCause(e);
+        } else if (e instanceof ValidationException) {
+            status = Status.INVALID_ARGUMENT
+                    .withDescription(((ValidationException) e).getErrorsString())
+                    .withCause(e);
         } else {
-            status = Status.UNKNOWN.withDescription("Unknown error occurred").withCause(e);
+            status = Status.UNKNOWN.withDescription(e.getMessage()).withCause(e);
         }
         log.error("Exception: {}", e.getMessage());
         return status.asRuntimeException();
