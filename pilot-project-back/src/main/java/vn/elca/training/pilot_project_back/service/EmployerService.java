@@ -13,4 +13,6 @@ public interface EmployerService {
     EmployerResponseDto getEmployerById(long id) throws EntityNotFoundException;
 
     EmployerResponseDto createEmployer(EmployerCreateRequestDto requestDto);
+
+    void deleteEmployer(long id) throws EntityNotFoundException;
 }

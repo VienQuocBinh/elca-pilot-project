@@ -50,4 +50,5 @@ service EmployerService {
   rpc GetEmployerById (EmployerId) returns (EmployerResponse) {};
   rpc GetEmployers (EmployerSearchRequest) returns (EmployerListResponse) {};
   rpc CreateEmployer (EmployerCreateRequest) returns (EmployerResponse) {};
+  rpc DeleteEmployer (EmployerId) returns (Empty) {}
 }

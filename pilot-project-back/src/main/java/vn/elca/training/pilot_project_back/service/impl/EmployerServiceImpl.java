@@ -49,6 +49,13 @@ public class EmployerServiceImpl implements EmployerService {
         return employerMapper.mapEntityToResponseDto(employer);
     }
 
+    @Override
+    public void deleteEmployer(long id) throws EntityNotFoundException {
+        Employer employer = employerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Employer.class, "id", id));
+        employerRepository.delete(employer);
+    }
+
     private BooleanBuilder buildSearchCriteria(EmployerSearchRequestDto searchRequest) {
         BooleanBuilder builder = new BooleanBuilder();
         QEmployer employer = QEmployer.employer;
