@@ -43,9 +43,22 @@ public class HomeEmployerTableCp implements FXComponent {
     private TableView<Employer> tbvEmployer;
     @FXML
     private TableColumn<Employer, Void> actionCol;
+    @FXML
+    private TableColumn<Employer, String> pensionTypeCol;
+    @FXML
+    private TableColumn<Employer, String> numberCol;
+    @FXML
+    private TableColumn<Employer, String> ideNumberCol;
+    @FXML
+    private TableColumn<Employer, String> nameCol;
+    @FXML
+    private TableColumn<Employer, String> createdDateCol;
+    @FXML
+    private TableColumn<Employer, String> expiredDateCol;
 
     @PostConstruct
     public void onPostConstruct() {
+        bindingResource();
         context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
         addButtonToTable();
         // Make TableView resize with the window. Delay the binding until the scene is available
@@ -137,5 +150,14 @@ public class HomeEmployerTableCp implements FXComponent {
         alert.setTitle(title);
         alert.setHeaderText(header + " \"" + employer.getName() + "\"?");
         return alert.showAndWait();
+    }
+
+    private void bindingResource() {
+        pensionTypeCol.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
+        numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
+        ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
+        nameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
+        createdDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
+        expiredDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
     }
 }

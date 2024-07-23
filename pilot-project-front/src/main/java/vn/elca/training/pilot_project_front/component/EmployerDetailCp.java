@@ -1,5 +1,6 @@
 package vn.elca.training.pilot_project_front.component;
 
+import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -17,12 +18,15 @@ import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
-import vn.elca.training.pilot_project_front.model.Employee;
 import vn.elca.training.pilot_project_front.model.Employer;
+import vn.elca.training.pilot_project_front.model.Salary;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.StageManager;
+import vn.elca.training.proto.employer.EmployerId;
+import vn.elca.training.proto.employer.EmployerResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
+import vn.elca.training.proto.salary.SalaryResponse;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -73,7 +77,7 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private Button btnSave;
     @FXML
-    private TableView<Employee> tbvEmployee;
+    private TableView<Salary> tbvSalary;
     @FXML
     private Label fileInput;
     @Getter
@@ -93,6 +97,26 @@ public class EmployerDetailCp implements FXComponent {
             cbPensionType.setValue(employer.getPensionType());
             dpCreateDate.setValue(LocalDate.parse(employer.getCreatedDate(), formatter));
             dpExpiredDate.setValue(LocalDate.parse(employer.getExpiredDate(), formatter));
+            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
+        } else if (message.getMessageBody() instanceof EmployerResponse) {
+            EmployerResponse employer = message.getTypedMessageBody(EmployerResponse.class);
+            List<SalaryResponse> salariesResponse = employer.getSalariesList();
+            List<Salary> salaries = salariesResponse
+                    .stream()
+                    .map(salaryResponse -> Salary.builder()
+                            .id(salaryResponse.getId())
+                            .avsNumber(salaryResponse.getAvsNumber())
+                            .firstName(salaryResponse.getFirstName())
+                            .lastName(salaryResponse.getLastName())
+                            .startDate(salaryResponse.getStartDate())
+                            .endDate(salaryResponse.getEndDate())
+                            .avsAmount(salaryResponse.getAvsAmount())
+                            .acAmount(salaryResponse.getAcAmount())
+                            .afAmount(salaryResponse.getAfAmount())
+                            .build())
+                    .collect(Collectors.toList());
+            tbvSalary.getItems().clear();
+            tbvSalary.setItems(FXCollections.observableList(salaries));
         }
         return null;
     }
@@ -140,12 +164,21 @@ public class EmployerDetailCp implements FXComponent {
                     .collect(Collectors.joining(","))).orElse(""));
             files = selectedFiles.orElse(new ArrayList<>());
         });
-        tbvEmployee.sceneProperty().addListener((observable, oldScene, newScene) -> {
+        tbvSalary.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                tbvEmployee.prefHeightProperty().bind(tbvEmployee.getScene().heightProperty());
-                tbvEmployee.prefWidthProperty().bind(tbvEmployee.getScene().widthProperty());
+                tbvSalary.prefHeightProperty().bind(tbvSalary.getScene().heightProperty());
+                tbvSalary.prefWidthProperty().bind(tbvSalary.getScene().widthProperty());
             }
         });
-        tbvEmployee.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tbvSalary.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
+
+    private void bindingResource() {
+//        pensionTypeCol.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
+//        numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
+//        ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
+//        nameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
+//        createdDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
+//        expiredDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
     }
 }

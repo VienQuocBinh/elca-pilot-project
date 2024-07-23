@@ -3,6 +3,8 @@ package vn.elca.training.pilot_project_front.model;
 import lombok.*;
 import vn.elca.training.proto.employer.PensionTypeProto;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -16,4 +18,5 @@ public class Employer {
     private String ideNumber;
     private String createdDate;
     private String expiredDate;
+    private List<Salary> salaries;
 }

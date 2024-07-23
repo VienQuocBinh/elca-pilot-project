@@ -30,36 +30,46 @@
         <Button fx:id="btnImport" text="%import"/>
     </HBox>
 
-    <TableView fx:id="tbvEmployee" GridPane.rowIndex="0" GridPane.columnIndex="0">
+    <TableView fx:id="tbvSalary" GridPane.rowIndex="0" GridPane.columnIndex="0">
         <columns>
-            <TableColumn fx:id="pensionTypeCol" text="%pensionType" prefWidth="150">
+            <TableColumn fx:id="avsNumberCol" text="%avsNumber" prefWidth="200">
                 <cellValueFactory>
-                    <PropertyValueFactory property="pensionType"/>
+                    <PropertyValueFactory property="avsNumber"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="numberCol" text="%number" prefWidth="120">
+            <TableColumn fx:id="lastNameCol" text="%employee.lastName" prefWidth="150">
                 <cellValueFactory>
-                    <PropertyValueFactory property="number"/>
+                    <PropertyValueFactory property="lastName"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="ideNumberCol" text="%ideNumber" prefWidth="150">
+            <TableColumn fx:id="firstNameCol" text="%employee.firstName" prefWidth="150">
                 <cellValueFactory>
-                    <PropertyValueFactory property="ideNumber"/>
+                    <PropertyValueFactory property="firstName"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="nameCol" text="%name" prefWidth="150">
+            <TableColumn fx:id="startDateCol" text="%startDate" prefWidth="100">
                 <cellValueFactory>
-                    <PropertyValueFactory property="name"/>
+                    <PropertyValueFactory property="startDate"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="createdDateCol" text="%createdDate" prefWidth="100">
+            <TableColumn fx:id="endDateCol" text="%endDate" prefWidth="100">
                 <cellValueFactory>
-                    <PropertyValueFactory property="createdDate"/>
+                    <PropertyValueFactory property="endDate"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="expiredDateCol" text="%expiredDate" prefWidth="100">
+            <TableColumn fx:id="avsAmountCol" text="%avs.ai.apg" prefWidth="100">
                 <cellValueFactory>
-                    <PropertyValueFactory property="expiredDate"/>
+                    <PropertyValueFactory property="avsAmount"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="acAmountCol" text="%ac" prefWidth="70">
+                <cellValueFactory>
+                    <PropertyValueFactory property="acAmount"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="afAmountCol" text="%af" prefWidth="70">
+                <cellValueFactory>
+                    <PropertyValueFactory property="afAmount"/>
                 </cellValueFactory>
             </TableColumn>
             <!--            <TableColumn fx:id="actionCol" prefWidth="200"/>-->
