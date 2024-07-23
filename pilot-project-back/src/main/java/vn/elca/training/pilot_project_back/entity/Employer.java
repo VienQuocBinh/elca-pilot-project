@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.Length;
 import vn.elca.training.pilot_project_back.constant.PensionType;
 import vn.elca.training.pilot_project_back.listener.EmployerListener;
@@ -13,6 +15,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,4 +44,7 @@ public class Employer extends BaseEntity {
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date expiredDate;
+    @OneToMany(mappedBy = "employer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Salary> salaries;
 }

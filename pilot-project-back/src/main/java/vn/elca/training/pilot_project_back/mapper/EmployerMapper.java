@@ -47,6 +47,7 @@ public abstract class EmployerMapper {
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionDtoToProto")
     @Mapping(target = "createdDate", source = "createdDate", qualifiedByName = "mapDateToString")
     @Mapping(target = "expiredDate", source = "expiredDate", qualifiedByName = "mapDateToString")
+    @Mapping(target = "salariesList", ignore = true)
     public abstract EmployerResponse mapResponseDtoToResponseProto(EmployerResponseDto employerResponseDto);
 
     @BeforeMapping

@@ -10,14 +10,9 @@ import vn.elca.training.pilot_project_back.dto.EmployerSearchRequestDto;
 import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 import vn.elca.training.pilot_project_back.exception.handler.GrpcExceptionHandler;
 import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
+import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
-import vn.elca.training.proto.employer.EmployerCreateRequest;
-import vn.elca.training.proto.employer.EmployerId;
-import vn.elca.training.proto.employer.EmployerListResponse;
-import vn.elca.training.proto.employer.EmployerResponse;
-import vn.elca.training.proto.employer.EmployerSearchRequest;
-import vn.elca.training.proto.employer.EmployerServiceGrpc;
-import vn.elca.training.proto.employer.Empty;
+import vn.elca.training.proto.employer.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,12 +23,26 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     private static final Logger log = LoggerFactory.getLogger(EmployerServiceGrpcImpl.class);
     private final EmployerService employerService;
     private final EmployerMapper employerMapper;
+    private final SalaryMapper salaryMapper;
 
     @Override
     public void getEmployerById(EmployerId request, StreamObserver<EmployerResponse> responseObserver) {
         try {
             EmployerResponseDto employerById = employerService.getEmployerById(request.getId());
-            responseObserver.onNext(employerMapper.mapResponseDtoToResponseProto(employerById));
+            // The salariesList of proto is immutable, so need to map in separate method
+            EmployerResponse employerResponse = employerMapper.mapResponseDtoToResponseProto(employerById);
+            EmployerResponse response = EmployerResponse.newBuilder()
+                    .setId(employerResponse.getId())
+                    .setCreatedDate(employerResponse.getCreatedDate())
+                    .setExpiredDate(employerResponse.getExpiredDate())
+                    .setUpdatedDate(employerResponse.getUpdatedDate())
+                    .setNumber(employerById.getNumber())
+                    .setName(employerResponse.getName())
+                    .setIdeNumber(employerResponse.getIdeNumber())
+                    .setPensionType(employerResponse.getPensionType())
+                    .addAllSalaries(salaryMapper.mapResponseDtoListToResponseProtoList(employerById.getSalaries()))
+                    .build();
+            responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (EntityNotFoundException e) {
             log.error(e.getMessage());

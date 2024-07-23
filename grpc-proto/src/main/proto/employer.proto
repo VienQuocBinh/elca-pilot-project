@@ -1,54 +1,58 @@
 syntax = "proto3";
 
+import "salary.proto";
+
+
 option java_multiple_files = true;
 option java_package = "vn.elca.training.proto.employer";
 
 enum PensionTypeProto {
-  NONE = 0;
-  REGIONAL = 1;
-  PROFESSIONAL = 2;
+    NONE = 0;
+    REGIONAL = 1;
+    PROFESSIONAL = 2;
 }
 
 message Empty {}
 
 message EmployerId {
-  uint64 id = 1;
+    uint64 id = 1;
 }
 
 message EmployerResponse {
-  uint64 id = 1;
-  string created_date = 2;
-  string updated_date = 3;
-  PensionTypeProto pension_type = 4;
-  string number = 5;
-  string name = 6;
-  string ide_number = 7;
-  string expired_date = 9;
+    uint64 id = 1;
+    string created_date = 2;
+    string updated_date = 3;
+    PensionTypeProto pension_type = 4;
+    string number = 5;
+    string name = 6;
+    string ide_number = 7;
+    string expired_date = 9;
+    repeated SalaryResponse salaries = 10;
 }
 
 message EmployerSearchRequest {
-  PensionTypeProto pension_type = 1;
-  string name = 2;
-  string number = 3;
-  string ide_number = 4;
-  string created_date = 5;
-  string expired_date = 6;
+    PensionTypeProto pension_type = 1;
+    string name = 2;
+    string number = 3;
+    string ide_number = 4;
+    string created_date = 5;
+    string expired_date = 6;
 }
 
 message EmployerListResponse {
-  repeated EmployerResponse employers = 1;
+    repeated EmployerResponse employers = 1;
 }
 
 message EmployerCreateRequest {
-  string name = 1;
-  PensionTypeProto pension_type = 2;
-  string ide_number = 3;
-  string expired_date = 4;
+    string name = 1;
+    PensionTypeProto pension_type = 2;
+    string ide_number = 3;
+    string expired_date = 4;
 }
 
 service EmployerService {
-  rpc GetEmployerById (EmployerId) returns (EmployerResponse) {};
-  rpc GetEmployers (EmployerSearchRequest) returns (EmployerListResponse) {};
-  rpc CreateEmployer (EmployerCreateRequest) returns (EmployerResponse) {};
-  rpc DeleteEmployer (EmployerId) returns (Empty) {}
+    rpc GetEmployerById (EmployerId) returns (EmployerResponse) {};
+    rpc GetEmployers (EmployerSearchRequest) returns (EmployerListResponse) {};
+    rpc CreateEmployer (EmployerCreateRequest) returns (EmployerResponse) {};
+    rpc DeleteEmployer (EmployerId) returns (Empty) {}
 }
