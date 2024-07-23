@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" spacing="10" xmlns="http://javafx.com/javafx/8"
+      fx:controller="vn.elca.training.pilot_project_front.controller.EmployerCreatePopupController"
+      styleClass="popupContainer"
+      stylesheets="@../style/styleEmployerPopup.css"
+      prefWidth="400"
+      prefHeight="500">
+    <Label fx:id="lbNumber" text="%number"/>
+    <TextField fx:id="tfNumber" prefWidth="350" disable="true"/>
+    <Label fx:id="lbName" text="%name"/>
+    <TextField fx:id="tfName"/>
+    <Label fx:id="lblNameError" styleClass="error-label" text="%error.name.required"/>
+
+    <Label fx:id="lbPensionType" text="%pensionType"/>
+    <ComboBox fx:id="cbPensionType"/>
+    <Label fx:id="lbIdeNumber" text="%ideNumber"/>
+    <TextField fx:id="tfIdeNumber"/>
+    <Label fx:id="lbCreatedDate" text="%createdDate"/>
+    <DatePicker fx:id="dpCreateDate"/>
+    <Label fx:id="lbExpiredDate" text="%expiredDate"/>
+    <DatePicker fx:id="dpExpiredDate"/>
+
+    <HBox alignment="CENTER_RIGHT" spacing="20">
+        <Button text="Save" onAction="#handleSave" prefWidth="100"/>
+        <Button text="Cancel" onAction="#handleCancel" prefWidth="100"/>
+    </HBox>
+</VBox>

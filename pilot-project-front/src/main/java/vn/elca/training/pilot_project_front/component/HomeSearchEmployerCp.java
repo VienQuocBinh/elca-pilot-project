@@ -1,9 +1,16 @@
 package vn.elca.training.pilot_project_front.component;
 
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.jacpfx.api.annotations.Resource;
 import org.jacpfx.api.annotations.component.DeclarativeView;
 import org.jacpfx.api.annotations.lifecycle.PostConstruct;
@@ -18,6 +25,8 @@ import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 @DeclarativeView(id = ComponentId.HOME_SEARCH_EMPLOYER_CP,
         name = "homeSearchEmployerCp",
@@ -26,6 +35,7 @@ import java.time.format.DateTimeFormatter;
         initialTargetLayoutId = PerspectiveId.HORIZONTAL_CONTAINER_TOP
 )
 public class HomeSearchEmployerCp implements FXComponent {
+    private static final Logger log = LoggerFactory.getLogger(HomeSearchEmployerCp.class);
     @Resource
     private Context context;
     @FXML
@@ -58,7 +68,7 @@ public class HomeSearchEmployerCp implements FXComponent {
     private Button btnAdd;
     @FXML
     private ComboBox<PensionTypeProto> cbPensionType;
-
+    private Stage stagePopup;
 
     @Override
     public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
@@ -88,6 +98,7 @@ public class HomeSearchEmployerCp implements FXComponent {
 
         btnSearch.setOnMouseClicked(event -> searchEmployers());
         btnReset.setOnMouseClicked(event -> resetSearchFields());
+        btnAdd.setOnMouseClicked(event -> showCreatePopup());
     }
 
     private void searchEmployers() {
@@ -110,5 +121,24 @@ public class HomeSearchEmployerCp implements FXComponent {
         tfIdeNumber.clear();
         dpCreateDate.setValue(null);
         dpExpiredDate.setValue(null);
+    }
+
+    private void showCreatePopup() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/employerCreatePopup.fxml"));
+            Locale locale = ObservableResourceFactory.resourceProperty().get().getLocale();
+            fxmlLoader.setResources(ResourceBundle.getBundle("bundles.languageBundle", locale));
+            Parent parent = fxmlLoader.load();
+            stagePopup = new Stage();
+            stagePopup.initModality(Modality.APPLICATION_MODAL);
+            stagePopup.setTitle("Add Employer");
+            stagePopup.setScene(new Scene(parent));
+            stagePopup.setResizable(false);
+            stagePopup.showAndWait();
+            // Reload your table view here after the popup is closed
+            System.out.println("reload");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 }
