@@ -20,7 +20,7 @@ import java.util.ResourceBundle;
         name = "workbench",
         perspectives = {
                 PerspectiveId.HOME_PERSPECTIVE,
-//                PerspectiveId.ADD_EMPLOYER_PERSPECTIVE
+                PerspectiveId.EMPLOYER_DETAIL_PERSPECTIVE
         })
 public class JacpFXWorkbench implements FXWorkbench {
     @Override

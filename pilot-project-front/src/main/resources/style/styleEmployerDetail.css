@@ -1,0 +1,17 @@
+.mainContainer {
+    -fx-padding: 30px;
+    -fx-spacing: 20px;
+}
+.lbSalDeclaration{
+    -fx-font-weight: bold;
+}
+
+.file-selector {
+    -fx-cursor: hand;
+    -fx-border-width: 1px;
+    -fx-border-color: #b6b6b6;
+    -fx-border-style: solid;
+    -fx-pref-width: 300;
+    -fx-padding: 5;
+    -fx-text-alignment: left;
+}

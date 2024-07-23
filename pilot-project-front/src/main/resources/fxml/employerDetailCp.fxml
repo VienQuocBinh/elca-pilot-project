@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:id="mainContainer"
+      xmlns="http://javafx.com/javafx"
+      spacing="10"
+      styleClass="mainContainer"
+      stylesheets="@../style/styleEmployerDetail.css">
+    <GridPane hgap="40" vgap="10">
+        <Label fx:id="lbNumber" text="%number" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="tfNumber" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="350" disable="true"/>
+        <Label fx:id="lbName" text="%name" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="tfName" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="350"/>
+        <Label fx:id="lbPensionType" text="%pensionType" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cbPensionType" GridPane.rowIndex="2" GridPane.columnIndex="1" prefWidth="350"/>
+        <Label fx:id="lbIdeNumber" text="%ideNumber" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="tfIdeNumber" GridPane.rowIndex="3" GridPane.columnIndex="1" prefWidth="350"/>
+        <Label fx:id="lbCreatedDate" text="%createdDate" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="dpCreateDate" GridPane.rowIndex="4" GridPane.columnIndex="1" prefWidth="350"/>
+        <Label fx:id="lbExpiredDate" text="%expiredDate" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="dpExpiredDate" GridPane.rowIndex="5" GridPane.columnIndex="1" prefWidth="350"/>
+    </GridPane>
+
+    <Separator/>
+    <Label fx:id="lbSalDeclaration" styleClass="lbSalDeclaration" text="%label.salary.declaration"/>
+    <HBox spacing="20">
+        <Label fx:id="fileInput" text="C:\ipension" styleClass="file-selector"/>
+        <Button fx:id="btnImport" text="%import"/>
+    </HBox>
+
+    <TableView fx:id="tbvEmployee" GridPane.rowIndex="0" GridPane.columnIndex="0">
+        <columns>
+            <TableColumn fx:id="pensionTypeCol" text="%pensionType" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="pensionType"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="numberCol" text="%number" prefWidth="120">
+                <cellValueFactory>
+                    <PropertyValueFactory property="number"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="ideNumberCol" text="%ideNumber" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="ideNumber"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="nameCol" text="%name" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="name"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="createdDateCol" text="%createdDate" prefWidth="100">
+                <cellValueFactory>
+                    <PropertyValueFactory property="createdDate"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="expiredDateCol" text="%expiredDate" prefWidth="100">
+                <cellValueFactory>
+                    <PropertyValueFactory property="expiredDate"/>
+                </cellValueFactory>
+            </TableColumn>
+            <!--            <TableColumn fx:id="actionCol" prefWidth="200"/>-->
+        </columns>
+    </TableView>
+    <HBox alignment="CENTER_RIGHT" spacing="20">
+        <Button fx:id="btnReturn" text="%return" prefWidth="100"/>
+        <Button fx:id="btnSave" text="%save" prefWidth="100"/>
+    </HBox>
+</VBox>
