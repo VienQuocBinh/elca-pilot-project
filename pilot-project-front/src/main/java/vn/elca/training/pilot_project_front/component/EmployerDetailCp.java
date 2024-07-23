@@ -79,6 +79,24 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private TableView<Salary> tbvSalary;
     @FXML
+    private TableColumn<Salary, String> avsNumberCol;
+    @FXML
+    private TableColumn<Salary, String> lastNameCol;
+    @FXML
+    private TableColumn<Salary, String> firstNameCol;
+    @FXML
+    private TableColumn<Salary, String> startDateCol;
+    @FXML
+    private TableColumn<Salary, String> endDateCol;
+    @FXML
+    private TableColumn<Salary, String> avsAmountCol;
+    @FXML
+    private TableColumn<Salary, String> acAmountCol;
+    @FXML
+    private TableColumn<Salary, String> afAmountCol;
+    @FXML
+    private Label lbSalDeclaration;
+    @FXML
     private Label fileInput;
     @Getter
     private List<File> files = new ArrayList<>();
@@ -128,16 +146,7 @@ public class EmployerDetailCp implements FXComponent {
 
     @PostConstruct
     public void onPostConstruct() {
-        lbPensionType.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
-        lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
-        lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
-        lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-        lbCreatedDate.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
-        lbExpiredDate.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
-        btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
-        btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));
-        btnImport.textProperty().bind(ObservableResourceFactory.getStringBinding("import"));
-
+        bindingResource();
         btnSave.setOnMouseClicked(event -> {
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
         });
@@ -174,11 +183,24 @@ public class EmployerDetailCp implements FXComponent {
     }
 
     private void bindingResource() {
-//        pensionTypeCol.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
-//        numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
-//        ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
-//        nameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-//        createdDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
-//        expiredDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
+        lbPensionType.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
+        lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
+        lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
+        lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
+        lbCreatedDate.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
+        lbExpiredDate.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
+        lbSalDeclaration.textProperty().bind(ObservableResourceFactory.getStringBinding("label.salary.declaration"));
+        btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
+        btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));
+        btnImport.textProperty().bind(ObservableResourceFactory.getStringBinding("import"));
+        // Table view col
+        avsNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avsNumber"));
+        lastNameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("employee.lastName"));
+        firstNameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("employee.firstName"));
+        startDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("startDate"));
+        endDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("endDate"));
+        avsAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avs.ai.apg"));
+        acAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ac"));
+        afAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("af"));
     }
 }
