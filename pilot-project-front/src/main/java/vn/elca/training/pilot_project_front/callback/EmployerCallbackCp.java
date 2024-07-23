@@ -44,6 +44,10 @@ public class EmployerCallbackCp implements CallbackComponent {
                 Empty empty = stub.deleteEmployer(EmployerId.newBuilder().setId(message.getTypedMessageBody(Long.class)).build());
                 context.setReturnTarget(ComponentId.HOME_EMPLOYER_TABLE_CP);
                 return empty;
+            } else if (message.getMessageBody() instanceof EmployerId) {
+                EmployerResponse employerById = stub.getEmployerById(message.getTypedMessageBody(EmployerId.class));
+                context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
+                return employerById;
             }
         } catch (StatusRuntimeException e) {
             log.warning(e.getMessage());

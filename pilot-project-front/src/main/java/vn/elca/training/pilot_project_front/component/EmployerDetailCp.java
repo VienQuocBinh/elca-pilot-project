@@ -1,5 +1,6 @@
 package vn.elca.training.pilot_project_front.component;
 
+import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -17,12 +18,15 @@ import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
-import vn.elca.training.pilot_project_front.model.Employee;
 import vn.elca.training.pilot_project_front.model.Employer;
+import vn.elca.training.pilot_project_front.model.Salary;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.StageManager;
+import vn.elca.training.proto.employer.EmployerId;
+import vn.elca.training.proto.employer.EmployerResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
+import vn.elca.training.proto.salary.SalaryResponse;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -73,7 +77,25 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private Button btnSave;
     @FXML
-    private TableView<Employee> tbvEmployee;
+    private TableView<Salary> tbvSalary;
+    @FXML
+    private TableColumn<Salary, String> avsNumberCol;
+    @FXML
+    private TableColumn<Salary, String> lastNameCol;
+    @FXML
+    private TableColumn<Salary, String> firstNameCol;
+    @FXML
+    private TableColumn<Salary, String> startDateCol;
+    @FXML
+    private TableColumn<Salary, String> endDateCol;
+    @FXML
+    private TableColumn<Salary, String> avsAmountCol;
+    @FXML
+    private TableColumn<Salary, String> acAmountCol;
+    @FXML
+    private TableColumn<Salary, String> afAmountCol;
+    @FXML
+    private Label lbSalDeclaration;
     @FXML
     private Label fileInput;
     @Getter
@@ -93,6 +115,26 @@ public class EmployerDetailCp implements FXComponent {
             cbPensionType.setValue(employer.getPensionType());
             dpCreateDate.setValue(LocalDate.parse(employer.getCreatedDate(), formatter));
             dpExpiredDate.setValue(LocalDate.parse(employer.getExpiredDate(), formatter));
+            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
+        } else if (message.getMessageBody() instanceof EmployerResponse) {
+            EmployerResponse employer = message.getTypedMessageBody(EmployerResponse.class);
+            List<SalaryResponse> salariesResponse = employer.getSalariesList();
+            List<Salary> salaries = salariesResponse
+                    .stream()
+                    .map(salaryResponse -> Salary.builder()
+                            .id(salaryResponse.getId())
+                            .avsNumber(salaryResponse.getAvsNumber())
+                            .firstName(salaryResponse.getFirstName())
+                            .lastName(salaryResponse.getLastName())
+                            .startDate(salaryResponse.getStartDate())
+                            .endDate(salaryResponse.getEndDate())
+                            .avsAmount(salaryResponse.getAvsAmount())
+                            .acAmount(salaryResponse.getAcAmount())
+                            .afAmount(salaryResponse.getAfAmount())
+                            .build())
+                    .collect(Collectors.toList());
+            tbvSalary.getItems().clear();
+            tbvSalary.setItems(FXCollections.observableList(salaries));
         }
         return null;
     }
@@ -104,16 +146,7 @@ public class EmployerDetailCp implements FXComponent {
 
     @PostConstruct
     public void onPostConstruct() {
-        lbPensionType.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
-        lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
-        lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
-        lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-        lbCreatedDate.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
-        lbExpiredDate.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
-        btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
-        btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));
-        btnImport.textProperty().bind(ObservableResourceFactory.getStringBinding("import"));
-
+        bindingResource();
         btnSave.setOnMouseClicked(event -> {
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
         });
@@ -140,12 +173,34 @@ public class EmployerDetailCp implements FXComponent {
                     .collect(Collectors.joining(","))).orElse(""));
             files = selectedFiles.orElse(new ArrayList<>());
         });
-        tbvEmployee.sceneProperty().addListener((observable, oldScene, newScene) -> {
+        tbvSalary.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                tbvEmployee.prefHeightProperty().bind(tbvEmployee.getScene().heightProperty());
-                tbvEmployee.prefWidthProperty().bind(tbvEmployee.getScene().widthProperty());
+                tbvSalary.prefHeightProperty().bind(tbvSalary.getScene().heightProperty());
+                tbvSalary.prefWidthProperty().bind(tbvSalary.getScene().widthProperty());
             }
         });
-        tbvEmployee.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tbvSalary.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
+
+    private void bindingResource() {
+        lbPensionType.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
+        lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
+        lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
+        lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
+        lbCreatedDate.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
+        lbExpiredDate.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
+        lbSalDeclaration.textProperty().bind(ObservableResourceFactory.getStringBinding("label.salary.declaration"));
+        btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
+        btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));
+        btnImport.textProperty().bind(ObservableResourceFactory.getStringBinding("import"));
+        // Table view col
+        avsNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avsNumber"));
+        lastNameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("employee.lastName"));
+        firstNameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("employee.firstName"));
+        startDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("startDate"));
+        endDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("endDate"));
+        avsAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avs.ai.apg"));
+        acAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ac"));
+        afAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("af"));
     }
 }
