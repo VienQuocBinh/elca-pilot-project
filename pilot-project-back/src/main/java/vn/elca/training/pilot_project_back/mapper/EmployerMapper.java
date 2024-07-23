@@ -1,6 +1,5 @@
 package vn.elca.training.pilot_project_back.mapper;
 
-import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,11 +18,9 @@ import vn.elca.training.proto.employer.EmployerResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
-@Mapper
+@Mapper(uses = {DateMapper.class})
 @Component
 public abstract class EmployerMapper {
     @Autowired
@@ -81,14 +78,4 @@ public abstract class EmployerMapper {
         }
     }
 
-    @Named("mapDateToString")
-    public String mapDateToString(Date date) {
-        return date != null ? simpleDateFormat.format(date) : "";
-    }
-
-    @Named("mapStringDateToDate")
-    public Date mapStringDateToDate(String dateString) throws ParseException {
-        if (dateString == null || StringUtils.isBlank(dateString)) return null;
-        return simpleDateFormat.parse(dateString);
-    }
 }
