@@ -15,11 +15,7 @@ import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.CallbackComponent;
 import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
-import vn.elca.training.proto.employer.EmployerId;
-import vn.elca.training.proto.employer.EmployerListResponse;
-import vn.elca.training.proto.employer.EmployerSearchRequest;
-import vn.elca.training.proto.employer.EmployerServiceGrpc;
-import vn.elca.training.proto.employer.Empty;
+import vn.elca.training.proto.employer.*;
 
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -39,10 +35,12 @@ public class EmployerCallbackCp implements CallbackComponent {
     public Object handle(Message<Event, Object> message) throws Exception {
         try {
             if (message.getMessageBody() instanceof EmployerSearchRequest) {
+                // Get list (search)
                 EmployerListResponse employers = stub.getEmployers(message.getTypedMessageBody(EmployerSearchRequest.class));
                 context.setReturnTarget(ComponentId.HOME_EMPLOYER_TABLE_CP);
                 return employers;
             } else if (message.getMessageBody() instanceof Long) {
+                // Delete
                 Empty empty = stub.deleteEmployer(EmployerId.newBuilder().setId(message.getTypedMessageBody(Long.class)).build());
                 context.setReturnTarget(ComponentId.HOME_EMPLOYER_TABLE_CP);
                 return empty;

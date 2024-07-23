@@ -10,7 +10,7 @@
       stylesheets="@../style/styleEmployerDetail.css">
     <GridPane hgap="40" vgap="10">
         <Label fx:id="lbNumber" text="%number" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="tfNumber" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="350"/>
+        <TextField fx:id="tfNumber" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="350" disable="true"/>
         <Label fx:id="lbName" text="%name" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
         <TextField fx:id="tfName" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="350"/>
         <Label fx:id="lbPensionType" text="%pensionType" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
@@ -23,8 +23,10 @@
         <DatePicker fx:id="dpExpiredDate" GridPane.rowIndex="5" GridPane.columnIndex="1" prefWidth="350"/>
     </GridPane>
 
-    <Label fx:id="lbSalDeclaration" text="%label.salary.declaration"/>
-    <HBox>
+    <Separator/>
+    <Label fx:id="lbSalDeclaration" styleClass="lbSalDeclaration" text="%label.salary.declaration"/>
+    <HBox spacing="20">
+        <Label fx:id="fileInput" text="C:\ipension" styleClass="file-selector"/>
         <Button fx:id="btnImport" text="%import"/>
     </HBox>
 
@@ -60,7 +62,7 @@
                     <PropertyValueFactory property="expiredDate"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="actionCol" prefWidth="200"/>
+            <!--            <TableColumn fx:id="actionCol" prefWidth="200"/>-->
         </columns>
     </TableView>
     <HBox alignment="CENTER_RIGHT" spacing="20">

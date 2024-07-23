@@ -71,6 +71,7 @@ public class HomeEmployerTableCp implements FXComponent {
             // Reload the employer list
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
         } else if (message.getMessageBody() instanceof EmployerListResponse) {
+            // For init table data and
             EmployerListResponse listResponse = message.getTypedMessageBody(EmployerListResponse.class);
             List<Employer> collect = listResponse.getEmployersList().stream()
                     .map(employer -> Employer.builder()
@@ -98,9 +99,10 @@ public class HomeEmployerTableCp implements FXComponent {
 
             {
                 btnDetail.setOnMouseClicked(event -> {
+                    // Switch to EmployerDetailPerspective
                     Employer employer = getTableView().getItems().get(getIndex());
                     log.info("Button clicked for: " + employer);
-                    context.send(PerspectiveId.EMPLOYER_DETAIL_PERSPECTIVE, employer.getName());
+                    context.send(PerspectiveId.EMPLOYER_DETAIL_PERSPECTIVE, employer);
                 });
                 btnDelete.setOnMouseClicked(event -> {
                     Employer employer = getTableView().getItems().get(getIndex());
