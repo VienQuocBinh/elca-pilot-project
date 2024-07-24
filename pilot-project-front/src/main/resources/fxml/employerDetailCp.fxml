@@ -10,7 +10,9 @@
       stylesheets="@../style/styleEmployerDetail.css">
     <GridPane hgap="40" vgap="10">
         <Label fx:id="lbNumber" text="%number" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="tfNumber" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="350" disable="true"/>
+        <Label fx:id="lbNumberValue" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="350"
+               style="-fx-font-weight: bold"/>
+
         <Label fx:id="lbName" text="%name" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
         <TextField fx:id="tfName" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="350"/>
         <Label fx:id="lbPensionType" text="%pensionType" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
@@ -18,9 +20,9 @@
         <Label fx:id="lbIdeNumber" text="%ideNumber" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
         <TextField fx:id="tfIdeNumber" GridPane.rowIndex="3" GridPane.columnIndex="1" prefWidth="350"/>
         <Label fx:id="lbDateCreation" text="%dateCreation" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <DatePicker fx:id="dpCreateDate" GridPane.rowIndex="4" GridPane.columnIndex="1" prefWidth="350"/>
+        <DatePicker fx:id="dpDateCreation" GridPane.rowIndex="4" GridPane.columnIndex="1" prefWidth="350"/>
         <Label fx:id="lbDateExpiration" text="%dateExpiration" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-        <DatePicker fx:id="dpExpiredDate" GridPane.rowIndex="5" GridPane.columnIndex="1" prefWidth="350"/>
+        <DatePicker fx:id="dpDateExpiration" GridPane.rowIndex="5" GridPane.columnIndex="1" prefWidth="350"/>
     </GridPane>
 
     <Separator/>

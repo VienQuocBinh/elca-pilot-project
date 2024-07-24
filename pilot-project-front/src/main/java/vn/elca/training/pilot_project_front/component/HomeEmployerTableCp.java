@@ -3,10 +3,15 @@ package vn.elca.training.pilot_project_front.component;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.jacpfx.api.annotations.Resource;
 import org.jacpfx.api.annotations.component.DeclarativeView;
@@ -17,6 +22,7 @@ import org.jacpfx.rcp.context.Context;
 import org.jacpfx.rcp.util.FXUtil;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
+import vn.elca.training.pilot_project_front.controller.EmployerCreatePopupController;
 import vn.elca.training.pilot_project_front.model.Employer;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.proto.employer.EmployerListResponse;
@@ -24,7 +30,9 @@ import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.Empty;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -36,9 +44,10 @@ import java.util.stream.Collectors;
 )
 public class HomeEmployerTableCp implements FXComponent {
     private final Logger log = Logger.getLogger(HomeEmployerTableCp.class.getName());
-
     @Resource
     private Context context;
+    @FXML
+    private Button btnAdd;
     @FXML
     private TableView<Employer> tbvEmployer;
     @FXML
@@ -55,6 +64,7 @@ public class HomeEmployerTableCp implements FXComponent {
     private TableColumn<Employer, String> dateCreationCol;
     @FXML
     private TableColumn<Employer, String> dateExpirationCol;
+    private Stage stagePopup;
 
     @PostConstruct
     public void onPostConstruct() {
@@ -153,11 +163,43 @@ public class HomeEmployerTableCp implements FXComponent {
     }
 
     private void bindingResource() {
+        btnAdd.textProperty().bind(ObservableResourceFactory.getStringBinding("add"));
         pensionTypeCol.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
         numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
         ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
         nameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
         dateCreationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
         dateExpirationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
+        btnAdd.setOnMouseClicked(event -> showCreatePopup());
+    }
+
+    private void showCreatePopup() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/employerCreatePopup.fxml"));
+            Locale locale = ObservableResourceFactory.resourceProperty().get().getLocale();
+            fxmlLoader.setResources(ResourceBundle.getBundle("bundles.languageBundle", locale));
+            Parent parent = fxmlLoader.load();
+            // Add new employer to current observable list by callback
+            EmployerCreatePopupController popupController = fxmlLoader.getController();
+            popupController.setCallback(employer -> tbvEmployer.getItems().add(Employer.builder()
+                    .id(employer.getId())
+                    .name(employer.getName())
+                    .number(employer.getNumber())
+                    .ideNumber(employer.getIdeNumber())
+                    .pensionType(employer.getPensionType())
+                    .dateCreation(employer.getDateCreation())
+                    .dateExpiration(employer.getDateExpiration())
+                    .build()));
+
+            stagePopup = new Stage();
+            stagePopup.initModality(Modality.APPLICATION_MODAL);
+            stagePopup.setTitle(ObservableResourceFactory.getProperty().getString("employer.add"));
+            stagePopup.setScene(new Scene(parent));
+//            stagePopup.setResizable(false);
+            stagePopup.showAndWait();
+
+        } catch (Exception e) {
+            log.warning(e.getMessage());
+        }
     }
 }

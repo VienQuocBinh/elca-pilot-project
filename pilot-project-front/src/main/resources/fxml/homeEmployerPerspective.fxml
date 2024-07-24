@@ -4,6 +4,6 @@
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainContainer" styleClass="mainContainer"
       stylesheets="@../style/styleHome.css">
-    <HBox fx:id="searchBox"/>
+    <HBox fx:id="searchBox" alignment="CENTER"/>
     <HBox fx:id="employerTable"/>
 </VBox>
