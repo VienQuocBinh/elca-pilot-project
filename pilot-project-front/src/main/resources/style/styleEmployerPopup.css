@@ -2,3 +2,15 @@
     -fx-padding: 30px;
     -fx-width: 400px;
 }
+.error-label {
+    -fx-text-fill: red;
+}
+.error {
+    -fx-border-color: red;
+    -fx-border-width: 1px;
+}
+
+.blankSpacing {
+    -fx-padding: 10px;
+}
+

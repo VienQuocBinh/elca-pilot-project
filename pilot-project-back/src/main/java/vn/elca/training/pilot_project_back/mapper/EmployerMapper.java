@@ -12,7 +12,7 @@ import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
 import vn.elca.training.pilot_project_back.dto.EmployerSearchRequestDto;
 import vn.elca.training.pilot_project_back.entity.Employer;
 import vn.elca.training.pilot_project_back.exception.ValidationException;
-import vn.elca.training.pilot_project_back.util.ValidationUtil;
+import vn.elca.training.pilot_project_back.service.ValidationService;
 import vn.elca.training.proto.employer.EmployerCreateRequest;
 import vn.elca.training.proto.employer.EmployerResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
@@ -26,30 +26,31 @@ public abstract class EmployerMapper {
     @Autowired
     private SimpleDateFormat simpleDateFormat;
     @Autowired
-    private ValidationUtil validationUtil;
+    private ValidationService validationService;
 
     public abstract EmployerResponseDto mapEntityToResponseDto(Employer employer);
 
     public abstract Employer mapCreateDtoToEntity(EmployerCreateRequestDto employerCreateRequestDto);
 
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionProtoToDto")
-    @Mapping(target = "expiredDate", source = "expiredDate", qualifiedByName = "mapStringDateToDate")
-    @Mapping(target = "createdDate", source = "createdDate", qualifiedByName = "mapStringDateToDate")
+    @Mapping(target = "dateExpiration", source = "dateExpiration", qualifiedByName = "mapStringDateToDate")
+    @Mapping(target = "dateCreation", source = "dateCreation", qualifiedByName = "mapStringDateToDate")
     public abstract EmployerSearchRequestDto mapSearchRequestProtoToDto(EmployerSearchRequest searchRequest) throws ValidationException;
 
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionProtoToDto")
-    @Mapping(target = "expiredDate", source = "expiredDate", qualifiedByName = "mapStringDateToDate")
+    @Mapping(target = "dateCreation", source = "dateCreation", qualifiedByName = "mapStringDateToDate")
+    @Mapping(target = "dateExpiration", source = "dateExpiration", qualifiedByName = "mapStringDateToDate")
     public abstract EmployerCreateRequestDto mapCreateRequestProtoToCreateRequestDto(EmployerCreateRequest employerCreateRequest);
 
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionDtoToProto")
-    @Mapping(target = "createdDate", source = "createdDate", qualifiedByName = "mapDateToString")
-    @Mapping(target = "expiredDate", source = "expiredDate", qualifiedByName = "mapDateToString")
+    @Mapping(target = "dateCreation", source = "dateCreation", qualifiedByName = "mapDateToString")
+    @Mapping(target = "dateExpiration", source = "dateExpiration", qualifiedByName = "mapDateToString")
     @Mapping(target = "salariesList", ignore = true)
     public abstract EmployerResponse mapResponseDtoToResponseProto(EmployerResponseDto employerResponseDto);
 
     @BeforeMapping
     protected void validate(EmployerSearchRequest employerSearchRequest) throws ValidationException {
-        validationUtil.validateEmployerSearchRequestDto(employerSearchRequest);
+        validationService.validateEmployerSearchRequestDto(employerSearchRequest);
     }
 
     @Named("pensionProtoToDto")

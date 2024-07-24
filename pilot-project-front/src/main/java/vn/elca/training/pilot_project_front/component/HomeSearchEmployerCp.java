@@ -1,7 +1,5 @@
 package vn.elca.training.pilot_project_front.component;
 
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +15,8 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
@@ -53,13 +53,13 @@ public class HomeSearchEmployerCp implements FXComponent {
     @FXML
     private TextField tfIdeNumber;
     @FXML
-    private Label lbCreatedDate;
+    private Label lbDateCreation;
     @FXML
-    private DatePicker dpCreateDate;
+    private DatePicker dpDateCreation;
     @FXML
-    private Label lbExpiredDate;
+    private Label lbDateExpiration;
     @FXML
-    private DatePicker dpExpiredDate;
+    private DatePicker dpDateExpiration;
     @FXML
     private Button btnSearch;
     @FXML
@@ -88,8 +88,8 @@ public class HomeSearchEmployerCp implements FXComponent {
         lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
         lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
         lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-        lbCreatedDate.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
-        lbExpiredDate.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
+        lbDateCreation.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
+        lbDateExpiration.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         btnSearch.textProperty().bind(ObservableResourceFactory.getStringBinding("search"));
         btnReset.textProperty().bind(ObservableResourceFactory.getStringBinding("reset"));
         btnAdd.textProperty().bind(ObservableResourceFactory.getStringBinding("add"));
@@ -108,8 +108,8 @@ public class HomeSearchEmployerCp implements FXComponent {
                 .setName(tfName.getText())
                 .setIdeNumber(tfIdeNumber.getText())
                 .setNumber(tfNumber.getText())
-                .setCreatedDate(dpCreateDate.getValue() != null ? dpCreateDate.getValue().format(dateTimeFormatter) : "")
-                .setExpiredDate(dpExpiredDate.getValue() != null ? dpExpiredDate.getValue().format(dateTimeFormatter) : "")
+                .setDateCreation(dpDateCreation.getValue() != null ? dpDateCreation.getValue().format(dateTimeFormatter) : "")
+                .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateTimeFormatter) : "")
                 .build();
         context.send(ComponentId.EMPLOYER_CALLBACK_CP, searchRequest);
     }
@@ -119,8 +119,8 @@ public class HomeSearchEmployerCp implements FXComponent {
         tfName.clear();
         tfNumber.clear();
         tfIdeNumber.clear();
-        dpCreateDate.setValue(null);
-        dpExpiredDate.setValue(null);
+        dpDateCreation.setValue(null);
+        dpDateExpiration.setValue(null);
     }
 
     private void showCreatePopup() {

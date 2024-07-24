@@ -72,15 +72,15 @@ public class EmployerServiceImpl implements EmployerService {
         if (searchRequest.getIdeNumber() != null && !searchRequest.getIdeNumber().isEmpty()) {
             builder.and(employer.ideNumber.eq(searchRequest.getIdeNumber()));
         }
-        if (searchRequest.getCreatedDate() != null) {
+        if (searchRequest.getDateCreation() != null) {
             // Compare only the date part
-            builder.and(Expressions.dateTemplate(java.util.Date.class, "date({0})", employer.createdDate)
-                    .eq(searchRequest.getCreatedDate()));
+            builder.and(Expressions.dateTemplate(java.util.Date.class, "date({0})", employer.dateCreation)
+                    .eq(searchRequest.getDateCreation()));
         }
-        if (searchRequest.getExpiredDate() != null) {
+        if (searchRequest.getDateExpiration() != null) {
             // Compare only the date part
-            builder.and(Expressions.dateTemplate(java.util.Date.class, "date({0})", employer.createdDate)
-                    .eq(searchRequest.getExpiredDate()));
+            builder.and(Expressions.dateTemplate(java.util.Date.class, "date({0})", employer.dateExpiration)
+                    .eq(searchRequest.getDateExpiration()));
         }
         return builder;
     }

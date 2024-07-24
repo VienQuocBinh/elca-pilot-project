@@ -17,7 +17,7 @@ public class EmployerResponseDto {
     private String name;
     private String number;
     private String ideNumber;
-    private Date createdDate;
-    private Date expiredDate;
+    private Date dateCreation;
+    private Date dateExpiration;
     private List<SalaryResponseDto> salaries;
 }

@@ -52,9 +52,9 @@ public class HomeEmployerTableCp implements FXComponent {
     @FXML
     private TableColumn<Employer, String> nameCol;
     @FXML
-    private TableColumn<Employer, String> createdDateCol;
+    private TableColumn<Employer, String> dateCreationCol;
     @FXML
-    private TableColumn<Employer, String> expiredDateCol;
+    private TableColumn<Employer, String> dateExpirationCol;
 
     @PostConstruct
     public void onPostConstruct() {
@@ -93,8 +93,8 @@ public class HomeEmployerTableCp implements FXComponent {
                             .name(employer.getName())
                             .number(employer.getNumber())
                             .ideNumber(employer.getIdeNumber())
-                            .createdDate(employer.getCreatedDate())
-                            .expiredDate(employer.getExpiredDate())
+                            .dateCreation(employer.getDateCreation())
+                            .dateExpiration(employer.getDateExpiration())
                             .build())
                     .collect(Collectors.toList());
 
@@ -157,7 +157,7 @@ public class HomeEmployerTableCp implements FXComponent {
         numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
         ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
         nameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-        createdDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
-        expiredDateCol.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
+        dateCreationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
+        dateExpirationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
     }
 }

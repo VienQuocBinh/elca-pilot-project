@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package proto;
+
 import "salary.proto";
 
 
@@ -20,23 +22,21 @@ message EmployerId {
 
 message EmployerResponse {
     uint64 id = 1;
-    string created_date = 2;
-    string updated_date = 3;
-    PensionTypeProto pension_type = 4;
-    string number = 5;
-    string name = 6;
-    string ide_number = 7;
-    string expired_date = 9;
-    repeated SalaryResponse salaries = 10;
+    string date_creation = 2;
+    PensionTypeProto pension_type = 3;
+    string number = 4;
+    string name = 5;
+    string ide_number = 6;
+    string date_expiration = 7;
+    repeated SalaryResponse salaries = 8;
 }
-
 message EmployerSearchRequest {
     PensionTypeProto pension_type = 1;
     string name = 2;
     string number = 3;
     string ide_number = 4;
-    string created_date = 5;
-    string expired_date = 6;
+    string date_creation = 5;
+    string date_expiration = 6;
 }
 
 message EmployerListResponse {
@@ -47,7 +47,8 @@ message EmployerCreateRequest {
     string name = 1;
     PensionTypeProto pension_type = 2;
     string ide_number = 3;
-    string expired_date = 4;
+    string date_creation = 4;
+    string date_expiration = 5;
 }
 
 service EmployerService {

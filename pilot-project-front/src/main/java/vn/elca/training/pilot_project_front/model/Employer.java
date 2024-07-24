@@ -16,7 +16,7 @@ public class Employer {
     private String name;
     private String number;
     private String ideNumber;
-    private String createdDate;
-    private String expiredDate;
+    private String dateCreation;
+    private String dateExpiration;
     private List<Salary> salaries;
 }

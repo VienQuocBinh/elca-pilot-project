@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" spacing="10" xmlns="http://javafx.com/javafx/8"
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8"
       fx:controller="vn.elca.training.pilot_project_front.controller.EmployerCreatePopupController"
       styleClass="popupContainer"
       stylesheets="@../style/styleEmployerPopup.css"
@@ -11,18 +10,27 @@
       prefHeight="500">
     <Label fx:id="lbNumber" text="%number"/>
     <TextField fx:id="tfNumber" prefWidth="350" disable="true"/>
+    <Region styleClass="blankSpacing"/>
+
     <Label fx:id="lbName" text="%name"/>
     <TextField fx:id="tfName"/>
-    <Label fx:id="lblNameError" styleClass="error-label" text="%error.name.required"/>
+    <Label fx:id="lbNameError" styleClass="error-label" visible="false"/>
 
     <Label fx:id="lbPensionType" text="%pensionType"/>
-    <ComboBox fx:id="cbPensionType"/>
+    <ComboBox fx:id="cbPensionType" prefWidth="200"/>
+    <Region styleClass="blankSpacing"/>
+
     <Label fx:id="lbIdeNumber" text="%ideNumber"/>
     <TextField fx:id="tfIdeNumber"/>
-    <Label fx:id="lbCreatedDate" text="%createdDate"/>
-    <DatePicker fx:id="dpCreateDate"/>
-    <Label fx:id="lbExpiredDate" text="%expiredDate"/>
-    <DatePicker fx:id="dpExpiredDate"/>
+    <Label fx:id="lbIdeNumberError" styleClass="error-label" visible="false"/>
+
+    <Label fx:id="lbDateCreation" text="%dateCreation"/>
+    <DatePicker fx:id="dpDateCreation" prefWidth="340"/>
+    <Region styleClass="blankSpacing"/>
+
+    <Label fx:id="lbDateExpiration" text="%dateExpiration"/>
+    <DatePicker fx:id="dpDateExpiration" prefWidth="340"/>
+    <Label fx:id="lbDateError" styleClass="error-label" visible="false"/>
 
     <HBox alignment="CENTER_RIGHT" spacing="20">
         <Button text="Save" onAction="#handleSave" prefWidth="100"/>
