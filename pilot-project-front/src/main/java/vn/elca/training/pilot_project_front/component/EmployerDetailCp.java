@@ -9,6 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.jacpfx.api.annotations.Resource;
 import org.jacpfx.api.annotations.component.DeclarativeView;
 import org.jacpfx.api.annotations.lifecycle.PostConstruct;
@@ -57,7 +58,7 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private Label lbNumber;
     @FXML
-    private TextField tfNumber;
+    private Label lbNumberValue;
     @FXML
     private Label lbIdeNumber;
     @FXML
@@ -65,11 +66,11 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private Label lbDateCreation;
     @FXML
-    private DatePicker dpCreateDate;
+    private DatePicker dpDateCreation;
     @FXML
     private Label lbDateExpiration;
     @FXML
-    private DatePicker dpExpiredDate;
+    private DatePicker dpDateExpiration;
     @FXML
     private Button btnReturn;
     @FXML
@@ -107,14 +108,15 @@ public class EmployerDetailCp implements FXComponent {
             // From EmployerDetailPerspective
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
             Employer employer = message.getTypedMessageBody(Employer.class);
-            tfNumber.setText(employer.getNumber());
+            lbNumberValue.setText(employer.getNumber());
             tfName.setText(employer.getName());
             tfIdeNumber.setText(employer.getIdeNumber());
             cbPensionType.getItems().clear();
             cbPensionType.getItems().addAll(PensionTypeProto.NONE, PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
             cbPensionType.setValue(employer.getPensionType());
-            dpCreateDate.setValue(LocalDate.parse(employer.getDateCreation(), formatter));
-            dpExpiredDate.setValue(LocalDate.parse(employer.getDateExpiration(), formatter));
+            dpDateCreation.setValue(LocalDate.parse(employer.getDateCreation(), formatter));
+            if (!StringUtils.isBlank(employer.getDateExpiration()))
+                dpDateExpiration.setValue(LocalDate.parse(employer.getDateExpiration(), formatter));
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
         } else if (message.getMessageBody() instanceof EmployerResponse) {
             EmployerResponse employer = message.getTypedMessageBody(EmployerResponse.class);
@@ -147,16 +149,13 @@ public class EmployerDetailCp implements FXComponent {
     @PostConstruct
     public void onPostConstruct() {
         bindingResource();
-        btnSave.setOnMouseClicked(event -> {
-            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
-        });
+        btnSave.setOnMouseClicked(event -> context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build()));
         btnReturn.setOnMouseClicked(event -> {
             // Set back app title
             Stage primaryStage = StageManager.getPrimaryStage();
             if (primaryStage != null) {
                 primaryStage.titleProperty().setValue(ObservableResourceFactory.getProperty().getString("title"));
             }
-            log.info(tfNumber.getText());
             context.send(PerspectiveId.HOME_PERSPECTIVE, "return");
         });
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {

@@ -12,6 +12,7 @@ import vn.elca.training.pilot_project_back.exception.handler.GrpcExceptionHandle
 import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
+import vn.elca.training.pilot_project_back.service.ValidationService;
 import vn.elca.training.proto.employer.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     private final EmployerService employerService;
     private final EmployerMapper employerMapper;
     private final SalaryMapper salaryMapper;
+    private final ValidationService validationService;
 
     @Override
     public void getEmployerById(EmployerId request, StreamObserver<EmployerResponse> responseObserver) {

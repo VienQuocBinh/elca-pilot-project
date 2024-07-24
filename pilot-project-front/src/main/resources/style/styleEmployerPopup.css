@@ -14,3 +14,7 @@
     -fx-padding: 10px;
 }
 
+.image-info {
+    -fx-cursor: hand;
+}
+

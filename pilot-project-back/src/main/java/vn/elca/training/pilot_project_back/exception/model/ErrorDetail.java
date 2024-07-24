@@ -10,4 +10,5 @@ public class ErrorDetail {
     private String field;
     private Object value;
     private String message;
+    private String fxErrorKey; // For binding error message in javaFX
 }

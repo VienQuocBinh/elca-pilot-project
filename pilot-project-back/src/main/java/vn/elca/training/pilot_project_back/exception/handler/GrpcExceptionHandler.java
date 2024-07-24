@@ -19,6 +19,9 @@ import java.util.Set;
 
 @Slf4j
 public class GrpcExceptionHandler {
+    private GrpcExceptionHandler() {
+    }
+
     public static StatusRuntimeException handleException(Exception e) {
         Status status;
         if (e instanceof EntityNotFoundException) {
@@ -31,7 +34,7 @@ public class GrpcExceptionHandler {
                     .withCause(e);
         } else if (e instanceof ValidationException) {
             status = Status.INVALID_ARGUMENT
-                    .withDescription(((ValidationException) e).getErrorsString())
+                    .withDescription(jsonStringify(((ValidationException) e).getErrors()))
                     .withCause(e);
         } else {
             status = Status.UNKNOWN.withDescription(e.getMessage()).withCause(e);
@@ -52,6 +55,16 @@ public class GrpcExceptionHandler {
                         .message(constraintViolation.getMessage())
                         .build());
             }
+            return ow.writeValueAsString(errorDetails);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String jsonStringify(List<ErrorDetail> errorDetails) {
+        try {
+            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             return ow.writeValueAsString(errorDetails);
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());

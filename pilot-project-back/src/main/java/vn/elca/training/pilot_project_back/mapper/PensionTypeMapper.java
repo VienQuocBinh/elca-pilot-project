@@ -1,11 +1,15 @@
 package vn.elca.training.pilot_project_back.mapper;
 
+import org.mapstruct.Named;
+import org.springframework.stereotype.Component;
 import vn.elca.training.pilot_project_back.constant.PensionType;
 import vn.elca.training.proto.employer.PensionTypeProto;
 
+@Component
 public class PensionTypeMapper {
-    public static PensionType mapProtoToEntity(PensionTypeProto fundTypeProto) {
-        switch (fundTypeProto) {
+    @Named("pensionProtoToDto")
+    public PensionType mapPensionTypeProtoToDto(PensionTypeProto pensionTypeProto) {
+        switch (pensionTypeProto) {
             case REGIONAL:
                 return PensionType.REGIONAL;
             case PROFESSIONAL:
@@ -16,7 +20,8 @@ public class PensionTypeMapper {
         }
     }
 
-    public static PensionTypeProto mapEntityToProto(PensionType pensionType) {
+    @Named("pensionDtoToProto")
+    public PensionTypeProto mapPensionTypeDtoToProto(PensionType pensionType) {
         switch (pensionType) {
             case REGIONAL:
                 return PensionTypeProto.REGIONAL;

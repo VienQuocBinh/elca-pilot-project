@@ -16,7 +16,6 @@ import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.repository.EmployerRepository;
 import vn.elca.training.pilot_project_back.service.EmployerService;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -44,7 +43,7 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
-    public EmployerResponseDto createEmployer(@Valid EmployerCreateRequestDto requestDto) {
+    public EmployerResponseDto createEmployer(EmployerCreateRequestDto requestDto) {
         Employer employer = employerRepository.save(employerMapper.mapCreateDtoToEntity(requestDto));
         return employerMapper.mapEntityToResponseDto(employer);
     }

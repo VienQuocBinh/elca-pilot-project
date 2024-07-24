@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.cell.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml"
-      xmlns="http://javafx.com/javafx">
+      xmlns="http://javafx.com/javafx"
+      spacing="20">
+    <HBox alignment="CENTER_RIGHT">
+        <Button fx:id="btnAdd" text="Add" prefWidth="100"/>
+    </HBox>
     <GridPane>
         <columnConstraints>
             <ColumnConstraints hgrow="ALWAYS" percentWidth="100"/>
