@@ -11,7 +11,10 @@ public class ObservableResourceFactory {
     private static final ObjectProperty<ResourceBundle> property = new SimpleObjectProperty<>();
 
     static {
-        property.set(ResourceBundle.getBundle("bundles/languageBundle", Locale.ENGLISH));
+        property.set(ResourceBundle.getBundle("bundles/languageBundle", Locale.FRENCH));
+    }
+
+    private ObservableResourceFactory() {
     }
 
     public static ObjectProperty<ResourceBundle> resourceProperty() {
