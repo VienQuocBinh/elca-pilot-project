@@ -63,11 +63,11 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private TextField tfIdeNumber;
     @FXML
-    private Label lbCreatedDate;
+    private Label lbDateCreation;
     @FXML
     private DatePicker dpCreateDate;
     @FXML
-    private Label lbExpiredDate;
+    private Label lbDateExpiration;
     @FXML
     private DatePicker dpExpiredDate;
     @FXML
@@ -113,8 +113,8 @@ public class EmployerDetailCp implements FXComponent {
             cbPensionType.getItems().clear();
             cbPensionType.getItems().addAll(PensionTypeProto.NONE, PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
             cbPensionType.setValue(employer.getPensionType());
-            dpCreateDate.setValue(LocalDate.parse(employer.getCreatedDate(), formatter));
-            dpExpiredDate.setValue(LocalDate.parse(employer.getExpiredDate(), formatter));
+            dpCreateDate.setValue(LocalDate.parse(employer.getDateCreation(), formatter));
+            dpExpiredDate.setValue(LocalDate.parse(employer.getDateExpiration(), formatter));
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
         } else if (message.getMessageBody() instanceof EmployerResponse) {
             EmployerResponse employer = message.getTypedMessageBody(EmployerResponse.class);
@@ -187,8 +187,8 @@ public class EmployerDetailCp implements FXComponent {
         lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
         lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
         lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-        lbCreatedDate.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
-        lbExpiredDate.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
+        lbDateCreation.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
+        lbDateExpiration.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         lbSalDeclaration.textProperty().bind(ObservableResourceFactory.getStringBinding("label.salary.declaration"));
         btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
         btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));

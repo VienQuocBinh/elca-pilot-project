@@ -43,7 +43,10 @@ public class Employer extends BaseEntity {
     private String ideNumber;
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
-    private Date expiredDate;
+    private Date dateCreation;
+    @NotNull
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateExpiration;
     @OneToMany(mappedBy = "employer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
     private List<Salary> salaries;

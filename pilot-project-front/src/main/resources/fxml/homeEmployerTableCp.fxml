@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.cell.PropertyValueFactory?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       xmlns="http://javafx.com/javafx">
     <GridPane>
@@ -34,14 +31,14 @@
                         <PropertyValueFactory property="name"/>
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="createdDateCol" text="%createdDate" prefWidth="100">
+                <TableColumn fx:id="dateCreationCol" text="%dateCreation" prefWidth="100">
                     <cellValueFactory>
-                        <PropertyValueFactory property="createdDate"/>
+                        <PropertyValueFactory property="dateCreation"/>
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="expiredDateCol" text="%expiredDate" prefWidth="100">
+                <TableColumn fx:id="dateExpirationCol" text="%dateExpiration" prefWidth="100">
                     <cellValueFactory>
-                        <PropertyValueFactory property="expiredDate"/>
+                        <PropertyValueFactory property="dateExpiration"/>
                     </cellValueFactory>
                 </TableColumn>
                 <TableColumn fx:id="actionCol" prefWidth="200"/>

@@ -23,5 +23,7 @@ public class EmployerCreateRequestDto {
     @Pattern(regexp = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}")
     private String ideNumber;
     @NotNull
-    private Date expiredDate;
+    private Date dateCreation;
+    @NotNull
+    private Date dateExpiration;
 }

@@ -33,9 +33,8 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
             EmployerResponse employerResponse = employerMapper.mapResponseDtoToResponseProto(employerById);
             EmployerResponse response = EmployerResponse.newBuilder()
                     .setId(employerResponse.getId())
-                    .setCreatedDate(employerResponse.getCreatedDate())
-                    .setExpiredDate(employerResponse.getExpiredDate())
-                    .setUpdatedDate(employerResponse.getUpdatedDate())
+                    .setDateCreation(employerResponse.getDateCreation())
+                    .setDateExpiration(employerResponse.getDateExpiration())
                     .setNumber(employerById.getNumber())
                     .setName(employerResponse.getName())
                     .setIdeNumber(employerResponse.getIdeNumber())

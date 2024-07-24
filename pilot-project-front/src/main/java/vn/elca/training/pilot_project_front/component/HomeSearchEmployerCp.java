@@ -2,14 +2,21 @@ package vn.elca.training.pilot_project_front.component;
 
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.jacpfx.api.annotations.Resource;
 import org.jacpfx.api.annotations.component.DeclarativeView;
 import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
@@ -18,6 +25,8 @@ import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 @DeclarativeView(id = ComponentId.HOME_SEARCH_EMPLOYER_CP,
         name = "homeSearchEmployerCp",
@@ -26,6 +35,7 @@ import java.time.format.DateTimeFormatter;
         initialTargetLayoutId = PerspectiveId.HORIZONTAL_CONTAINER_TOP
 )
 public class HomeSearchEmployerCp implements FXComponent {
+    private static final Logger log = LoggerFactory.getLogger(HomeSearchEmployerCp.class);
     @Resource
     private Context context;
     @FXML
@@ -43,13 +53,13 @@ public class HomeSearchEmployerCp implements FXComponent {
     @FXML
     private TextField tfIdeNumber;
     @FXML
-    private Label lbCreatedDate;
+    private Label lbDateCreation;
     @FXML
-    private DatePicker dpCreateDate;
+    private DatePicker dpDateCreation;
     @FXML
-    private Label lbExpiredDate;
+    private Label lbDateExpiration;
     @FXML
-    private DatePicker dpExpiredDate;
+    private DatePicker dpDateExpiration;
     @FXML
     private Button btnSearch;
     @FXML
@@ -58,7 +68,7 @@ public class HomeSearchEmployerCp implements FXComponent {
     private Button btnAdd;
     @FXML
     private ComboBox<PensionTypeProto> cbPensionType;
-
+    private Stage stagePopup;
 
     @Override
     public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
@@ -78,8 +88,8 @@ public class HomeSearchEmployerCp implements FXComponent {
         lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
         lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
         lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-        lbCreatedDate.textProperty().bind(ObservableResourceFactory.getStringBinding("createdDate"));
-        lbExpiredDate.textProperty().bind(ObservableResourceFactory.getStringBinding("expiredDate"));
+        lbDateCreation.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
+        lbDateExpiration.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         btnSearch.textProperty().bind(ObservableResourceFactory.getStringBinding("search"));
         btnReset.textProperty().bind(ObservableResourceFactory.getStringBinding("reset"));
         btnAdd.textProperty().bind(ObservableResourceFactory.getStringBinding("add"));
@@ -88,6 +98,7 @@ public class HomeSearchEmployerCp implements FXComponent {
 
         btnSearch.setOnMouseClicked(event -> searchEmployers());
         btnReset.setOnMouseClicked(event -> resetSearchFields());
+        btnAdd.setOnMouseClicked(event -> showCreatePopup());
     }
 
     private void searchEmployers() {
@@ -97,8 +108,8 @@ public class HomeSearchEmployerCp implements FXComponent {
                 .setName(tfName.getText())
                 .setIdeNumber(tfIdeNumber.getText())
                 .setNumber(tfNumber.getText())
-                .setCreatedDate(dpCreateDate.getValue() != null ? dpCreateDate.getValue().format(dateTimeFormatter) : "")
-                .setExpiredDate(dpExpiredDate.getValue() != null ? dpExpiredDate.getValue().format(dateTimeFormatter) : "")
+                .setDateCreation(dpDateCreation.getValue() != null ? dpDateCreation.getValue().format(dateTimeFormatter) : "")
+                .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateTimeFormatter) : "")
                 .build();
         context.send(ComponentId.EMPLOYER_CALLBACK_CP, searchRequest);
     }
@@ -108,7 +119,26 @@ public class HomeSearchEmployerCp implements FXComponent {
         tfName.clear();
         tfNumber.clear();
         tfIdeNumber.clear();
-        dpCreateDate.setValue(null);
-        dpExpiredDate.setValue(null);
+        dpDateCreation.setValue(null);
+        dpDateExpiration.setValue(null);
+    }
+
+    private void showCreatePopup() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/employerCreatePopup.fxml"));
+            Locale locale = ObservableResourceFactory.resourceProperty().get().getLocale();
+            fxmlLoader.setResources(ResourceBundle.getBundle("bundles.languageBundle", locale));
+            Parent parent = fxmlLoader.load();
+            stagePopup = new Stage();
+            stagePopup.initModality(Modality.APPLICATION_MODAL);
+            stagePopup.setTitle("Add Employer");
+            stagePopup.setScene(new Scene(parent));
+            stagePopup.setResizable(false);
+            stagePopup.showAndWait();
+            // Reload your table view here after the popup is closed
+            System.out.println("reload");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 }

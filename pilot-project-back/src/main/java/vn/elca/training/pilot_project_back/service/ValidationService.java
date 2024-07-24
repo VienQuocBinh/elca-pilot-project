@@ -1,4 +1,4 @@
-package vn.elca.training.pilot_project_back.util;
+package vn.elca.training.pilot_project_back.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
-public class ValidationUtil {
+public class ValidationService {
     private final SimpleDateFormat simpleDateFormat;
 
     public void validateEmployerSearchRequestDto(EmployerSearchRequest searchRequestDto) throws ValidationException {
@@ -24,15 +24,15 @@ public class ValidationUtil {
         if (!ideNumber.isEmpty() && !Pattern.matches(pattern, ideNumber)) {
             errors.add("Invalid ideNumber format: " + ideNumber);
         }
-        // Validate createdDate
-        String createdDate = searchRequestDto.getCreatedDate();
-        if (!createdDate.isEmpty() && isValidDate(createdDate)) {
-            errors.add("Invalid date format for createdDate: " + createdDate);
+        // Validate dateCreation
+        String dateCreation = searchRequestDto.getDateCreation();
+        if (!dateCreation.isEmpty() && isValidDate(dateCreation)) {
+            errors.add("Invalid date format for creation date: " + dateCreation);
         }
-        // Validate expiredDate
-        String expiredDate = searchRequestDto.getExpiredDate();
-        if (!expiredDate.isEmpty() && isValidDate(expiredDate)) {
-            errors.add("Invalid date format for expiredDate: " + expiredDate);
+        // Validate dateExpiration
+        String dateExpiration = searchRequestDto.getDateExpiration();
+        if (!dateExpiration.isEmpty() && isValidDate(dateExpiration)) {
+            errors.add("Invalid date format for expiration date: " + dateExpiration);
         }
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
