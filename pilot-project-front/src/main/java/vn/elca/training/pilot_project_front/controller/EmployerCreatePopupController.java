@@ -61,7 +61,9 @@ public class EmployerCreatePopupController implements Initializable {
     @FXML
     private DatePicker dpDateExpiration;
     @FXML
-    private Label lbDateError;
+    private Label lbDateOrderError;
+    //    @FXML
+//    private Label lbDateOrderError;
     @FXML
     private ImageView infoName;
     @FXML
@@ -200,13 +202,13 @@ public class EmployerCreatePopupController implements Initializable {
             if (!dpDateCreation.getValue().isBefore(dpDateExpiration.getValue())) {
                 dpDateCreation.getStyleClass().add(errorStyleClass);
                 dpDateExpiration.getStyleClass().add(errorStyleClass);
-                lbDateError.setText(resourceBundle.getString("error.dateOrder"));
-                lbDateError.setVisible(true);
+                lbDateOrderError.setText(resourceBundle.getString("error.dateOrder"));
+                lbDateOrderError.setVisible(true);
                 isValid = false;
             } else {
                 dpDateCreation.getStyleClass().remove(errorStyleClass);
                 dpDateExpiration.getStyleClass().remove(errorStyleClass);
-                lbDateError.setVisible(false);
+                lbDateOrderError.setVisible(false);
             }
         }
         return isValid;
@@ -222,7 +224,7 @@ public class EmployerCreatePopupController implements Initializable {
         dpDateCreation.getStyleClass().remove(errorStyleClass);
         lbDateCreationError.setVisible(false);
         dpDateExpiration.getStyleClass().remove(errorStyleClass);
-        lbDateError.setVisible(false);
+        lbDateOrderError.setVisible(false);
 
         for (ErrorDetail errorDetail : errorDetails) {
             switch (errorDetail.getFxErrorKey()) {
@@ -244,11 +246,16 @@ public class EmployerCreatePopupController implements Initializable {
                     lbDateCreationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     lbDateCreationError.setVisible(true);
                     break;
+                case "error.dateExpiration.format":
+                    dpDateExpiration.getStyleClass().add(errorStyleClass);
+                    lbDateOrderError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    lbDateOrderError.setVisible(true);
+                    break;
                 case "error.dateOrder":
                     dpDateCreation.getStyleClass().add(errorStyleClass);
                     dpDateExpiration.getStyleClass().add(errorStyleClass);
-                    lbDateError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
-                    lbDateError.setVisible(true);
+                    lbDateOrderError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    lbDateOrderError.setVisible(true);
                     break;
                 default:
                     break;

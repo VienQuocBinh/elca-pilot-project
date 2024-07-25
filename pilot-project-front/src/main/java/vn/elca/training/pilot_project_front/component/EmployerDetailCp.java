@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 @DeclarativeView(id = ComponentId.EMPLOYER_DETAIL_CP,
@@ -258,6 +259,7 @@ public class EmployerDetailCp implements FXComponent {
 
     private void showErrorDetails(List<ErrorDetail> errorDetails) {
         String errorStyleClass = "error";
+        ResourceBundle resourceBundle = ObservableResourceFactory.getProperty();
         tfName.getStyleClass().remove(errorStyleClass);
         lbNameError.setVisible(false);
         tfIdeNumber.getStyleClass().remove(errorStyleClass);
@@ -268,15 +270,21 @@ public class EmployerDetailCp implements FXComponent {
 
         for (ErrorDetail errorDetail : errorDetails) {
             switch (errorDetail.getFxErrorKey()) {
+                case "error.name.required":
+                    tfName.getStyleClass().add(errorStyleClass);
+                    lbNameError.setVisible(true);
+                    lbNameError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    break;
+                case "error.ideNumber.required":
                 case "error.ideNumber.format":
                 case "error.ideNumber.duplicate":
                     tfIdeNumber.getStyleClass().add(errorStyleClass);
                     lbIdeNumberError.setVisible(true);
-                    lbIdeNumberError.setText(ObservableResourceFactory.getProperty().getString(errorDetail.getFxErrorKey()));
+                    lbIdeNumberError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     break;
                 case "error.dateExpiration.format":
                     dpDateExpiration.getStyleClass().add(errorStyleClass);
-                    lbDateExpirationError.setText(ObservableResourceFactory.getProperty().getString(errorDetail.getFxErrorKey()));
+                    lbDateExpirationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     lbDateExpirationError.setVisible(true);
                     break;
                 // TODO: error create date required
@@ -286,7 +294,7 @@ public class EmployerDetailCp implements FXComponent {
                 case "error.dateOrder":
                     dpDateCreation.getStyleClass().add(errorStyleClass);
                     dpDateExpiration.getStyleClass().add(errorStyleClass);
-                    lbDateExpirationError.setText(ObservableResourceFactory.getProperty().getString(errorDetail.getFxErrorKey()));
+                    lbDateExpirationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     lbDateExpirationError.setVisible(true);
                     break;
                 default:
