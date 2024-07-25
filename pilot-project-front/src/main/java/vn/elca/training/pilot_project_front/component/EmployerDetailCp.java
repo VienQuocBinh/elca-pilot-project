@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
         initialTargetLayoutId = PerspectiveId.EMPLOYER_DETAIL_PERSPECTIVE,
         resourceBundleLocation = "bundles.languageBundle")
 public class EmployerDetailCp implements FXComponent {
+    private static final String ERROR_STYLE_CLASS = "error";
     @Resource
     private Context context;
     @FXML
@@ -151,7 +152,7 @@ public class EmployerDetailCp implements FXComponent {
                 showSuccessAlert("Update employer", "Update employer successfully");
             }
         } else if (message.getMessageBody() instanceof ExceptionMessage) {
-            // From Employer Callback catch
+            // From EmployerCallbackCp catch
             String errorMessage = message.getTypedMessageBody(ExceptionMessage.class).getErrorMessage();
             showErrorDetails(JsonStringify.convertStringErrorDetailToList(errorMessage));
         }
@@ -167,29 +168,31 @@ public class EmployerDetailCp implements FXComponent {
     public void onPostConstruct() {
         bindingResource();
         btnSave.setOnMouseClicked(event -> {
-            // Just send imported salaries to save to db
-            List<SalaryCreateRequest> salaryCreateRequests = importedSalaries.stream()
-                    .map(salary -> SalaryCreateRequest.newBuilder()
-                            .setFirstName(salary.getFirstName())
-                            .setLastName(salary.getLastName())
-                            .setAvsNumber(salary.getAvsNumber())
-                            .setStartDate(salary.getStartDate())
-                            .setEndDate(salary.getEndDate())
-                            .setAvsAmount(salary.getAvsAmount())
-                            .setAcAmount(salary.getAcAmount())
-                            .setAfAmount(salary.getAfAmount())
-                            .build())
-                    .collect(Collectors.toList());
-            DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
-            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerUpdateRequest.newBuilder()
-                    .setId(employer.getId())
-                    .setName(tfName.getText())
-                    .setDateCreation(dpDateCreation.getValue().format(dateFormater))
-                    .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateFormater) : "")
-                    .setIdeNumber(tfIdeNumber.getText())
-                    .setPensionType(cbPensionType.getSelectionModel().getSelectedItem())
-                    .addAllSalaries(salaryCreateRequests)
-                    .build());
+            if (validateInputs()) {
+                // Just send imported salaries to save to db
+                List<SalaryCreateRequest> salaryCreateRequests = importedSalaries.stream()
+                        .map(salary -> SalaryCreateRequest.newBuilder()
+                                .setFirstName(salary.getFirstName())
+                                .setLastName(salary.getLastName())
+                                .setAvsNumber(salary.getAvsNumber())
+                                .setStartDate(salary.getStartDate())
+                                .setEndDate(salary.getEndDate())
+                                .setAvsAmount(salary.getAvsAmount())
+                                .setAcAmount(salary.getAcAmount())
+                                .setAfAmount(salary.getAfAmount())
+                                .build())
+                        .collect(Collectors.toList());
+                DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
+                context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerUpdateRequest.newBuilder()
+                        .setId(employer.getId())
+                        .setName(tfName.getText())
+                        .setDateCreation(dpDateCreation.getValue().format(dateFormater))
+                        .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateFormater) : "")
+                        .setIdeNumber(tfIdeNumber.getText())
+                        .setPensionType(cbPensionType.getSelectionModel().getSelectedItem())
+                        .addAllSalaries(salaryCreateRequests)
+                        .build());
+            }
         });
         btnReturn.setOnMouseClicked(event -> {
             // Set back app title
@@ -200,8 +203,7 @@ public class EmployerDetailCp implements FXComponent {
             context.send(PerspectiveId.HOME_PERSPECTIVE, ActionType.RETURN);
         });
         btnImport.setOnMouseClicked(e -> {
-            ValidationUtil validationUtil = new ValidationUtil();
-            List<FileError> errors = validationUtil.validateSalaryFile(file);
+            List<FileError> errors = ValidationUtil.validateSalaryFile(file);
             if (errors.isEmpty()) {
                 importedSalaries = FileUtil.processSalaryCsvFiles(file);
                 tbvSalary.getItems().addAll(importedSalaries);
@@ -256,38 +258,72 @@ public class EmployerDetailCp implements FXComponent {
         afAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("af"));
     }
 
+    // Validate on UI layer
+    private boolean validateInputs() {
+        String regex = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}$";
+        ResourceBundle resourceBundle = ObservableResourceFactory.getProperty();
+        boolean isValid = true;
+        if (tfName.getText().isEmpty()) {
+            tfName.getStyleClass().add(ERROR_STYLE_CLASS);
+            lbNameError.setVisible(true);
+            lbNameError.setText(resourceBundle.getString("error.name.required"));
+            isValid = false;
+        } else {
+            tfName.getStyleClass().remove(ERROR_STYLE_CLASS);
+            lbNameError.setVisible(false);
+        }
+        if (tfIdeNumber.getText().isEmpty()) {
+            tfIdeNumber.getStyleClass().add(ERROR_STYLE_CLASS);
+            lbIdeNumberError.setVisible(true);
+            lbIdeNumberError.setText(resourceBundle.getString("error.ideNumber.required"));
+            isValid = false;
+        } else if (!tfIdeNumber.getText().matches(regex)) {
+            tfIdeNumber.getStyleClass().add(ERROR_STYLE_CLASS);
+            lbIdeNumberError.setVisible(true);
+            lbIdeNumberError.setText(resourceBundle.getString("error.ideNumber.format"));
+            isValid = false;
+        } else {
+            tfIdeNumber.getStyleClass().remove(ERROR_STYLE_CLASS);
+            lbIdeNumberError.setVisible(false);
+        }
+        ValidationUtil.validateDateFields(dpDateCreation, dpDateExpiration,
+                lbDateCreationError, lbDateExpirationError,
+                ERROR_STYLE_CLASS, resourceBundle);
+        return isValid;
+    }
+
+    // Show errors thrown from BE and catch at FE Callback
     private void showErrorDetails(List<ErrorDetail> errorDetails) {
-        String errorStyleClass = "error";
         ResourceBundle resourceBundle = ObservableResourceFactory.getProperty();
         clearErrors();
         for (ErrorDetail errorDetail : errorDetails) {
             switch (errorDetail.getFxErrorKey()) {
                 case "error.name.required":
-                    tfName.getStyleClass().add(errorStyleClass);
+                    tfName.getStyleClass().add(ERROR_STYLE_CLASS);
                     lbNameError.setVisible(true);
                     lbNameError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     break;
                 case "error.ideNumber.required":
                 case "error.ideNumber.format":
                 case "error.ideNumber.duplicate":
-                    tfIdeNumber.getStyleClass().add(errorStyleClass);
+                    tfIdeNumber.getStyleClass().add(ERROR_STYLE_CLASS);
                     lbIdeNumberError.setVisible(true);
                     lbIdeNumberError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     break;
                 case "error.dateCreation.format":
                 case "error.dateCreation.required":
-                    dpDateCreation.getStyleClass().add(errorStyleClass);
+                    dpDateCreation.getStyleClass().add(ERROR_STYLE_CLASS);
                     lbDateCreationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     lbDateCreationError.setVisible(true);
                     break;
                 case "error.dateExpiration.format":
-                    dpDateExpiration.getStyleClass().add(errorStyleClass);
+                    dpDateExpiration.getStyleClass().add(ERROR_STYLE_CLASS);
                     lbDateExpirationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     lbDateExpirationError.setVisible(true);
                     break;
                 case "error.dateOrder":
-                    dpDateCreation.getStyleClass().add(errorStyleClass);
-                    dpDateExpiration.getStyleClass().add(errorStyleClass);
+                    dpDateCreation.getStyleClass().add(ERROR_STYLE_CLASS);
+                    dpDateExpiration.getStyleClass().add(ERROR_STYLE_CLASS);
                     lbDateExpirationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     lbDateExpirationError.setVisible(true);
                     break;
@@ -317,13 +353,12 @@ public class EmployerDetailCp implements FXComponent {
     }
 
     private void clearErrors() {
-        String errorStyleClass = "error";
-        tfName.getStyleClass().remove(errorStyleClass);
+        tfName.getStyleClass().remove(ERROR_STYLE_CLASS);
         lbNameError.setVisible(false);
-        tfIdeNumber.getStyleClass().remove(errorStyleClass);
+        tfIdeNumber.getStyleClass().remove(ERROR_STYLE_CLASS);
         lbIdeNumberError.setVisible(false);
-        dpDateCreation.getStyleClass().remove(errorStyleClass);
-        dpDateExpiration.getStyleClass().remove(errorStyleClass);
+        dpDateCreation.getStyleClass().remove(ERROR_STYLE_CLASS);
+        dpDateExpiration.getStyleClass().remove(ERROR_STYLE_CLASS);
         lbDateExpirationError.setVisible(false);
     }
 }
