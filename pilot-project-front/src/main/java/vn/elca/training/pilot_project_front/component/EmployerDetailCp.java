@@ -22,10 +22,12 @@ import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.Employer;
 import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
+import vn.elca.training.pilot_project_front.model.FileError;
 import vn.elca.training.pilot_project_front.model.Salary;
 import vn.elca.training.pilot_project_front.util.FileUtil;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.StageManager;
+import vn.elca.training.pilot_project_front.util.ValidationUtil;
 import vn.elca.training.proto.employer.EmployerId;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
@@ -190,9 +192,17 @@ public class EmployerDetailCp implements FXComponent {
             context.send(PerspectiveId.HOME_PERSPECTIVE, ActionType.RETURN);
         });
         btnImport.setOnMouseClicked(e -> {
-            importedSalaries = FileUtil.processSalaryCsvFiles(file);
-            tbvSalary.getItems().addAll(importedSalaries);
-            showSuccessAlert("Import salary dialog", "Import successfully");
+            ValidationUtil validationUtil = new ValidationUtil();
+            List<FileError> errors = validationUtil.validateSalaryFile(file);
+            if (errors.isEmpty()) {
+                importedSalaries = FileUtil.processSalaryCsvFiles(file);
+                tbvSalary.getItems().addAll(importedSalaries);
+                showSuccessAlert("Import salary success dialog", "Import successfully");
+            } else {
+                showWarningAlert("Import salary warning dialog", "Import fail", errors);
+            }
+
+
         });
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             FileChooser fileChooser = new FileChooser();
@@ -244,6 +254,18 @@ public class EmployerDetailCp implements FXComponent {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
+        alert.show();
+    }
+
+    private void showWarningAlert(String title, String headerText, List<FileError> fileErrors) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        List<String> errorMessages = fileErrors.stream()
+                .map(e -> "At line " + e.getLineNumber() + ": " + e.getErrorMessage() + " value: " + e.getErrorValue())
+                .collect(Collectors.toList());
+
+        alert.setContentText(String.join("\n", errorMessages));
         alert.show();
     }
 }
