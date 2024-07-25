@@ -10,13 +10,13 @@
       prefWidth="400"
       prefHeight="500">
     <HBox spacing="5" alignment="CENTER_LEFT">
-        <Label fx:id="lbNumber" text="%number"/>
+        <Label fx:id="lbNumber" text="%number.required"/>
         <ImageView fx:id="infoNumber" pickOnBounds="true" fitWidth="16" fitHeight="16" styleClass="image-info"/>
     </HBox>
     <TextField fx:id="tfNumber" prefWidth="350" disable="true"/>
     <Region styleClass="blankSpacing"/>
     <HBox spacing="5" alignment="CENTER_LEFT">
-        <Label fx:id="lbName" text="%name"/>
+        <Label fx:id="lbName" text="%name.required"/>
         <ImageView fx:id="infoName" pickOnBounds="true" fitWidth="16" fitHeight="16" styleClass="image-info"/>
     </HBox>
     <TextField fx:id="tfName"/>
@@ -27,13 +27,13 @@
     <Region styleClass="blankSpacing"/>
 
     <HBox spacing="5" alignment="CENTER_LEFT">
-        <Label fx:id="lbIdeNumber" text="%ideNumber"/>
+        <Label fx:id="lbIdeNumber" text="%ideNumber.required"/>
         <ImageView fx:id="infoIdeNumber" pickOnBounds="true" fitWidth="16" fitHeight="16" styleClass="image-info"/>
     </HBox>
     <TextField fx:id="tfIdeNumber"/>
     <Label fx:id="lbIdeNumberError" styleClass="error-label" visible="false"/>
 
-    <Label fx:id="lbDateCreation" text="%dateCreation"/>
+    <Label fx:id="lbDateCreation" text="%dateCreation.required"/>
     <DatePicker fx:id="dpDateCreation" prefWidth="340"/>
     <Label fx:id="lbDateCreationError" styleClass="error-label" visible="false"/>
 

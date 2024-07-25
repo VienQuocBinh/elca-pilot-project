@@ -30,8 +30,8 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public void validateEmployerCreateRequestProto(EmployerCreateRequest createRequest) throws ValidationException {
         List<ErrorDetail> errorDetails = new ArrayList<>();
-        String ideNumberField = "ideNumber";
-        String dateCreationField = "dateCreation";
+        String ideNumberField = "ideNumber.required";
+        String dateCreationField = "dateCreation.required";
         String dateExpirationField = "dateExpiration";
         // Validate ideNumber
         String ideNumber = createRequest.getIdeNumber();
@@ -118,8 +118,8 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public void validateEmployerUpdateRequestProto(EmployerUpdateRequest updateRequest) throws ValidationException {
         List<ErrorDetail> errorDetails = new ArrayList<>();
-        String ideNumberField = "ideNumber";
-        String dateCreationField = "dateCreation";
+        String ideNumberField = "ideNumber.required";
+        String dateCreationField = "dateCreation.required";
         String dateExpirationField = "dateExpiration";
         // Validate ideNumber
         String ideNumber = updateRequest.getIdeNumber();

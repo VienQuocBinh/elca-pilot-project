@@ -201,8 +201,6 @@ public class EmployerDetailCp implements FXComponent {
             } else {
                 showWarningAlert("Import salary warning dialog", "Import fail", errors);
             }
-
-
         });
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             FileChooser fileChooser = new FileChooser();
@@ -231,9 +229,9 @@ public class EmployerDetailCp implements FXComponent {
     private void bindingResource() {
         lbPensionType.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
         lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
-        lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
-        lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-        lbDateCreation.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
+        lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber.required"));
+        lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name.required"));
+        lbDateCreation.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation.required"));
         lbDateExpiration.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         lbSalDeclaration.textProperty().bind(ObservableResourceFactory.getStringBinding("label.salary.declaration"));
         btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));

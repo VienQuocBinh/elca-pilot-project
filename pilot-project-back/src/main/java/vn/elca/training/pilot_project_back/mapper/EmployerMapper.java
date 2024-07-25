@@ -29,22 +29,22 @@ public abstract class EmployerMapper {
 
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionProtoToDto")
     @Mapping(target = "dateExpiration", source = "dateExpiration", qualifiedByName = "mapStringDateToDate")
-    @Mapping(target = "dateCreation", source = "dateCreation", qualifiedByName = "mapStringDateToDate")
+    @Mapping(target = "dateCreation.required", source = "dateCreation.required", qualifiedByName = "mapStringDateToDate")
     public abstract EmployerSearchRequestDto mapSearchRequestProtoToDto(EmployerSearchRequest searchRequest);
 
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionProtoToDto")
-    @Mapping(target = "dateCreation", source = "dateCreation", qualifiedByName = "mapStringDateToDate")
+    @Mapping(target = "dateCreation.required", source = "dateCreation.required", qualifiedByName = "mapStringDateToDate")
     @Mapping(target = "dateExpiration", source = "dateExpiration", qualifiedByName = "mapStringDateToDate")
     public abstract EmployerCreateRequestDto mapCreateRequestProtoToCreateRequestDto(EmployerCreateRequest employerCreateRequest) throws ValidationException;
 
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionDtoToProto")
-    @Mapping(target = "dateCreation", source = "dateCreation", qualifiedByName = "mapDateToString")
+    @Mapping(target = "dateCreation.required", source = "dateCreation.required", qualifiedByName = "mapDateToString")
     @Mapping(target = "dateExpiration", source = "dateExpiration", qualifiedByName = "mapDateToString")
     @Mapping(target = "salariesList", ignore = true)
     public abstract EmployerResponse mapResponseDtoToResponseProto(EmployerResponseDto employerResponseDto);
 
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionProtoToDto")
-    @Mapping(target = "dateCreation", source = "dateCreation", qualifiedByName = "mapStringDateToDate")
+    @Mapping(target = "dateCreation.required", source = "dateCreation.required", qualifiedByName = "mapStringDateToDate")
     @Mapping(target = "dateExpiration", source = "dateExpiration", qualifiedByName = "mapStringDateToDate")
     @Mapping(target = "salaries", ignore = true)
     public abstract EmployerUpdateRequestDto mapUpdateRequestProtoToCreateRequestDto(EmployerUpdateRequest employerUpdateRequest) throws ValidationException;
