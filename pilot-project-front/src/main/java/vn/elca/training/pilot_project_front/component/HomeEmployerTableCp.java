@@ -19,7 +19,6 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
-import org.jacpfx.rcp.util.FXUtil;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.controller.EmployerCreatePopupController;
@@ -87,9 +86,7 @@ public class HomeEmployerTableCp implements FXComponent {
 
     @Override
     public Node handle(Message<Event, Object> message) throws Exception {
-        if (message.getMessageBody() instanceof String && !message.messageBodyEquals(FXUtil.MessageUtil.INIT)) {
-            log.info(message.getTypedMessageBody(String.class));
-        } else if (message.getMessageBody() instanceof Empty) {
+        if (message.getMessageBody() instanceof Empty) {
             // Reload the employer list
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
         } else if (message.getMessageBody() instanceof EmployerListResponse) {
@@ -194,7 +191,7 @@ public class HomeEmployerTableCp implements FXComponent {
             stagePopup.initModality(Modality.APPLICATION_MODAL);
             stagePopup.setTitle(ObservableResourceFactory.getProperty().getString("employer.add"));
             stagePopup.setScene(new Scene(parent));
-//            stagePopup.setResizable(false);
+            stagePopup.setResizable(false);
             stagePopup.showAndWait();
 
         } catch (Exception e) {

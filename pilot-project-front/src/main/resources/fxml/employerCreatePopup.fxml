@@ -7,13 +7,13 @@
       fx:controller="vn.elca.training.pilot_project_front.controller.EmployerCreatePopupController"
       styleClass="popupContainer"
       stylesheets="@../style/styleEmployerPopup.css"
-      prefWidth="400"
+      prefWidth="580"
       prefHeight="500">
     <HBox spacing="5" alignment="CENTER_LEFT">
         <Label fx:id="lbNumber" text="%number.required"/>
         <ImageView fx:id="infoNumber" pickOnBounds="true" fitWidth="16" fitHeight="16" styleClass="image-info"/>
     </HBox>
-    <TextField fx:id="tfNumber" prefWidth="350" disable="true"/>
+    <TextField fx:id="tfNumber" disable="true"/>
     <Region styleClass="blankSpacing"/>
     <HBox spacing="5" alignment="CENTER_LEFT">
         <Label fx:id="lbName" text="%name.required"/>
@@ -33,14 +33,20 @@
     <TextField fx:id="tfIdeNumber"/>
     <Label fx:id="lbIdeNumberError" styleClass="error-label" visible="false"/>
 
-    <Label fx:id="lbDateCreation" text="%dateCreation.required"/>
-    <DatePicker fx:id="dpDateCreation" prefWidth="340"/>
-    <Label fx:id="lbDateCreationError" styleClass="error-label" visible="false"/>
-
-
-    <Label fx:id="lbDateExpiration" text="%dateExpiration"/>
-    <DatePicker fx:id="dpDateExpiration" prefWidth="340"/>
-    <Label fx:id="lbDateOrderError" styleClass="error-label" visible="false"/>
+    <VBox>
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <VBox>
+                <Label fx:id="lbDateCreation" text="%dateCreation.required"/>
+                <DatePicker fx:id="dpDateCreation" prefWidth="340"/>
+            </VBox>
+            <VBox>
+                <Label fx:id="lbDateExpiration" text="%dateExpiration"/>
+                <DatePicker fx:id="dpDateExpiration" prefWidth="340"/>
+            </VBox>
+        </HBox>
+        <Label fx:id="lbDateCreationError" styleClass="error-label" visible="false"/>
+        <Label fx:id="lbDateOrderError" styleClass="error-label" visible="false"/>
+    </VBox>
 
     <HBox alignment="CENTER_RIGHT" spacing="20">
         <Button text="Save" onAction="#handleSave" prefWidth="100"/>
