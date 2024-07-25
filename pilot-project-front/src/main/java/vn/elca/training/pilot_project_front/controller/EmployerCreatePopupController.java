@@ -159,7 +159,7 @@ public class EmployerCreatePopupController implements Initializable {
         Tooltip.install(infoIdeNumber, new Tooltip(resourceBundle.getString("tooltip.ideNumber")));
     }
 
-    // Validate onn UI layer
+    // Validate on UI layer
     private boolean validateInputs() {
         String errorStyleClass = "error";
         String regex = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}$";
@@ -220,16 +220,29 @@ public class EmployerCreatePopupController implements Initializable {
         tfIdeNumber.getStyleClass().remove(errorStyleClass);
         lbIdeNumberError.setVisible(false);
         dpDateCreation.getStyleClass().remove(errorStyleClass);
+        lbDateCreationError.setVisible(false);
         dpDateExpiration.getStyleClass().remove(errorStyleClass);
         lbDateError.setVisible(false);
 
         for (ErrorDetail errorDetail : errorDetails) {
             switch (errorDetail.getFxErrorKey()) {
+                case "error.name.required":
+                    tfName.getStyleClass().add(errorStyleClass);
+                    lbNameError.setVisible(true);
+                    lbNameError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    break;
+                case "error.ideNumber.required":
                 case "error.ideNumber.format":
                 case "error.ideNumber.duplicate":
                     tfIdeNumber.getStyleClass().add(errorStyleClass);
                     lbIdeNumberError.setVisible(true);
                     lbIdeNumberError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    break;
+                case "error.dateCreation.format":
+                case "error.dateCreation.required":
+                    dpDateCreation.getStyleClass().add(errorStyleClass);
+                    lbDateCreationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    lbDateCreationError.setVisible(true);
                     break;
                 case "error.dateOrder":
                     dpDateCreation.getStyleClass().add(errorStyleClass);

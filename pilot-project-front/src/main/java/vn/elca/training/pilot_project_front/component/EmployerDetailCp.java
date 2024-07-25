@@ -20,14 +20,8 @@ import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
-import vn.elca.training.pilot_project_front.model.Employer;
-import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
-import vn.elca.training.pilot_project_front.model.FileError;
-import vn.elca.training.pilot_project_front.model.Salary;
-import vn.elca.training.pilot_project_front.util.FileUtil;
-import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
-import vn.elca.training.pilot_project_front.util.StageManager;
-import vn.elca.training.pilot_project_front.util.ValidationUtil;
+import vn.elca.training.pilot_project_front.model.*;
+import vn.elca.training.pilot_project_front.util.*;
 import vn.elca.training.proto.employer.EmployerId;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
@@ -59,6 +53,8 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private TextField tfName;
     @FXML
+    private Label lbNameError;
+    @FXML
     private Label lbNumber;
     @FXML
     private Label lbNumberValue;
@@ -67,6 +63,8 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private TextField tfIdeNumber;
     @FXML
+    private Label lbIdeNumberError;
+    @FXML
     private Label lbDateCreation;
     @FXML
     private DatePicker dpDateCreation;
@@ -74,6 +72,8 @@ public class EmployerDetailCp implements FXComponent {
     private Label lbDateExpiration;
     @FXML
     private DatePicker dpDateExpiration;
+    @FXML
+    private Label lbDateExpirationError;
     @FXML
     private Button btnReturn;
     @FXML
@@ -146,6 +146,14 @@ public class EmployerDetailCp implements FXComponent {
             if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)) {
                 showSuccessAlert("Update employer", "Update employer successfully");
             }
+        } else if (message.getMessageBody() instanceof ExceptionMessage) {
+//            Alert alert = new Alert(Alert.AlertType.WARNING);
+//            alert.setTitle("Error");
+//            alert.setHeaderText("An error occurred");
+//            alert.setContentText(message.getTypedMessageBody(StatusRuntimeExceptionWrapper.class).getErrorMessage());
+//            alert.showAndWait();
+            String errorMessage = message.getTypedMessageBody(ExceptionMessage.class).getErrorMessage();
+            showErrorDetails(JsonStringify.convertStringErrorDetailToList(errorMessage));
         }
         return null;
     }
@@ -246,6 +254,45 @@ public class EmployerDetailCp implements FXComponent {
         avsAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avs.ai.apg"));
         acAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ac"));
         afAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("af"));
+    }
+
+    private void showErrorDetails(List<ErrorDetail> errorDetails) {
+        String errorStyleClass = "error";
+        tfName.getStyleClass().remove(errorStyleClass);
+        lbNameError.setVisible(false);
+        tfIdeNumber.getStyleClass().remove(errorStyleClass);
+        lbIdeNumberError.setVisible(false);
+        dpDateCreation.getStyleClass().remove(errorStyleClass);
+        dpDateExpiration.getStyleClass().remove(errorStyleClass);
+        lbDateExpirationError.setVisible(false);
+
+        for (ErrorDetail errorDetail : errorDetails) {
+            switch (errorDetail.getFxErrorKey()) {
+                case "error.ideNumber.format":
+                case "error.ideNumber.duplicate":
+                    tfIdeNumber.getStyleClass().add(errorStyleClass);
+                    lbIdeNumberError.setVisible(true);
+                    lbIdeNumberError.setText(ObservableResourceFactory.getProperty().getString(errorDetail.getFxErrorKey()));
+                    break;
+                case "error.dateExpiration.format":
+                    dpDateExpiration.getStyleClass().add(errorStyleClass);
+                    lbDateExpirationError.setText(ObservableResourceFactory.getProperty().getString(errorDetail.getFxErrorKey()));
+                    lbDateExpirationError.setVisible(true);
+                    break;
+                // TODO: error create date required
+                // TODO: error create date format
+                // TODO: build enum for fx key = lang bundle key
+
+                case "error.dateOrder":
+                    dpDateCreation.getStyleClass().add(errorStyleClass);
+                    dpDateExpiration.getStyleClass().add(errorStyleClass);
+                    lbDateExpirationError.setText(ObservableResourceFactory.getProperty().getString(errorDetail.getFxErrorKey()));
+                    lbDateExpirationError.setVisible(true);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private void showSuccessAlert(String title, String headerText) {

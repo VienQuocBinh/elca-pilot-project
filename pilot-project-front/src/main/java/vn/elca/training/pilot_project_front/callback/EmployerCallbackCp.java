@@ -17,6 +17,7 @@ import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
+import vn.elca.training.pilot_project_front.model.ExceptionMessage;
 import vn.elca.training.proto.employer.*;
 
 import java.util.ResourceBundle;
@@ -60,6 +61,13 @@ public class EmployerCallbackCp implements CallbackComponent {
         } catch (StatusRuntimeException e) {
             log.warning(e.getMessage());
             Platform.runLater(() -> showAlert(e)); // To not crash with current thread
+
+            // Forward error message to ComponentId.EMPLOYER_DETAIL_CP if update fail
+            if (message.getMessageBody() instanceof EmployerUpdateRequest) {
+                context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
+                context.send(ComponentId.EMPLOYER_DETAIL_CP, ExceptionMessage.builder()
+                        .errorMessage(e.getMessage()));
+            }
         }
         return null;
     }

@@ -3,6 +3,7 @@ package vn.elca.training.pilot_project_back.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import vn.elca.training.pilot_project_back.constant.LanguageBundleKey;
 import vn.elca.training.pilot_project_back.entity.Employer;
 import vn.elca.training.pilot_project_back.exception.ValidationException;
 import vn.elca.training.pilot_project_back.exception.model.ErrorDetail;
@@ -30,9 +31,21 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public void validateEmployerCreateRequestProto(EmployerCreateRequest createRequest) throws ValidationException {
         List<ErrorDetail> errorDetails = new ArrayList<>();
-        String ideNumberField = "ideNumber.required";
-        String dateCreationField = "dateCreation.required";
+        String nameField = "name";
+        String ideNumberField = "ideNumber";
+        String dateCreationField = "dateCreation";
         String dateExpirationField = "dateExpiration";
+        // Validate name
+        String name = createRequest.getName();
+        if (name.trim().isEmpty()) {
+            errorDetails.add(ErrorDetail.builder()
+                    .object(createRequest.getClass().getSimpleName())
+                    .field(nameField)
+                    .value(name)
+                    .message("The name is required")
+                    .fxErrorKey(LanguageBundleKey.ERROR_NAME_REQUIRED)
+                    .build());
+        }
         // Validate ideNumber
         String ideNumber = createRequest.getIdeNumber();
         if (!ideNumber.isEmpty()) {
@@ -42,7 +55,7 @@ public class ValidationServiceImpl implements ValidationService {
                         .field(ideNumberField)
                         .value(ideNumber)
                         .message("Invalid ideNumber format")
-                        .fxErrorKey("error.ideNumber.format")
+                        .fxErrorKey(LanguageBundleKey.ERROR_IDE_NUMBER_FORMAT)
                         .build());
             }
             // Check duplicate ide number
@@ -52,7 +65,7 @@ public class ValidationServiceImpl implements ValidationService {
                             .field(ideNumberField)
                             .value(employer.getIdeNumber())
                             .message("IDE Number is already existed")
-                            .fxErrorKey("error.ideNumber.duplicate")
+                            .fxErrorKey(LanguageBundleKey.ERROR_IDE_NUMBER_DUPLICATE)
                             .build()));
         } else {
             errorDetails.add(ErrorDetail.builder()
@@ -60,7 +73,7 @@ public class ValidationServiceImpl implements ValidationService {
                     .field(ideNumberField)
                     .value(ideNumber)
                     .message("IDE Number is required")
-                    .fxErrorKey("error.ideNumber.required")
+                    .fxErrorKey(LanguageBundleKey.ERROR_IDE_NUMBER_REQUIRED)
                     .build());
         }
         // Validate dateCreation
@@ -72,7 +85,7 @@ public class ValidationServiceImpl implements ValidationService {
                         .field(dateCreationField)
                         .value(dateCreation)
                         .message("Invalid date format for creation date")
-                        .fxErrorKey("error.dateCreation.format")
+                        .fxErrorKey(LanguageBundleKey.ERROR_DATE_CREATION_FORMAT)
                         .build());
         } else {
             errorDetails.add(ErrorDetail.builder()
@@ -80,7 +93,7 @@ public class ValidationServiceImpl implements ValidationService {
                     .field(dateCreationField)
                     .value(dateCreation)
                     .message("Creation date is required")
-                    .fxErrorKey("error.dateCreation.required")
+                    .fxErrorKey(LanguageBundleKey.ERROR_DATE_CREATION_REQUIRED)
                     .build());
         }
         // Validate dateExpiration
@@ -91,7 +104,7 @@ public class ValidationServiceImpl implements ValidationService {
                     .field(dateExpirationField)
                     .value(dateExpiration)
                     .message("Invalid date format for expiration date")
-                    .fxErrorKey("error.dateExpiration.format")
+                    .fxErrorKey(LanguageBundleKey.ERROR_DATE_EXPIRATION_FORMAT)
                     .build());
         }
 
@@ -106,7 +119,7 @@ public class ValidationServiceImpl implements ValidationService {
                     .field("dateCreation and dateExpiration")
                     .value(dateExpiration)
                     .message("Created Date must be before Expired Date")
-                    .fxErrorKey("error.dateOrder")
+                    .fxErrorKey(LanguageBundleKey.ERROR_DATE_ORDER)
                     .build());
         }
 
@@ -118,8 +131,8 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public void validateEmployerUpdateRequestProto(EmployerUpdateRequest updateRequest) throws ValidationException {
         List<ErrorDetail> errorDetails = new ArrayList<>();
-        String ideNumberField = "ideNumber.required";
-        String dateCreationField = "dateCreation.required";
+        String ideNumberField = "ideNumber";
+        String dateCreationField = "dateCreation";
         String dateExpirationField = "dateExpiration";
         // Validate ideNumber
         String ideNumber = updateRequest.getIdeNumber();
@@ -131,7 +144,7 @@ public class ValidationServiceImpl implements ValidationService {
                         .field(ideNumberField)
                         .value(ideNumber)
                         .message("Invalid ideNumber format")
-                        .fxErrorKey("error.ideNumber.format")
+                        .fxErrorKey(LanguageBundleKey.ERROR_IDE_NUMBER_FORMAT)
                         .build());
             } else if (employerOptional.isPresent() && !employerOptional.get().getId().equals(updateRequest.getId())) {
                 // Check duplicate ide number with others employer
@@ -140,7 +153,7 @@ public class ValidationServiceImpl implements ValidationService {
                         .field(ideNumberField)
                         .value(updateRequest.getIdeNumber())
                         .message("IDE Number is already existed")
-                        .fxErrorKey("error.ideNumber.duplicate")
+                        .fxErrorKey(LanguageBundleKey.ERROR_IDE_NUMBER_DUPLICATE)
                         .build());
             }
         } else {
@@ -149,7 +162,7 @@ public class ValidationServiceImpl implements ValidationService {
                     .field(ideNumberField)
                     .value(ideNumber)
                     .message("IDE Number is required")
-                    .fxErrorKey("error.ideNumber.required")
+                    .fxErrorKey(LanguageBundleKey.ERROR_IDE_NUMBER_REQUIRED)
                     .build());
         }
         // Validate dateCreation
@@ -161,7 +174,7 @@ public class ValidationServiceImpl implements ValidationService {
                         .field(dateCreationField)
                         .value(dateCreation)
                         .message("Invalid date format for creation date")
-                        .fxErrorKey("error.dateCreation.format")
+                        .fxErrorKey(LanguageBundleKey.ERROR_DATE_CREATION_FORMAT)
                         .build());
         } else {
             errorDetails.add(ErrorDetail.builder()
@@ -169,20 +182,19 @@ public class ValidationServiceImpl implements ValidationService {
                     .field(dateCreationField)
                     .value(dateCreation)
                     .message("Creation date is required")
-                    .fxErrorKey("error.dateCreation.required")
+                    .fxErrorKey(LanguageBundleKey.ERROR_DATE_CREATION_REQUIRED)
                     .build());
         }
         // Validate dateExpiration
         String dateExpiration = updateRequest.getDateExpiration();
-        if (!dateExpiration.isEmpty() && !isValidDate(dateExpiration)) {
+        if (!dateExpiration.isEmpty() && !isValidDate(dateExpiration))
             errorDetails.add(ErrorDetail.builder()
                     .object(updateRequest.getClass().getSimpleName())
                     .field(dateExpirationField)
                     .value(dateExpiration)
                     .message("Invalid date format for expiration date")
-                    .fxErrorKey("error.dateExpiration.format")
+                    .fxErrorKey(LanguageBundleKey.ERROR_DATE_EXPIRATION_FORMAT)
                     .build());
-        }
 
         // Validate create date is before expiration date
         if (!dateCreation.isEmpty()
@@ -195,7 +207,7 @@ public class ValidationServiceImpl implements ValidationService {
                     .field("dateCreation and dateExpiration")
                     .value(dateExpiration)
                     .message("Created Date must be before Expired Date")
-                    .fxErrorKey("error.dateOrder")
+                    .fxErrorKey(LanguageBundleKey.ERROR_DATE_ORDER)
                     .build());
         }
 
