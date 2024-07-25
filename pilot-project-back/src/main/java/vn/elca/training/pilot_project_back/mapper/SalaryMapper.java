@@ -1,26 +1,20 @@
 package vn.elca.training.pilot_project_back.mapper;
 
-import com.google.protobuf.ByteString;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import vn.elca.training.pilot_project_back.dto.SalaryCreateRequestDto;
 import vn.elca.training.pilot_project_back.dto.SalaryResponseDto;
 import vn.elca.training.pilot_project_back.entity.Salary;
-import vn.elca.training.proto.salary.DecimalValue;
+import vn.elca.training.proto.salary.SalaryCreateRequest;
 import vn.elca.training.proto.salary.SalaryResponse;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(uses = {DateMapper.class})
+@Mapper(uses = {DateMapper.class, BigDecimalMapper.class})
 @Component
 public abstract class SalaryMapper {
-    @Autowired
-    private DateMapper dateMapper;
-
     public abstract SalaryResponseDto mapEntityToResponseDto(Salary salary);
 
     @Mapping(target = "avsAmount", source = "avsAmount", qualifiedByName = "mapBigDecimalToString")
@@ -38,17 +32,28 @@ public abstract class SalaryMapper {
         return salaryResponses;
     }
 
-    @Named("mapBigDecimalToDecimalValue")
-    public DecimalValue mapBigDecimalToDecimalValue(BigDecimal bigDecimal) {
-        return DecimalValue.newBuilder()
-                .setScale(bigDecimal.scale())
-                .setPrecision(bigDecimal.precision())
-                .setValue(ByteString.copyFrom(bigDecimal.unscaledValue().toByteArray()))
-                .build();
+    @Mapping(target = "avsAmount", source = "avsAmount", qualifiedByName = "mapStringToBigDecimal")
+    @Mapping(target = "acAmount", source = "acAmount", qualifiedByName = "mapStringToBigDecimal")
+    @Mapping(target = "afAmount", source = "afAmount", qualifiedByName = "mapStringToBigDecimal")
+    @Mapping(target = "startDate", source = "startDate", qualifiedByName = "mapStringDateToDate")
+    @Mapping(target = "endDate", source = "endDate", qualifiedByName = "mapStringDateToDate")
+    public abstract SalaryCreateRequestDto mapCreateRequestProtoToDto(SalaryCreateRequest salaryCreateRequest);
+
+    public abstract Salary mapCreateRequestDtoToEntity(SalaryCreateRequestDto salaryCreateRequestDto);
+
+    public List<SalaryCreateRequestDto> mapCreateListRequestProtoToDtoList(List<SalaryCreateRequest> salaryCreateRequests) {
+        List<SalaryCreateRequestDto> salaries = new ArrayList<>();
+        for (SalaryCreateRequest salaryCreateRequestDto : salaryCreateRequests) {
+            salaries.add(mapCreateRequestProtoToDto(salaryCreateRequestDto));
+        }
+        return salaries;
     }
 
-    @Named("mapBigDecimalToString")
-    public String mapBigDecimalToString(BigDecimal bigDecimal) {
-        return bigDecimal.toString();
+    public List<Salary> mapCreateListRequestDtoToEntityList(List<SalaryCreateRequestDto> salaryCreateRequestDtos) {
+        List<Salary> salaries = new ArrayList<>();
+        for (SalaryCreateRequestDto salaryCreateRequestDto : salaryCreateRequestDtos) {
+            salaries.add(mapCreateRequestDtoToEntity(salaryCreateRequestDto));
+        }
+        return salaries;
     }
 }

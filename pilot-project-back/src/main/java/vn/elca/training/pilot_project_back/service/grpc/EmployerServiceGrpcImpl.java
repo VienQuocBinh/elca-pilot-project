@@ -7,12 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
 import vn.elca.training.pilot_project_back.dto.EmployerSearchRequestDto;
+import vn.elca.training.pilot_project_back.dto.EmployerUpdateRequestDto;
 import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 import vn.elca.training.pilot_project_back.exception.handler.GrpcExceptionHandler;
 import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
-import vn.elca.training.pilot_project_back.service.ValidationService;
 import vn.elca.training.proto.employer.*;
 
 import java.util.List;
@@ -25,7 +25,6 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     private final EmployerService employerService;
     private final EmployerMapper employerMapper;
     private final SalaryMapper salaryMapper;
-    private final ValidationService validationService;
 
     @Override
     public void getEmployerById(EmployerId request, StreamObserver<EmployerResponse> responseObserver) {
@@ -33,17 +32,9 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
             EmployerResponseDto employerById = employerService.getEmployerById(request.getId());
             // The salariesList of proto is immutable, so need to map in separate method
             EmployerResponse employerResponse = employerMapper.mapResponseDtoToResponseProto(employerById);
-            EmployerResponse response = EmployerResponse.newBuilder()
-                    .setId(employerResponse.getId())
-                    .setDateCreation(employerResponse.getDateCreation())
-                    .setDateExpiration(employerResponse.getDateExpiration())
-                    .setNumber(employerById.getNumber())
-                    .setName(employerResponse.getName())
-                    .setIdeNumber(employerResponse.getIdeNumber())
-                    .setPensionType(employerResponse.getPensionType())
+            responseObserver.onNext(employerResponse.toBuilder()
                     .addAllSalaries(salaryMapper.mapResponseDtoListToResponseProtoList(employerById.getSalaries()))
-                    .build();
-            responseObserver.onNext(response);
+                    .build());
             responseObserver.onCompleted();
         } catch (EntityNotFoundException e) {
             log.error(e.getMessage());
@@ -84,6 +75,24 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
         try {
             employerService.deleteEmployer(request.getId());
             responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(GrpcExceptionHandler.handleException(e));
+        }
+    }
+
+    @Override
+    public void updateEmployer(EmployerUpdateRequest request, StreamObserver<EmployerResponse> responseObserver) {
+        try {
+            EmployerUpdateRequestDto employerUpdateRequestDto = employerMapper.mapUpdateRequestProtoToCreateRequestDto(request);
+            employerUpdateRequestDto.setSalaries(salaryMapper.mapCreateListRequestProtoToDtoList(request.getSalariesList()));
+
+            EmployerResponseDto employerResponseDto = employerService.updateEmployer(employerUpdateRequestDto);
+            EmployerResponse employerResponseProto = employerMapper.mapResponseDtoToResponseProto(employerResponseDto);
+
+            responseObserver.onNext(employerResponseProto.toBuilder()
+                    .addAllSalaries(salaryMapper.mapResponseDtoListToResponseProtoList(employerResponseDto.getSalaries()))
+                    .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(GrpcExceptionHandler.handleException(e));
