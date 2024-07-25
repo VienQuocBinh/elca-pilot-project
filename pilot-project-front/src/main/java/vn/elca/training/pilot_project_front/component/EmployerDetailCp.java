@@ -70,6 +70,8 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private DatePicker dpDateCreation;
     @FXML
+    private Label lbDateCreationError;
+    @FXML
     private Label lbDateExpiration;
     @FXML
     private DatePicker dpDateExpiration;
@@ -112,6 +114,7 @@ public class EmployerDetailCp implements FXComponent {
     public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
         if (message.getMessageBody() instanceof Employer) {
             // From EmployerDetailPerspective
+            clearErrors();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
             employer = message.getTypedMessageBody(Employer.class);
             lbNumberValue.setText(employer.getNumber());
@@ -148,11 +151,7 @@ public class EmployerDetailCp implements FXComponent {
                 showSuccessAlert("Update employer", "Update employer successfully");
             }
         } else if (message.getMessageBody() instanceof ExceptionMessage) {
-//            Alert alert = new Alert(Alert.AlertType.WARNING);
-//            alert.setTitle("Error");
-//            alert.setHeaderText("An error occurred");
-//            alert.setContentText(message.getTypedMessageBody(StatusRuntimeExceptionWrapper.class).getErrorMessage());
-//            alert.showAndWait();
+            // From Employer Callback catch
             String errorMessage = message.getTypedMessageBody(ExceptionMessage.class).getErrorMessage();
             showErrorDetails(JsonStringify.convertStringErrorDetailToList(errorMessage));
         }
@@ -186,7 +185,7 @@ public class EmployerDetailCp implements FXComponent {
                     .setId(employer.getId())
                     .setName(tfName.getText())
                     .setDateCreation(dpDateCreation.getValue().format(dateFormater))
-                    .setDateExpiration(dpDateExpiration.getValue().format(dateFormater))
+                    .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateFormater) : "")
                     .setIdeNumber(tfIdeNumber.getText())
                     .setPensionType(cbPensionType.getSelectionModel().getSelectedItem())
                     .addAllSalaries(salaryCreateRequests)
@@ -260,14 +259,7 @@ public class EmployerDetailCp implements FXComponent {
     private void showErrorDetails(List<ErrorDetail> errorDetails) {
         String errorStyleClass = "error";
         ResourceBundle resourceBundle = ObservableResourceFactory.getProperty();
-        tfName.getStyleClass().remove(errorStyleClass);
-        lbNameError.setVisible(false);
-        tfIdeNumber.getStyleClass().remove(errorStyleClass);
-        lbIdeNumberError.setVisible(false);
-        dpDateCreation.getStyleClass().remove(errorStyleClass);
-        dpDateExpiration.getStyleClass().remove(errorStyleClass);
-        lbDateExpirationError.setVisible(false);
-
+        clearErrors();
         for (ErrorDetail errorDetail : errorDetails) {
             switch (errorDetail.getFxErrorKey()) {
                 case "error.name.required":
@@ -282,15 +274,17 @@ public class EmployerDetailCp implements FXComponent {
                     lbIdeNumberError.setVisible(true);
                     lbIdeNumberError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     break;
+                case "error.dateCreation.format":
+                case "error.dateCreation.required":
+                    dpDateCreation.getStyleClass().add(errorStyleClass);
+                    lbDateCreationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    lbDateCreationError.setVisible(true);
+                    break;
                 case "error.dateExpiration.format":
                     dpDateExpiration.getStyleClass().add(errorStyleClass);
                     lbDateExpirationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
                     lbDateExpirationError.setVisible(true);
                     break;
-                // TODO: error create date required
-                // TODO: error create date format
-                // TODO: build enum for fx key = lang bundle key
-
                 case "error.dateOrder":
                     dpDateCreation.getStyleClass().add(errorStyleClass);
                     dpDateExpiration.getStyleClass().add(errorStyleClass);
@@ -320,5 +314,16 @@ public class EmployerDetailCp implements FXComponent {
 
         alert.setContentText(String.join("\n", errorMessages));
         alert.show();
+    }
+
+    private void clearErrors() {
+        String errorStyleClass = "error";
+        tfName.getStyleClass().remove(errorStyleClass);
+        lbNameError.setVisible(false);
+        tfIdeNumber.getStyleClass().remove(errorStyleClass);
+        lbIdeNumberError.setVisible(false);
+        dpDateCreation.getStyleClass().remove(errorStyleClass);
+        dpDateExpiration.getStyleClass().remove(errorStyleClass);
+        lbDateExpirationError.setVisible(false);
     }
 }

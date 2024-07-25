@@ -131,9 +131,21 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public void validateEmployerUpdateRequestProto(EmployerUpdateRequest updateRequest) throws ValidationException {
         List<ErrorDetail> errorDetails = new ArrayList<>();
+        String nameField = "name";
         String ideNumberField = "ideNumber";
         String dateCreationField = "dateCreation";
         String dateExpirationField = "dateExpiration";
+        // Validate name
+        String name = updateRequest.getName();
+        if (name.trim().isEmpty()) {
+            errorDetails.add(ErrorDetail.builder()
+                    .object(updateRequest.getClass().getSimpleName())
+                    .field(nameField)
+                    .value(name)
+                    .message("The name is required")
+                    .fxErrorKey(LanguageBundleKey.ERROR_NAME_REQUIRED)
+                    .build());
+        }
         // Validate ideNumber
         String ideNumber = updateRequest.getIdeNumber();
         if (!ideNumber.isEmpty()) {
