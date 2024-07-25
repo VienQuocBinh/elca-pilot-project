@@ -21,6 +21,7 @@ import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.Employer;
 import vn.elca.training.pilot_project_front.model.Salary;
+import vn.elca.training.pilot_project_front.util.FileUtil;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.StageManager;
 import vn.elca.training.proto.employer.EmployerId;
@@ -32,10 +33,8 @@ import vn.elca.training.proto.salary.SalaryResponse;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @DeclarativeView(id = ComponentId.EMPLOYER_DETAIL_CP,
@@ -44,7 +43,6 @@ import java.util.stream.Collectors;
         initialTargetLayoutId = PerspectiveId.EMPLOYER_DETAIL_PERSPECTIVE,
         resourceBundleLocation = "bundles.languageBundle")
 public class EmployerDetailCp implements FXComponent {
-    private final Logger log = Logger.getLogger(EmployerDetailCp.class.getName());
     @Resource
     private Context context;
     @FXML
@@ -100,7 +98,7 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private Label fileInput;
     @Getter
-    private List<File> files = new ArrayList<>();
+    private File file;
 
     @Override
     public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
@@ -158,6 +156,10 @@ public class EmployerDetailCp implements FXComponent {
             }
             context.send(PerspectiveId.HOME_PERSPECTIVE, "return");
         });
+        btnImport.setOnMouseClicked(e -> {
+            List<Salary> salaries = FileUtil.processSalaryCsvFiles(file);
+            tbvSalary.getItems().addAll(salaries);
+        });
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             FileChooser fileChooser = new FileChooser();
 
@@ -167,10 +169,11 @@ public class EmployerDetailCp implements FXComponent {
                     .ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx");
 
             fileChooser.getExtensionFilters().addAll(csvFilter, xlsxFilter);
-            Optional<List<File>> selectedFiles = Optional.ofNullable(fileChooser.showOpenMultipleDialog(fileInput.getScene().getWindow()));
-            fileInput.setText(selectedFiles.map(fileList -> fileList.stream().map(File::getName)
-                    .collect(Collectors.joining(","))).orElse(""));
-            files = selectedFiles.orElse(new ArrayList<>());
+            Optional<File> selectedFile = Optional.ofNullable(fileChooser.showOpenDialog(fileInput.getScene().getWindow()));
+            if (selectedFile.isPresent()) {
+                fileInput.setText(selectedFile.get().getName());
+                file = selectedFile.get();
+            }
         });
         tbvSalary.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
