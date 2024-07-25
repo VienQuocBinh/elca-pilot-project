@@ -4,12 +4,16 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.jacpfx.api.annotations.Resource;
 import org.jacpfx.api.annotations.perspective.Perspective;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.componentLayout.PerspectiveLayout;
+import org.jacpfx.rcp.context.Context;
 import org.jacpfx.rcp.perspective.FXPerspective;
+import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
+import vn.elca.training.proto.employer.EmployerSearchRequest;
 
 @Perspective(id = PerspectiveId.HOME_PERSPECTIVE,
         name = "homePerspective",
@@ -21,6 +25,8 @@ import vn.elca.training.pilot_project_front.constant.PerspectiveId;
         viewLocation = "/fxml/homeEmployerPerspective.fxml",
         resourceBundleLocation = "bundles.languageBundle")
 public class HomePerspective implements FXPerspective {
+    @Resource
+    private Context context;
     @FXML
     private VBox mainContainer;
     @FXML
@@ -33,5 +39,10 @@ public class HomePerspective implements FXPerspective {
         perspectiveLayout.registerRootComponent(mainContainer);
         perspectiveLayout.registerTargetLayoutComponent(PerspectiveId.HORIZONTAL_CONTAINER_TOP, searchBox);
         perspectiveLayout.registerTargetLayoutComponent(PerspectiveId.HORIZONTAL_CONTAINER_BOT, employerTable);
+        if (message.getMessageBody() instanceof ActionType
+                && message.getTypedMessageBody(ActionType.class).equals(ActionType.RETURN)) {
+            // Reload employer table view on returning
+            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
+        }
     }
 }

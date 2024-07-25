@@ -162,7 +162,7 @@ public class EmployerCreatePopupController implements Initializable {
     // Validate onn UI layer
     private boolean validateInputs() {
         String errorStyleClass = "error";
-        String regex = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}";
+        String regex = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}$";
         boolean isValid = true;
         if (tfName.getText().isEmpty()) {
             tfName.getStyleClass().add(errorStyleClass);

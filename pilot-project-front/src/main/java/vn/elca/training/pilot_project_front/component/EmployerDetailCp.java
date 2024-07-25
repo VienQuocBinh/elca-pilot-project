@@ -16,23 +16,26 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
+import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.Employer;
+import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
 import vn.elca.training.pilot_project_front.model.Salary;
 import vn.elca.training.pilot_project_front.util.FileUtil;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.StageManager;
 import vn.elca.training.proto.employer.EmployerId;
-import vn.elca.training.proto.employer.EmployerResponse;
-import vn.elca.training.proto.employer.EmployerSearchRequest;
+import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
+import vn.elca.training.proto.salary.SalaryCreateRequest;
 import vn.elca.training.proto.salary.SalaryResponse;
 
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -99,26 +102,29 @@ public class EmployerDetailCp implements FXComponent {
     private Label fileInput;
     @Getter
     private File file;
+    private Employer employer;
+    private List<Salary> importedSalaries = new ArrayList<>();
 
     @Override
     public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
         if (message.getMessageBody() instanceof Employer) {
             // From EmployerDetailPerspective
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
-            Employer employer = message.getTypedMessageBody(Employer.class);
+            employer = message.getTypedMessageBody(Employer.class);
             lbNumberValue.setText(employer.getNumber());
             tfName.setText(employer.getName());
             tfIdeNumber.setText(employer.getIdeNumber());
             cbPensionType.getItems().clear();
-            cbPensionType.getItems().addAll(PensionTypeProto.NONE, PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
+            cbPensionType.getItems().addAll(PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
             cbPensionType.setValue(employer.getPensionType());
             dpDateCreation.setValue(LocalDate.parse(employer.getDateCreation(), formatter));
             if (!StringUtils.isBlank(employer.getDateExpiration()))
                 dpDateExpiration.setValue(LocalDate.parse(employer.getDateExpiration(), formatter));
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
-        } else if (message.getMessageBody() instanceof EmployerResponse) {
-            EmployerResponse employer = message.getTypedMessageBody(EmployerResponse.class);
-            List<SalaryResponse> salariesResponse = employer.getSalariesList();
+        } else if (message.getMessageBody() instanceof EmployerResponseWrapper) {
+            // From get employer detail, update stub callback
+            EmployerResponseWrapper employerResponseWrapper = message.getTypedMessageBody(EmployerResponseWrapper.class);
+            List<SalaryResponse> salariesResponse = employerResponseWrapper.getEmployerResponse().getSalariesList();
             List<Salary> salaries = salariesResponse
                     .stream()
                     .map(salaryResponse -> Salary.builder()
@@ -135,6 +141,9 @@ public class EmployerDetailCp implements FXComponent {
                     .collect(Collectors.toList());
             tbvSalary.getItems().clear();
             tbvSalary.setItems(FXCollections.observableList(salaries));
+            if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)) {
+                showSuccessAlert("Update employer", "Update employer successfully");
+            }
         }
         return null;
     }
@@ -147,18 +156,43 @@ public class EmployerDetailCp implements FXComponent {
     @PostConstruct
     public void onPostConstruct() {
         bindingResource();
-        btnSave.setOnMouseClicked(event -> context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build()));
+        btnSave.setOnMouseClicked(event -> {
+            // Just send imported salaries to save to db
+            List<SalaryCreateRequest> salaryCreateRequests = importedSalaries.stream()
+                    .map(salary -> SalaryCreateRequest.newBuilder()
+                            .setFirstName(salary.getFirstName())
+                            .setLastName(salary.getLastName())
+                            .setAvsNumber(salary.getAvsNumber())
+                            .setStartDate(salary.getStartDate())
+                            .setEndDate(salary.getEndDate())
+                            .setAvsAmount(salary.getAvsAmount())
+                            .setAcAmount(salary.getAcAmount())
+                            .setAfAmount(salary.getAfAmount())
+                            .build())
+                    .collect(Collectors.toList());
+            DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
+            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerUpdateRequest.newBuilder()
+                    .setId(employer.getId())
+                    .setName(tfName.getText())
+                    .setDateCreation(dpDateCreation.getValue().format(dateFormater))
+                    .setDateExpiration(dpDateExpiration.getValue().format(dateFormater))
+                    .setIdeNumber(tfIdeNumber.getText())
+                    .setPensionType(cbPensionType.getSelectionModel().getSelectedItem())
+                    .addAllSalaries(salaryCreateRequests)
+                    .build());
+        });
         btnReturn.setOnMouseClicked(event -> {
             // Set back app title
             Stage primaryStage = StageManager.getPrimaryStage();
             if (primaryStage != null) {
                 primaryStage.titleProperty().setValue(ObservableResourceFactory.getProperty().getString("title"));
             }
-            context.send(PerspectiveId.HOME_PERSPECTIVE, "return");
+            context.send(PerspectiveId.HOME_PERSPECTIVE, ActionType.RETURN);
         });
         btnImport.setOnMouseClicked(e -> {
-            List<Salary> salaries = FileUtil.processSalaryCsvFiles(file);
-            tbvSalary.getItems().addAll(salaries);
+            importedSalaries = FileUtil.processSalaryCsvFiles(file);
+            tbvSalary.getItems().addAll(importedSalaries);
+            showSuccessAlert("Import salary dialog", "Import successfully");
         });
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             FileChooser fileChooser = new FileChooser();
@@ -204,5 +238,12 @@ public class EmployerDetailCp implements FXComponent {
         avsAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avs.ai.apg"));
         acAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ac"));
         afAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("af"));
+    }
+
+    private void showSuccessAlert(String title, String headerText) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.show();
     }
 }

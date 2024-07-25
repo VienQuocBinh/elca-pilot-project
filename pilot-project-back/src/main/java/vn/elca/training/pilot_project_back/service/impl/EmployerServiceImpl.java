@@ -74,7 +74,7 @@ public class EmployerServiceImpl implements EmployerService {
             salary.setEmployer(employer);
         }
         employer.getSalaries().addAll(salaries);
-//        employerRepository.saveAndFlush(employer); // To get the latest salary id
+        employerRepository.saveAndFlush(employer); // To get the latest salary id
         return employerMapper.mapEntityToResponseDto(employer);
     }
 

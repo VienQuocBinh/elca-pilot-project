@@ -64,7 +64,6 @@ public class HomeEmployerTableCp implements FXComponent {
     private TableColumn<Employer, String> dateCreationCol;
     @FXML
     private TableColumn<Employer, String> dateExpirationCol;
-    private Stage stagePopup;
 
     @PostConstruct
     public void onPostConstruct() {
@@ -191,7 +190,7 @@ public class HomeEmployerTableCp implements FXComponent {
                     .dateExpiration(employer.getDateExpiration())
                     .build()));
 
-            stagePopup = new Stage();
+            Stage stagePopup = new Stage();
             stagePopup.initModality(Modality.APPLICATION_MODAL);
             stagePopup.setTitle(ObservableResourceFactory.getProperty().getString("employer.add"));
             stagePopup.setScene(new Scene(parent));
