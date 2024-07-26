@@ -24,6 +24,7 @@ import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.controller.EmployerCreatePopupController;
 import vn.elca.training.pilot_project_front.model.Employer;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
+import vn.elca.training.proto.common.PagingRequest;
 import vn.elca.training.proto.employer.EmployerListResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.Empty;
@@ -67,7 +68,11 @@ public class HomeEmployerTableCp implements FXComponent {
     @PostConstruct
     public void onPostConstruct() {
         bindingResource();
-        context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
+        context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder()
+                .setPagingRequest(PagingRequest.newBuilder()
+                        .setPageIndex(0)
+                        .build())
+                .build());
         addButtonToTable();
         // Make TableView resize with the window. Delay the binding until the scene is available
         tbvEmployer.sceneProperty().addListener((observable, oldScene, newScene) -> {

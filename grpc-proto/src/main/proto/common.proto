@@ -11,7 +11,6 @@ message EmployerId {
 
 message PagingRequest {
     uint32 page_index = 1;
-    uint32 page_size = 2;
 }
 
 message PagingResponse {

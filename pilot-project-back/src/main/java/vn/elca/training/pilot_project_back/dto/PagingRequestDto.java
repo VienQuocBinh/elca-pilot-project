@@ -9,5 +9,4 @@ import lombok.Getter;
 @AllArgsConstructor
 public class PagingRequestDto {
     private int pageIndex;
-    private int pageSize;
 }

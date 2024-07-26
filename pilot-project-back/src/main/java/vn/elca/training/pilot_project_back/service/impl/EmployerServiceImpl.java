@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,15 +32,20 @@ public class EmployerServiceImpl implements EmployerService {
     private final EmployerRepository employerRepository;
     private final EmployerMapper employerMapper;
     private final SalaryMapper salaryMapper;
+    @Value("${paging.default.page.size}")
+    private String pageSize;
 
     @Override
     public Page<EmployerResponseDto> getEmployers(EmployerSearchRequestDto searchRequest) {
         Predicate predicate = buildSearchCriteria(searchRequest);
         Sort sort = Sort.by(QEmployer.employer.number.getMetadata().getName());
-        Pageable pageable = PageRequest.of(
-                searchRequest.getPagingRequest().getPageIndex(),
-                searchRequest.getPagingRequest().getPageSize(),
-                sort);
+        Pageable pageable;
+        int size = Integer.parseInt(pageSize);
+        if (searchRequest.getPagingRequest() == null) {
+            pageable = PageRequest.of(0, size, sort);
+        } else {
+            pageable = PageRequest.of(searchRequest.getPagingRequest().getPageIndex(), size, sort);
+        }
         Page<Employer> employers = employerRepository.findAll(predicate, pageable);
         return new PageImpl<>(
                 employers.stream().map(employerMapper::mapEntityToResponseDto).collect(Collectors.toList()),
