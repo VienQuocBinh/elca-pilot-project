@@ -42,7 +42,6 @@ public class HomePerspective implements FXPerspective {
     private Label lbTotalElements;
     @FXML
     private Pagination pgEmployer;
-    private int totalPages;
 
     @Override
     public void handlePerspective(Message<Event, Object> message, PerspectiveLayout perspectiveLayout) {
@@ -52,13 +51,16 @@ public class HomePerspective implements FXPerspective {
         if (message.getMessageBody() instanceof ActionType
                 && message.getTypedMessageBody(ActionType.class).equals(ActionType.RETURN)) {
             // Reload employer table view on returning
-            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
+            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder()
+                    .setPagingRequest(PagingRequest.newBuilder()
+                            .setPageIndex(pgEmployer.getCurrentPageIndex())
+                            .build())
+                    .build());
         } else if (message.getMessageBody() instanceof PagingResponse) {
             // From init table of HomeEmployerTableCp
             PagingResponse pagingResponse = message.getTypedMessageBody(PagingResponse.class);
-            totalPages = pagingResponse.getTotalPages();
-            pgEmployer.setPageCount(totalPages);
-            pgEmployer.setVisible(true);
+            pgEmployer.setPageCount(pagingResponse.getTotalPages());
+            pgEmployer.setVisible(pagingResponse.getTotalPages() != 0);
             lbTotalElements.setText("Total items: " + pagingResponse.getTotalElements());
         } else if (message.getMessageBody() instanceof EmployerSearchRequest) {
             // Get from HomeSearchEmployerCp to append paging info then send to callback
@@ -73,7 +75,6 @@ public class HomePerspective implements FXPerspective {
     @PostConstruct
     public void onPostConstruct() {
         pgEmployer.setMaxPageIndicatorCount(5);
-        pgEmployer.setPageCount(totalPages);
         pgEmployer.currentPageIndexProperty().addListener((observable, oldValue, newValue) ->
                 // Send message to callback
                 context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder()

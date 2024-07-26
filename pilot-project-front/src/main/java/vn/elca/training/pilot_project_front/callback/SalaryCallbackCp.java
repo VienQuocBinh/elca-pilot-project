@@ -16,7 +16,7 @@ import org.jacpfx.rcp.component.CallbackComponent;
 import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.config.GrpcConfig;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
-import vn.elca.training.proto.common.EmployerId;
+import vn.elca.training.proto.salary.SalaryListRequest;
 import vn.elca.training.proto.salary.SalaryListResponse;
 import vn.elca.training.proto.salary.SalaryServiceGrpc;
 
@@ -34,11 +34,11 @@ public class SalaryCallbackCp implements CallbackComponent {
     private Context context;
 
     @Override
-    public Object handle(Message<Event, Object> message) throws Exception {
+    public Object handle(Message<Event, Object> message) {
         try {
-            if (message.getMessageBody() instanceof EmployerId) {
+            if (message.getMessageBody() instanceof SalaryListRequest) {
                 // Get salaries of employer
-                SalaryListResponse salaries = stub.getSalariesByEmployerId(message.getTypedMessageBody(EmployerId.class));
+                SalaryListResponse salaries = stub.getSalariesByEmployerId(message.getTypedMessageBody(SalaryListRequest.class));
                 context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
                 return salaries;
             }

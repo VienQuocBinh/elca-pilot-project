@@ -122,7 +122,7 @@
             <Label fx:id="lbTotalElements"/>
         </left>
         <right>
-            <Pagination fx:id="pgSalary"/>
+            <Pagination fx:id="pgSalary" visible="false"/>
         </right>
     </BorderPane>
     <HBox alignment="CENTER_RIGHT" spacing="20">

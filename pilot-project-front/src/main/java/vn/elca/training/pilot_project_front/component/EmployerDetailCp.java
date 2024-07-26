@@ -22,10 +22,12 @@ import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.*;
 import vn.elca.training.pilot_project_front.util.*;
-import vn.elca.training.proto.common.EmployerId;
+import vn.elca.training.proto.common.PagingRequest;
+import vn.elca.training.proto.employer.EmployerResponse;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 import vn.elca.training.proto.salary.SalaryCreateRequest;
+import vn.elca.training.proto.salary.SalaryListRequest;
 import vn.elca.training.proto.salary.SalaryListResponse;
 import vn.elca.training.proto.salary.SalaryResponse;
 
@@ -130,12 +132,19 @@ public class EmployerDetailCp implements FXComponent {
             if (!StringUtils.isBlank(employer.getDateExpiration()))
                 dpDateExpiration.setValue(LocalDate.parse(employer.getDateExpiration(), formatter));
             else dpDateExpiration.setValue(null);
-            context.send(ComponentId.SALARY_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
+            // To get salaries and paging
+            context.send(ComponentId.SALARY_CALLBACK_CP, SalaryListRequest.newBuilder()
+                    .setEmployerId(employer.getId())
+                    .setPagingRequest(PagingRequest.newBuilder()
+                            .setPageIndex(pgSalary.getCurrentPageIndex())
+                            .build())
+                    .build());
         } else if (message.getMessageBody() instanceof EmployerResponseWrapper) {
             // From update stub callback
             EmployerResponseWrapper employerResponseWrapper = message.getTypedMessageBody(EmployerResponseWrapper.class);
+            EmployerResponse employerResponse = employerResponseWrapper.getEmployerResponse();
             if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)) {
-                List<SalaryResponse> salariesResponse = employerResponseWrapper.getEmployerResponse().getSalariesList();
+                List<SalaryResponse> salariesResponse = employerResponse.getSalariesList();
                 Comparator<Salary> salaryComparator = Comparator
                         .comparing(Salary::getLastName)
                         .thenComparing(Salary::getFirstName);
@@ -182,6 +191,8 @@ public class EmployerDetailCp implements FXComponent {
                     .collect(Collectors.toList());
             tbvSalary.getItems().clear();
             tbvSalary.setItems(FXCollections.observableList(salaries));
+            pgSalary.setPageCount(typedMessageBody.getPagingResponse().getTotalPages());
+            pgSalary.setVisible(typedMessageBody.getPagingResponse().getTotalPages() != 0);
         }
         return null;
     }
@@ -262,6 +273,14 @@ public class EmployerDetailCp implements FXComponent {
             }
         });
         tbvSalary.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        pgSalary.setMaxPageIndicatorCount(5);
+        pgSalary.currentPageIndexProperty().addListener((observable, oldValue, newValue) ->
+                context.send(ComponentId.SALARY_CALLBACK_CP, SalaryListRequest.newBuilder()
+                        .setEmployerId(employer.getId())
+                        .setPagingRequest(PagingRequest.newBuilder()
+                                .setPageIndex(pgSalary.getCurrentPageIndex())
+                                .build())
+                        .build()));
     }
 
     private void bindingResource() {
