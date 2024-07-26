@@ -2,6 +2,7 @@ package vn.elca.training.pilot_project_front.callback;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -19,6 +20,7 @@ import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
 import vn.elca.training.pilot_project_front.model.ExceptionMessage;
+import vn.elca.training.proto.common.EmployerId;
 import vn.elca.training.proto.employer.*;
 
 import java.util.logging.Logger;
@@ -60,13 +62,18 @@ public class EmployerCallbackCp implements CallbackComponent {
             }
         } catch (StatusRuntimeException e) {
             log.warning(e.getMessage());
-            // Forward error message to ComponentId.EMPLOYER_DETAIL_CP if update fail
-            if (message.getMessageBody() instanceof EmployerUpdateRequest) {
-                context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
-                context.send(ComponentId.EMPLOYER_DETAIL_CP, ExceptionMessage.builder()
-                        .errorMessage(e.getMessage()).build());
-            } else
-                Platform.runLater(() -> showAlert(e)); // To not crash with current thread
+            if (e.getStatus().getCode() == Status.UNKNOWN.getCode()) {
+                Platform.runLater(() -> showAlert(e));
+            } else {
+                // Forward error message to ComponentId.EMPLOYER_DETAIL_CP if update fail
+                if (message.getMessageBody() instanceof EmployerUpdateRequest) {
+                    context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
+                    context.send(ComponentId.EMPLOYER_DETAIL_CP, ExceptionMessage.builder()
+                            .errorMessage(e.getMessage()).build());
+                } else {
+                    Platform.runLater(() -> showAlert(e));
+                }
+            }
         }
         return null;
     }

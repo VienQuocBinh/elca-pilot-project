@@ -22,19 +22,17 @@ import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.*;
 import vn.elca.training.pilot_project_front.util.*;
-import vn.elca.training.proto.employer.EmployerId;
+import vn.elca.training.proto.common.EmployerId;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 import vn.elca.training.proto.salary.SalaryCreateRequest;
+import vn.elca.training.proto.salary.SalaryListResponse;
 import vn.elca.training.proto.salary.SalaryResponse;
 
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @DeclarativeView(id = ComponentId.EMPLOYER_DETAIL_CP,
@@ -128,11 +126,42 @@ public class EmployerDetailCp implements FXComponent {
             if (!StringUtils.isBlank(employer.getDateExpiration()))
                 dpDateExpiration.setValue(LocalDate.parse(employer.getDateExpiration(), formatter));
             else dpDateExpiration.setValue(null);
-            context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
+            context.send(ComponentId.SALARY_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
         } else if (message.getMessageBody() instanceof EmployerResponseWrapper) {
-            // From get employer detail, update stub callback
+            // From update stub callback
             EmployerResponseWrapper employerResponseWrapper = message.getTypedMessageBody(EmployerResponseWrapper.class);
-            List<SalaryResponse> salariesResponse = employerResponseWrapper.getEmployerResponse().getSalariesList();
+            if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)) {
+                List<SalaryResponse> salariesResponse = employerResponseWrapper.getEmployerResponse().getSalariesList();
+                Comparator<Salary> salaryComparator = Comparator
+                        .comparing(Salary::getLastName)
+                        .thenComparing(Salary::getFirstName);
+                List<Salary> salaries = salariesResponse
+                        .stream()
+                        .map(salaryResponse -> Salary.builder()
+                                .id(salaryResponse.getId())
+                                .avsNumber(salaryResponse.getAvsNumber())
+                                .firstName(salaryResponse.getFirstName())
+                                .lastName(salaryResponse.getLastName())
+                                .startDate(salaryResponse.getStartDate())
+                                .endDate(salaryResponse.getEndDate())
+                                .avsAmount(salaryResponse.getAvsAmount())
+                                .acAmount(salaryResponse.getAcAmount())
+                                .afAmount(salaryResponse.getAfAmount())
+                                .build())
+                        .sorted(salaryComparator)
+                        .collect(Collectors.toList());
+                tbvSalary.getItems().clear();
+                tbvSalary.setItems(FXCollections.observableList(salaries));
+                showSuccessAlert("Update employer", "Update employer successfully");
+            }
+        } else if (message.getMessageBody() instanceof ExceptionMessage) {
+            // From EmployerCallbackCp catch
+            String errorMessage = message.getTypedMessageBody(ExceptionMessage.class).getErrorMessage();
+            showErrorDetails(JsonStringify.convertStringErrorDetailToList(errorMessage));
+        } else if (message.getMessageBody() instanceof SalaryListResponse) {
+            // From SalaryCallbackCp to get salaries of Employer
+            SalaryListResponse typedMessageBody = message.getTypedMessageBody(SalaryListResponse.class);
+            List<SalaryResponse> salariesResponse = typedMessageBody.getSalariesList();
             List<Salary> salaries = salariesResponse
                     .stream()
                     .map(salaryResponse -> Salary.builder()
@@ -149,13 +178,6 @@ public class EmployerDetailCp implements FXComponent {
                     .collect(Collectors.toList());
             tbvSalary.getItems().clear();
             tbvSalary.setItems(FXCollections.observableList(salaries));
-            if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)) {
-                showSuccessAlert("Update employer", "Update employer successfully");
-            }
-        } else if (message.getMessageBody() instanceof ExceptionMessage) {
-            // From EmployerCallbackCp catch
-            String errorMessage = message.getTypedMessageBody(ExceptionMessage.class).getErrorMessage();
-            showErrorDetails(JsonStringify.convertStringErrorDetailToList(errorMessage));
         }
         return null;
     }
@@ -226,6 +248,7 @@ public class EmployerDetailCp implements FXComponent {
             if (selectedFile.isPresent()) {
                 fileInput.setText(selectedFile.get().getName());
                 file = selectedFile.get();
+                btnImport.setDisable(false);
             }
         });
         tbvSalary.sceneProperty().addListener((observable, oldScene, newScene) -> {

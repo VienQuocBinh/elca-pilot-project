@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package proto;
 
+import "common.proto";
 import "salary.proto";
 
 
@@ -15,10 +16,6 @@ enum PensionTypeProto {
 }
 
 message Empty {}
-
-message EmployerId {
-    uint64 id = 1;
-}
 
 message EmployerNextNumberResponse {
     string number = 1;
