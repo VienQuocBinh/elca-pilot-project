@@ -20,7 +20,7 @@ public class EmployerCreateRequestDto {
     private PensionType pensionType;
     @NotNull
     @Length(max = 36)
-    @Pattern(regexp = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}")
+    @Pattern(regexp = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}$")
     private String ideNumber;
     @NotNull
     private Date dateCreation;

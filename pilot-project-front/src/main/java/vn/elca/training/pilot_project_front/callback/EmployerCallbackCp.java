@@ -14,7 +14,10 @@ import org.jacpfx.api.annotations.lifecycle.PreDestroy;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.CallbackComponent;
 import org.jacpfx.rcp.context.Context;
+import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
+import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
+import vn.elca.training.pilot_project_front.model.ExceptionMessage;
 import vn.elca.training.proto.employer.*;
 
 import java.util.ResourceBundle;
@@ -35,23 +38,35 @@ public class EmployerCallbackCp implements CallbackComponent {
     public Object handle(Message<Event, Object> message) throws Exception {
         try {
             if (message.getMessageBody() instanceof EmployerSearchRequest) {
-                // Get list (search)
+                // Get list (search) employers
                 EmployerListResponse employers = stub.getEmployers(message.getTypedMessageBody(EmployerSearchRequest.class));
                 context.setReturnTarget(ComponentId.HOME_EMPLOYER_TABLE_CP);
                 return employers;
             } else if (message.getMessageBody() instanceof Long) {
-                // Delete
+                // Delete employer
                 Empty empty = stub.deleteEmployer(EmployerId.newBuilder().setId(message.getTypedMessageBody(Long.class)).build());
                 context.setReturnTarget(ComponentId.HOME_EMPLOYER_TABLE_CP);
                 return empty;
             } else if (message.getMessageBody() instanceof EmployerId) {
-                EmployerResponse employerById = stub.getEmployerById(message.getTypedMessageBody(EmployerId.class));
+                // Get employer detail
+                EmployerResponse employerResponse = stub.getEmployerById(message.getTypedMessageBody(EmployerId.class));
                 context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
-                return employerById;
+                return new EmployerResponseWrapper(employerResponse, ActionType.GET_DETAIL);
+            } else if (message.getMessageBody() instanceof EmployerUpdateRequest) {
+                // Update employer
+                EmployerResponse employerResponse = stub.updateEmployer(message.getTypedMessageBody(EmployerUpdateRequest.class));
+                context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
+                return new EmployerResponseWrapper(employerResponse, ActionType.UPDATE);
             }
         } catch (StatusRuntimeException e) {
             log.warning(e.getMessage());
-            Platform.runLater(() -> showAlert(e)); // To not crash with current thread
+            // Forward error message to ComponentId.EMPLOYER_DETAIL_CP if update fail
+            if (message.getMessageBody() instanceof EmployerUpdateRequest) {
+                context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
+                context.send(ComponentId.EMPLOYER_DETAIL_CP, ExceptionMessage.builder()
+                        .errorMessage(e.getMessage()).build());
+            } else
+                Platform.runLater(() -> showAlert(e)); // To not crash with current thread
         }
         return null;
     }

@@ -19,7 +19,6 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
-import org.jacpfx.rcp.util.FXUtil;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.controller.EmployerCreatePopupController;
@@ -64,7 +63,6 @@ public class HomeEmployerTableCp implements FXComponent {
     private TableColumn<Employer, String> dateCreationCol;
     @FXML
     private TableColumn<Employer, String> dateExpirationCol;
-    private Stage stagePopup;
 
     @PostConstruct
     public void onPostConstruct() {
@@ -88,9 +86,7 @@ public class HomeEmployerTableCp implements FXComponent {
 
     @Override
     public Node handle(Message<Event, Object> message) throws Exception {
-        if (message.getMessageBody() instanceof String && !message.messageBodyEquals(FXUtil.MessageUtil.INIT)) {
-            log.info(message.getTypedMessageBody(String.class));
-        } else if (message.getMessageBody() instanceof Empty) {
+        if (message.getMessageBody() instanceof Empty) {
             // Reload the employer list
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
         } else if (message.getMessageBody() instanceof EmployerListResponse) {
@@ -165,10 +161,10 @@ public class HomeEmployerTableCp implements FXComponent {
     private void bindingResource() {
         btnAdd.textProperty().bind(ObservableResourceFactory.getStringBinding("add"));
         pensionTypeCol.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
-        numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
-        ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
-        nameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-        dateCreationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
+        numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number.required"));
+        ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber.required"));
+        nameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("name.required"));
+        dateCreationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation.required"));
         dateExpirationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         btnAdd.setOnMouseClicked(event -> showCreatePopup());
     }
@@ -191,11 +187,11 @@ public class HomeEmployerTableCp implements FXComponent {
                     .dateExpiration(employer.getDateExpiration())
                     .build()));
 
-            stagePopup = new Stage();
+            Stage stagePopup = new Stage();
             stagePopup.initModality(Modality.APPLICATION_MODAL);
             stagePopup.setTitle(ObservableResourceFactory.getProperty().getString("employer.add"));
             stagePopup.setScene(new Scene(parent));
-//            stagePopup.setResizable(false);
+            stagePopup.setResizable(false);
             stagePopup.showAndWait();
 
         } catch (Exception e) {

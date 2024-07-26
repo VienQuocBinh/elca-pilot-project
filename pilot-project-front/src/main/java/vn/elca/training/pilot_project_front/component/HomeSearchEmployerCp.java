@@ -26,7 +26,6 @@ import java.time.format.DateTimeFormatter;
         initialTargetLayoutId = PerspectiveId.HORIZONTAL_CONTAINER_TOP
 )
 public class HomeSearchEmployerCp implements FXComponent {
-    //    private static final Logger log = LoggerFactory.getLogger(HomeSearchEmployerCp.class);
     @Resource
     private Context context;
     @FXML
@@ -55,11 +54,8 @@ public class HomeSearchEmployerCp implements FXComponent {
     private Button btnSearch;
     @FXML
     private Button btnReset;
-    //    @FXML
-//    private Button btnAdd;
     @FXML
     private ComboBox<PensionTypeProto> cbPensionType;
-//    private Stage stagePopup;
 
     @Override
     public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
@@ -83,13 +79,11 @@ public class HomeSearchEmployerCp implements FXComponent {
         lbDateExpiration.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         btnSearch.textProperty().bind(ObservableResourceFactory.getStringBinding("search"));
         btnReset.textProperty().bind(ObservableResourceFactory.getStringBinding("reset"));
-//        btnAdd.textProperty().bind(ObservableResourceFactory.getStringBinding("add"));
         cbPensionType.getItems().addAll(PensionTypeProto.NONE, PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
         cbPensionType.getSelectionModel().selectFirst();
 
         btnSearch.setOnMouseClicked(event -> searchEmployers());
         btnReset.setOnMouseClicked(event -> resetSearchFields());
-//        btnAdd.setOnMouseClicked(event -> showCreatePopup());
     }
 
     private void searchEmployers() {
@@ -113,28 +107,4 @@ public class HomeSearchEmployerCp implements FXComponent {
         dpDateCreation.setValue(null);
         dpDateExpiration.setValue(null);
     }
-
-//    private void showCreatePopup() {
-//        try {
-//            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/employerCreatePopup.fxml"));
-//            Locale locale = ObservableResourceFactory.resourceProperty().get().getLocale();
-//            fxmlLoader.setResources(ResourceBundle.getBundle("bundles.languageBundle", locale));
-//            Parent parent = fxmlLoader.load();
-//            // Add new employer to current observable list by callback
-//            EmployerCreatePopupController popupController = fxmlLoader.getController();
-//            popupController.setCallback(employer -> {
-//
-//            });
-//
-//            stagePopup = new Stage();
-//            stagePopup.initModality(Modality.APPLICATION_MODAL);
-//            stagePopup.setTitle(ObservableResourceFactory.getProperty().getString("employer.add"));
-//            stagePopup.setScene(new Scene(parent));
-////            stagePopup.setResizable(false);
-//            stagePopup.showAndWait();
-//
-//        } catch (Exception e) {
-//            log.error(e.getMessage());
-//        }
-//    }
 }

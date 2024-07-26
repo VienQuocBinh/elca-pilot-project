@@ -16,17 +16,16 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
+import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
-import vn.elca.training.pilot_project_front.model.Employer;
-import vn.elca.training.pilot_project_front.model.Salary;
-import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
-import vn.elca.training.pilot_project_front.util.StageManager;
+import vn.elca.training.pilot_project_front.model.*;
+import vn.elca.training.pilot_project_front.util.*;
 import vn.elca.training.proto.employer.EmployerId;
-import vn.elca.training.proto.employer.EmployerResponse;
-import vn.elca.training.proto.employer.EmployerSearchRequest;
+import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
+import vn.elca.training.proto.salary.SalaryCreateRequest;
 import vn.elca.training.proto.salary.SalaryResponse;
 
 import java.io.File;
@@ -35,7 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 @DeclarativeView(id = ComponentId.EMPLOYER_DETAIL_CP,
@@ -44,7 +43,7 @@ import java.util.stream.Collectors;
         initialTargetLayoutId = PerspectiveId.EMPLOYER_DETAIL_PERSPECTIVE,
         resourceBundleLocation = "bundles.languageBundle")
 public class EmployerDetailCp implements FXComponent {
-    private final Logger log = Logger.getLogger(EmployerDetailCp.class.getName());
+    private static final String ERROR_STYLE_CLASS = "error";
     @Resource
     private Context context;
     @FXML
@@ -56,6 +55,8 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private TextField tfName;
     @FXML
+    private Label lbNameError;
+    @FXML
     private Label lbNumber;
     @FXML
     private Label lbNumberValue;
@@ -64,13 +65,19 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private TextField tfIdeNumber;
     @FXML
+    private Label lbIdeNumberError;
+    @FXML
     private Label lbDateCreation;
     @FXML
     private DatePicker dpDateCreation;
     @FXML
+    private Label lbDateCreationError;
+    @FXML
     private Label lbDateExpiration;
     @FXML
     private DatePicker dpDateExpiration;
+    @FXML
+    private Label lbDateExpirationError;
     @FXML
     private Button btnReturn;
     @FXML
@@ -100,27 +107,31 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private Label fileInput;
     @Getter
-    private List<File> files = new ArrayList<>();
+    private File file;
+    private Employer employer;
+    private List<Salary> importedSalaries = new ArrayList<>();
 
     @Override
     public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
         if (message.getMessageBody() instanceof Employer) {
             // From EmployerDetailPerspective
+            clearErrors();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
-            Employer employer = message.getTypedMessageBody(Employer.class);
+            employer = message.getTypedMessageBody(Employer.class);
             lbNumberValue.setText(employer.getNumber());
             tfName.setText(employer.getName());
             tfIdeNumber.setText(employer.getIdeNumber());
             cbPensionType.getItems().clear();
-            cbPensionType.getItems().addAll(PensionTypeProto.NONE, PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
+            cbPensionType.getItems().addAll(PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
             cbPensionType.setValue(employer.getPensionType());
             dpDateCreation.setValue(LocalDate.parse(employer.getDateCreation(), formatter));
             if (!StringUtils.isBlank(employer.getDateExpiration()))
                 dpDateExpiration.setValue(LocalDate.parse(employer.getDateExpiration(), formatter));
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
-        } else if (message.getMessageBody() instanceof EmployerResponse) {
-            EmployerResponse employer = message.getTypedMessageBody(EmployerResponse.class);
-            List<SalaryResponse> salariesResponse = employer.getSalariesList();
+        } else if (message.getMessageBody() instanceof EmployerResponseWrapper) {
+            // From get employer detail, update stub callback
+            EmployerResponseWrapper employerResponseWrapper = message.getTypedMessageBody(EmployerResponseWrapper.class);
+            List<SalaryResponse> salariesResponse = employerResponseWrapper.getEmployerResponse().getSalariesList();
             List<Salary> salaries = salariesResponse
                     .stream()
                     .map(salaryResponse -> Salary.builder()
@@ -137,6 +148,13 @@ public class EmployerDetailCp implements FXComponent {
                     .collect(Collectors.toList());
             tbvSalary.getItems().clear();
             tbvSalary.setItems(FXCollections.observableList(salaries));
+            if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)) {
+                showSuccessAlert("Update employer", "Update employer successfully");
+            }
+        } else if (message.getMessageBody() instanceof ExceptionMessage) {
+            // From EmployerCallbackCp catch
+            String errorMessage = message.getTypedMessageBody(ExceptionMessage.class).getErrorMessage();
+            showErrorDetails(JsonStringify.convertStringErrorDetailToList(errorMessage));
         }
         return null;
     }
@@ -149,14 +167,50 @@ public class EmployerDetailCp implements FXComponent {
     @PostConstruct
     public void onPostConstruct() {
         bindingResource();
-        btnSave.setOnMouseClicked(event -> context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build()));
+        btnSave.setOnMouseClicked(event -> {
+            if (validateInputs()) {
+                // Just send imported salaries to save to db
+                List<SalaryCreateRequest> salaryCreateRequests = importedSalaries.stream()
+                        .map(salary -> SalaryCreateRequest.newBuilder()
+                                .setFirstName(salary.getFirstName())
+                                .setLastName(salary.getLastName())
+                                .setAvsNumber(salary.getAvsNumber())
+                                .setStartDate(salary.getStartDate())
+                                .setEndDate(salary.getEndDate())
+                                .setAvsAmount(salary.getAvsAmount())
+                                .setAcAmount(salary.getAcAmount())
+                                .setAfAmount(salary.getAfAmount())
+                                .build())
+                        .collect(Collectors.toList());
+                DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
+                context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerUpdateRequest.newBuilder()
+                        .setId(employer.getId())
+                        .setName(tfName.getText())
+                        .setDateCreation(dpDateCreation.getValue().format(dateFormater))
+                        .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateFormater) : "")
+                        .setIdeNumber(tfIdeNumber.getText())
+                        .setPensionType(cbPensionType.getSelectionModel().getSelectedItem())
+                        .addAllSalaries(salaryCreateRequests)
+                        .build());
+            }
+        });
         btnReturn.setOnMouseClicked(event -> {
             // Set back app title
             Stage primaryStage = StageManager.getPrimaryStage();
             if (primaryStage != null) {
                 primaryStage.titleProperty().setValue(ObservableResourceFactory.getProperty().getString("title"));
             }
-            context.send(PerspectiveId.HOME_PERSPECTIVE, "return");
+            context.send(PerspectiveId.HOME_PERSPECTIVE, ActionType.RETURN);
+        });
+        btnImport.setOnMouseClicked(e -> {
+            List<FileError> errors = ValidationUtil.validateSalaryFile(file);
+            if (errors.isEmpty()) {
+                importedSalaries = FileUtil.processSalaryCsvFiles(file);
+                tbvSalary.getItems().addAll(importedSalaries);
+                showSuccessAlert("Import salary success dialog", "Import successfully");
+            } else {
+                showWarningAlert("Import salary warning dialog", "Import fail", errors);
+            }
         });
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             FileChooser fileChooser = new FileChooser();
@@ -167,10 +221,11 @@ public class EmployerDetailCp implements FXComponent {
                     .ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx");
 
             fileChooser.getExtensionFilters().addAll(csvFilter, xlsxFilter);
-            Optional<List<File>> selectedFiles = Optional.ofNullable(fileChooser.showOpenMultipleDialog(fileInput.getScene().getWindow()));
-            fileInput.setText(selectedFiles.map(fileList -> fileList.stream().map(File::getName)
-                    .collect(Collectors.joining(","))).orElse(""));
-            files = selectedFiles.orElse(new ArrayList<>());
+            Optional<File> selectedFile = Optional.ofNullable(fileChooser.showOpenDialog(fileInput.getScene().getWindow()));
+            if (selectedFile.isPresent()) {
+                fileInput.setText(selectedFile.get().getName());
+                file = selectedFile.get();
+            }
         });
         tbvSalary.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
@@ -184,9 +239,9 @@ public class EmployerDetailCp implements FXComponent {
     private void bindingResource() {
         lbPensionType.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
         lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
-        lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
-        lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
-        lbDateCreation.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
+        lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber.required"));
+        lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name.required"));
+        lbDateCreation.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation.required"));
         lbDateExpiration.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         lbSalDeclaration.textProperty().bind(ObservableResourceFactory.getStringBinding("label.salary.declaration"));
         btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
@@ -201,5 +256,109 @@ public class EmployerDetailCp implements FXComponent {
         avsAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avs.ai.apg"));
         acAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ac"));
         afAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("af"));
+    }
+
+    // Validate on UI layer
+    private boolean validateInputs() {
+        String regex = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}$";
+        ResourceBundle resourceBundle = ObservableResourceFactory.getProperty();
+        boolean isValid = true;
+        if (tfName.getText().isEmpty()) {
+            tfName.getStyleClass().add(ERROR_STYLE_CLASS);
+            lbNameError.setVisible(true);
+            lbNameError.setText(resourceBundle.getString("error.name.required"));
+            isValid = false;
+        } else {
+            tfName.getStyleClass().remove(ERROR_STYLE_CLASS);
+            lbNameError.setVisible(false);
+        }
+        if (tfIdeNumber.getText().isEmpty()) {
+            tfIdeNumber.getStyleClass().add(ERROR_STYLE_CLASS);
+            lbIdeNumberError.setVisible(true);
+            lbIdeNumberError.setText(resourceBundle.getString("error.ideNumber.required"));
+            isValid = false;
+        } else if (!tfIdeNumber.getText().matches(regex)) {
+            tfIdeNumber.getStyleClass().add(ERROR_STYLE_CLASS);
+            lbIdeNumberError.setVisible(true);
+            lbIdeNumberError.setText(resourceBundle.getString("error.ideNumber.format"));
+            isValid = false;
+        } else {
+            tfIdeNumber.getStyleClass().remove(ERROR_STYLE_CLASS);
+            lbIdeNumberError.setVisible(false);
+        }
+        ValidationUtil.validateDateFields(dpDateCreation, dpDateExpiration,
+                lbDateCreationError, lbDateExpirationError,
+                ERROR_STYLE_CLASS, resourceBundle);
+        return isValid;
+    }
+
+    // Show errors thrown from BE and catch at FE Callback
+    private void showErrorDetails(List<ErrorDetail> errorDetails) {
+        ResourceBundle resourceBundle = ObservableResourceFactory.getProperty();
+        clearErrors();
+        for (ErrorDetail errorDetail : errorDetails) {
+            switch (errorDetail.getFxErrorKey()) {
+                case "error.name.required":
+                    tfName.getStyleClass().add(ERROR_STYLE_CLASS);
+                    lbNameError.setVisible(true);
+                    lbNameError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    break;
+                case "error.ideNumber.required":
+                case "error.ideNumber.format":
+                case "error.ideNumber.duplicate":
+                    tfIdeNumber.getStyleClass().add(ERROR_STYLE_CLASS);
+                    lbIdeNumberError.setVisible(true);
+                    lbIdeNumberError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    break;
+                case "error.dateCreation.format":
+                case "error.dateCreation.required":
+                    dpDateCreation.getStyleClass().add(ERROR_STYLE_CLASS);
+                    lbDateCreationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    lbDateCreationError.setVisible(true);
+                    break;
+                case "error.dateExpiration.format":
+                    dpDateExpiration.getStyleClass().add(ERROR_STYLE_CLASS);
+                    lbDateExpirationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    lbDateExpirationError.setVisible(true);
+                    break;
+                case "error.dateOrder":
+                    dpDateCreation.getStyleClass().add(ERROR_STYLE_CLASS);
+                    dpDateExpiration.getStyleClass().add(ERROR_STYLE_CLASS);
+                    lbDateExpirationError.setText(resourceBundle.getString(errorDetail.getFxErrorKey()));
+                    lbDateExpirationError.setVisible(true);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void showSuccessAlert(String title, String headerText) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.show();
+    }
+
+    private void showWarningAlert(String title, String headerText, List<FileError> fileErrors) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        List<String> errorMessages = fileErrors.stream()
+                .map(e -> "At line " + e.getLineNumber() + ": " + e.getErrorMessage() + " value: " + e.getErrorValue())
+                .collect(Collectors.toList());
+
+        alert.setContentText(String.join("\n", errorMessages));
+        alert.show();
+    }
+
+    private void clearErrors() {
+        tfName.getStyleClass().remove(ERROR_STYLE_CLASS);
+        lbNameError.setVisible(false);
+        tfIdeNumber.getStyleClass().remove(ERROR_STYLE_CLASS);
+        lbIdeNumberError.setVisible(false);
+        dpDateCreation.getStyleClass().remove(ERROR_STYLE_CLASS);
+        dpDateExpiration.getStyleClass().remove(ERROR_STYLE_CLASS);
+        lbDateExpirationError.setVisible(false);
     }
 }
