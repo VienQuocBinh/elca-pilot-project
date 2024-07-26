@@ -18,10 +18,7 @@ import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.model.ErrorDetail;
 import vn.elca.training.pilot_project_front.util.JsonStringify;
 import vn.elca.training.pilot_project_front.util.TextFieldUtil;
-import vn.elca.training.proto.employer.EmployerCreateRequest;
-import vn.elca.training.proto.employer.EmployerResponse;
-import vn.elca.training.proto.employer.EmployerServiceGrpc;
-import vn.elca.training.proto.employer.PensionTypeProto;
+import vn.elca.training.proto.employer.*;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +27,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class EmployerCreatePopupController implements Initializable {
+    private final EmployerServiceGrpc.EmployerServiceBlockingStub stub;
     @FXML
     private Label lbPensionType;
     @FXML
@@ -43,7 +41,7 @@ public class EmployerCreatePopupController implements Initializable {
     @FXML
     private Label lbNumber;
     @FXML
-    private TextField tfNumber;
+    private Label lbNumberValue;
     @FXML
     private Label lbIdeNumber;
     @FXML
@@ -70,10 +68,10 @@ public class EmployerCreatePopupController implements Initializable {
     private ImageView infoNumber;
     @FXML
     private ImageView infoIdeNumber;
-    private EmployerServiceGrpc.EmployerServiceBlockingStub stub;
     private ResourceBundle resourceBundle;
     @Setter
     private EmployerCreationCallback callback;
+
 
     public EmployerCreatePopupController() {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
@@ -88,6 +86,8 @@ public class EmployerCreatePopupController implements Initializable {
         Platform.runLater(() -> {
             Stage stage = (Stage) tfName.getScene().getWindow();
             stage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::handleWindowClose);
+            EmployerNextNumberResponse employerNextNumber = stub.getEmployerNextNumber(Empty.newBuilder().build());
+            lbNumberValue.setText(employerNextNumber.getNumber());
             cbPensionType.getItems().addAll(PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
             cbPensionType.getSelectionModel().selectFirst();
 

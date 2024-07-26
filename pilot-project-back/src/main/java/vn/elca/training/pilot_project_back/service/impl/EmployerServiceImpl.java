@@ -47,6 +47,11 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
+    public int getEmployerNextNumber() {
+        return employerRepository.findMaxNumber() + 1;
+    }
+
+    @Override
     public EmployerResponseDto createEmployer(EmployerCreateRequestDto requestDto) {
         Employer employer = employerRepository.save(employerMapper.mapCreateDtoToEntity(requestDto));
         return employerMapper.mapEntityToResponseDto(employer);

@@ -43,6 +43,14 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     }
 
     @Override
+    public void getEmployerNextNumber(Empty request, StreamObserver<EmployerNextNumberResponse> responseObserver) {
+        responseObserver.onNext(EmployerNextNumberResponse.newBuilder()
+                .setNumber(String.format("%06d", employerService.getEmployerNextNumber()))
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void getEmployers(EmployerSearchRequest request, StreamObserver<EmployerListResponse> responseObserver) {
         try {
             EmployerSearchRequestDto searchRequestDto = employerMapper.mapSearchRequestProtoToDto(request);

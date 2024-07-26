@@ -20,6 +20,10 @@ message EmployerId {
     uint64 id = 1;
 }
 
+message EmployerNextNumberResponse {
+    string number = 1;
+}
+
 message EmployerResponse {
     uint64 id = 1;
     string date_creation = 2;
@@ -64,6 +68,7 @@ message EmployerUpdateRequest {
 service EmployerService {
     rpc GetEmployerById (EmployerId) returns (EmployerResponse) {};
     rpc GetEmployers (EmployerSearchRequest) returns (EmployerListResponse) {};
+    rpc GetEmployerNextNumber (Empty) returns (EmployerNextNumberResponse) {};
     rpc CreateEmployer (EmployerCreateRequest) returns (EmployerResponse) {};
     rpc DeleteEmployer (EmployerId) returns (Empty) {}
     rpc UpdateEmployer (EmployerUpdateRequest) returns (EmployerResponse);

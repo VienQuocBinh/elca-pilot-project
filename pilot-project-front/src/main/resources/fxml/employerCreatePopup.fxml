@@ -13,7 +13,7 @@
         <Label fx:id="lbNumber" text="%number.required"/>
         <ImageView fx:id="infoNumber" pickOnBounds="true" fitWidth="16" fitHeight="16" styleClass="image-info"/>
     </HBox>
-    <TextField fx:id="tfNumber" disable="true"/>
+    <Label fx:id="lbNumberValue" style="-fx-font-weight: bold"/>
     <Region styleClass="blankSpacing"/>
     <HBox spacing="5" alignment="CENTER_LEFT">
         <Label fx:id="lbName" text="%name.required"/>
