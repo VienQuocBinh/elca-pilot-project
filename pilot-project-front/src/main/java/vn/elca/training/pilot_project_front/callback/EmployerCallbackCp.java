@@ -14,13 +14,13 @@ import org.jacpfx.api.annotations.lifecycle.PreDestroy;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.CallbackComponent;
 import org.jacpfx.rcp.context.Context;
+import vn.elca.training.pilot_project_front.config.GrpcConfig;
 import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
 import vn.elca.training.pilot_project_front.model.ExceptionMessage;
 import vn.elca.training.proto.employer.*;
 
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 @Component(id = ComponentId.EMPLOYER_CALLBACK_CP,
@@ -72,9 +72,9 @@ public class EmployerCallbackCp implements CallbackComponent {
     }
 
     @PostConstruct
-    public void onPostConstructComponent(final ResourceBundle resourceBundle) {
+    public void onPostConstructComponent() {
         this.channel = ManagedChannelBuilder
-                .forAddress("localhost", 9090)
+                .forAddress(GrpcConfig.ADDRESS, GrpcConfig.PORT)
                 .usePlaintext()
                 .build();
         this.stub = EmployerServiceGrpc.newBlockingStub(channel);

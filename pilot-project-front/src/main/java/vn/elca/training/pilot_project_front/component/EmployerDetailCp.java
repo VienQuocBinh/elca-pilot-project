@@ -127,6 +127,7 @@ public class EmployerDetailCp implements FXComponent {
             dpDateCreation.setValue(LocalDate.parse(employer.getDateCreation(), formatter));
             if (!StringUtils.isBlank(employer.getDateExpiration()))
                 dpDateExpiration.setValue(LocalDate.parse(employer.getDateExpiration(), formatter));
+            else dpDateExpiration.setValue(null);
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build());
         } else if (message.getMessageBody() instanceof EmployerResponseWrapper) {
             // From get employer detail, update stub callback
@@ -244,6 +245,12 @@ public class EmployerDetailCp implements FXComponent {
         lbDateCreation.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation.required"));
         lbDateExpiration.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         lbSalDeclaration.textProperty().bind(ObservableResourceFactory.getStringBinding("label.salary.declaration"));
+        TextFieldUtil.applyDateFilter(dpDateCreation.getEditor());
+        dpDateCreation.promptTextProperty().bind(ObservableResourceFactory.getStringBinding("date.format"));
+        dpDateCreation.setConverter(TextFieldUtil.dateStringConverter());
+        TextFieldUtil.applyDateFilter(dpDateExpiration.getEditor());
+        dpDateExpiration.promptTextProperty().bind(ObservableResourceFactory.getStringBinding("date.format"));
+        dpDateExpiration.setConverter(TextFieldUtil.dateStringConverter());
         btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
         btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));
         btnImport.textProperty().bind(ObservableResourceFactory.getStringBinding("import"));

@@ -14,6 +14,7 @@ import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
+import vn.elca.training.pilot_project_front.util.TextFieldUtil;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 
@@ -81,7 +82,12 @@ public class HomeSearchEmployerCp implements FXComponent {
         btnReset.textProperty().bind(ObservableResourceFactory.getStringBinding("reset"));
         cbPensionType.getItems().addAll(PensionTypeProto.NONE, PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
         cbPensionType.getSelectionModel().selectFirst();
-
+        TextFieldUtil.applyDateFilter(dpDateCreation.getEditor());
+        dpDateCreation.promptTextProperty().bind(ObservableResourceFactory.getStringBinding("date.format"));
+        dpDateCreation.setConverter(TextFieldUtil.dateStringConverter());
+        TextFieldUtil.applyDateFilter(dpDateExpiration.getEditor());
+        dpDateExpiration.promptTextProperty().bind(ObservableResourceFactory.getStringBinding("date.format"));
+        dpDateExpiration.setConverter(TextFieldUtil.dateStringConverter());
         btnSearch.setOnMouseClicked(event -> searchEmployers());
         btnReset.setOnMouseClicked(event -> resetSearchFields());
     }
