@@ -8,3 +8,15 @@ option java_package = "vn.elca.training.proto.common";
 message EmployerId {
     uint64 id = 1;
 }
+
+message PagingRequest {
+    uint32 page_index = 1;
+    uint32 page_size = 2;
+}
+
+message PagingResponse {
+    uint32 page_index = 1;
+    uint32 page_size = 2;
+    uint32 total_pages = 3;
+    uint64 total_elements = 4;
+}

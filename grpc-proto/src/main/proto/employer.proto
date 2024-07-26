@@ -38,10 +38,12 @@ message EmployerSearchRequest {
     string ide_number = 4;
     string date_creation = 5;
     string date_expiration = 6;
+    PagingRequest paging_request = 7;
 }
 
 message EmployerListResponse {
-    repeated EmployerResponse employers = 1;
+    PagingResponse paging_response = 1;
+    repeated EmployerResponse employers = 2;
 }
 
 message EmployerCreateRequest {

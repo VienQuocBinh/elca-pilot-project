@@ -17,4 +17,5 @@ public class EmployerSearchRequestDto {
     private String ideNumber;
     private Date dateCreation;
     private Date dateExpiration;
+    private PagingRequestDto pagingRequest;
 }
