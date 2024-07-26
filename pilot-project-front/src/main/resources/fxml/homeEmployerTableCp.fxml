@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.cell.*?>
 <?import javafx.scene.layout.*?>
+<?import vn.elca.training.pilot_project_front.callback.*?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       xmlns="http://javafx.com/javafx"
       spacing="20">
@@ -19,31 +20,49 @@
                     <cellValueFactory>
                         <PropertyValueFactory property="pensionType"/>
                     </cellValueFactory>
+                    <cellFactory>
+                        <FormattedTableCell alignment="LEFT"/>
+                    </cellFactory>
                 </TableColumn>
                 <TableColumn fx:id="numberCol" text="%number" prefWidth="120">
                     <cellValueFactory>
                         <PropertyValueFactory property="number"/>
                     </cellValueFactory>
+                    <cellFactory>
+                        <FormattedTableCell alignment="CENTER"/>
+                    </cellFactory>
                 </TableColumn>
                 <TableColumn fx:id="ideNumberCol" text="%ideNumber" prefWidth="150">
                     <cellValueFactory>
                         <PropertyValueFactory property="ideNumber"/>
                     </cellValueFactory>
+                    <cellFactory>
+                        <FormattedTableCell alignment="LEFT"/>
+                    </cellFactory>
                 </TableColumn>
                 <TableColumn fx:id="nameCol" text="%name" prefWidth="150">
                     <cellValueFactory>
                         <PropertyValueFactory property="name"/>
                     </cellValueFactory>
+                    <cellFactory>
+                        <FormattedTableCell alignment="LEFT"/>
+                    </cellFactory>
                 </TableColumn>
                 <TableColumn fx:id="dateCreationCol" text="%dateCreation" prefWidth="100">
                     <cellValueFactory>
                         <PropertyValueFactory property="dateCreation"/>
                     </cellValueFactory>
+                    <cellFactory>
+                        <FormattedTableCell alignment="CENTER"/>
+                    </cellFactory>
                 </TableColumn>
                 <TableColumn fx:id="dateExpirationCol" text="%dateExpiration" prefWidth="100">
                     <cellValueFactory>
                         <PropertyValueFactory property="dateExpiration"/>
                     </cellValueFactory>
+                    <cellFactory>
+                        <FormattedTableCell alignment="CENTER"/>
+                    </cellFactory>
                 </TableColumn>
                 <TableColumn fx:id="actionCol" prefWidth="200"/>
             </columns>

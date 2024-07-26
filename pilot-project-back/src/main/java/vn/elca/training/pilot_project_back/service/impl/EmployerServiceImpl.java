@@ -19,6 +19,7 @@ import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.repository.EmployerRepository;
 import vn.elca.training.pilot_project_back.service.EmployerService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -37,6 +38,7 @@ public class EmployerServiceImpl implements EmployerService {
         Iterable<Employer> employers = employerRepository.findAll(builder);
         return StreamSupport.stream(employers.spliterator(), false)
                 .map(employerMapper::mapEntityToResponseDto)
+                .sorted(Comparator.comparing(EmployerResponseDto::getNumber))
                 .collect(Collectors.toList());
     }
 
@@ -44,6 +46,11 @@ public class EmployerServiceImpl implements EmployerService {
     public EmployerResponseDto getEmployerById(long id) throws EntityNotFoundException {
         return employerRepository.findById(id).map(employerMapper::mapEntityToResponseDto)
                 .orElseThrow(() -> new EntityNotFoundException(Employer.class, "id", id));
+    }
+
+    @Override
+    public int getEmployerNextNumber() {
+        return employerRepository.findMaxNumber() + 1;
     }
 
     @Override

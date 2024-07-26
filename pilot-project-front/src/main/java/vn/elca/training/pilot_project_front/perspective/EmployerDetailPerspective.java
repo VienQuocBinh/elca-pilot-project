@@ -20,7 +20,8 @@ import vn.elca.training.pilot_project_front.util.StageManager;
         name = "employerDetailPerspective",
         components = {
                 ComponentId.EMPLOYER_DETAIL_CP,
-                ComponentId.EMPLOYER_CALLBACK_CP
+                ComponentId.EMPLOYER_CALLBACK_CP,
+                ComponentId.SALARY_CALLBACK_CP
         },
         viewLocation = "/fxml/employerDetailPerspective.fxml",
         resourceBundleLocation = "bundles.languageBundle",

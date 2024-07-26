@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.cell.*?>
 <?import javafx.scene.layout.*?>
+<?import vn.elca.training.pilot_project_front.callback.*?>
 <VBox xmlns:fx="http://javafx.com/fxml" fx:id="mainContainer"
       xmlns="http://javafx.com/javafx"
       spacing="10"
@@ -44,7 +45,7 @@
     <Label fx:id="lbSalDeclaration" styleClass="lbSalDeclaration" text="%label.salary.declaration"/>
     <HBox spacing="20">
         <Label fx:id="fileInput" text="C:\ipension" styleClass="file-selector"/>
-        <Button fx:id="btnImport" text="%import"/>
+        <Button fx:id="btnImport" text="%import" disable="true"/>
     </HBox>
 
     <TableView fx:id="tbvSalary" GridPane.rowIndex="0" GridPane.columnIndex="0">
@@ -53,41 +54,65 @@
                 <cellValueFactory>
                     <PropertyValueFactory property="avsNumber"/>
                 </cellValueFactory>
+                <cellFactory>
+                    <FormattedTableCell alignment="LEFT"/>
+                </cellFactory>
             </TableColumn>
             <TableColumn fx:id="lastNameCol" text="%employee.lastName" prefWidth="150">
                 <cellValueFactory>
                     <PropertyValueFactory property="lastName"/>
                 </cellValueFactory>
+                <cellFactory>
+                    <FormattedTableCell alignment="LEFT"/>
+                </cellFactory>
             </TableColumn>
             <TableColumn fx:id="firstNameCol" text="%employee.firstName" prefWidth="150">
                 <cellValueFactory>
                     <PropertyValueFactory property="firstName"/>
                 </cellValueFactory>
+                <cellFactory>
+                    <FormattedTableCell alignment="LEFT"/>
+                </cellFactory>
             </TableColumn>
             <TableColumn fx:id="startDateCol" text="%startDate" prefWidth="100">
                 <cellValueFactory>
                     <PropertyValueFactory property="startDate"/>
                 </cellValueFactory>
+                <cellFactory>
+                    <FormattedTableCell alignment="CENTER"/>
+                </cellFactory>
             </TableColumn>
             <TableColumn fx:id="endDateCol" text="%endDate" prefWidth="100">
                 <cellValueFactory>
                     <PropertyValueFactory property="endDate"/>
                 </cellValueFactory>
+                <cellFactory>
+                    <FormattedTableCell alignment="CENTER"/>
+                </cellFactory>
             </TableColumn>
             <TableColumn fx:id="avsAmountCol" text="%avs.ai.apg" prefWidth="100">
                 <cellValueFactory>
                     <PropertyValueFactory property="avsAmount"/>
                 </cellValueFactory>
+                <cellFactory>
+                    <FormattedTableCell alignment="RIGHT"/>
+                </cellFactory>
             </TableColumn>
             <TableColumn fx:id="acAmountCol" text="%ac" prefWidth="70">
                 <cellValueFactory>
                     <PropertyValueFactory property="acAmount"/>
                 </cellValueFactory>
+                <cellFactory>
+                    <FormattedTableCell alignment="RIGHT"/>
+                </cellFactory>
             </TableColumn>
             <TableColumn fx:id="afAmountCol" text="%af" prefWidth="70">
                 <cellValueFactory>
                     <PropertyValueFactory property="afAmount"/>
                 </cellValueFactory>
+                <cellFactory>
+                    <FormattedTableCell alignment="RIGHT"/>
+                </cellFactory>
             </TableColumn>
             <!--            <TableColumn fx:id="actionCol" prefWidth="200"/>-->
         </columns>

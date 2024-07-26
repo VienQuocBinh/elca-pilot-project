@@ -14,14 +14,13 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import lombok.Setter;
 import vn.elca.training.pilot_project_front.callback.EmployerCreationCallback;
+import vn.elca.training.pilot_project_front.config.GrpcConfig;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.model.ErrorDetail;
 import vn.elca.training.pilot_project_front.util.JsonStringify;
+import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.TextFieldUtil;
-import vn.elca.training.proto.employer.EmployerCreateRequest;
-import vn.elca.training.proto.employer.EmployerResponse;
-import vn.elca.training.proto.employer.EmployerServiceGrpc;
-import vn.elca.training.proto.employer.PensionTypeProto;
+import vn.elca.training.proto.employer.*;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +29,8 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class EmployerCreatePopupController implements Initializable {
+    private final EmployerServiceGrpc.EmployerServiceBlockingStub stub;
+    private final ManagedChannel channel;
     @FXML
     private Label lbPensionType;
     @FXML
@@ -43,7 +44,7 @@ public class EmployerCreatePopupController implements Initializable {
     @FXML
     private Label lbNumber;
     @FXML
-    private TextField tfNumber;
+    private Label lbNumberValue;
     @FXML
     private Label lbIdeNumber;
     @FXML
@@ -70,13 +71,13 @@ public class EmployerCreatePopupController implements Initializable {
     private ImageView infoNumber;
     @FXML
     private ImageView infoIdeNumber;
-    private EmployerServiceGrpc.EmployerServiceBlockingStub stub;
     private ResourceBundle resourceBundle;
     @Setter
     private EmployerCreationCallback callback;
 
     public EmployerCreatePopupController() {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
+        channel = ManagedChannelBuilder
+                .forAddress(GrpcConfig.ADDRESS, GrpcConfig.PORT)
                 .usePlaintext()
                 .build();
         stub = EmployerServiceGrpc.newBlockingStub(channel);
@@ -88,11 +89,16 @@ public class EmployerCreatePopupController implements Initializable {
         Platform.runLater(() -> {
             Stage stage = (Stage) tfName.getScene().getWindow();
             stage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::handleWindowClose);
+            EmployerNextNumberResponse employerNextNumber = stub.getEmployerNextNumber(Empty.newBuilder().build());
+            lbNumberValue.setText(employerNextNumber.getNumber());
             cbPensionType.getItems().addAll(PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
             cbPensionType.getSelectionModel().selectFirst();
-
-//            dpDateCreation.setValue(LocalDate.now());
-//            dpDateExpiration.setValue(LocalDate.now());
+            TextFieldUtil.applyDateFilter(dpDateCreation.getEditor());
+            dpDateCreation.promptTextProperty().bind(ObservableResourceFactory.getStringBinding("date.format"));
+            dpDateCreation.setConverter(TextFieldUtil.dateStringConverter());
+            TextFieldUtil.applyDateFilter(dpDateExpiration.getEditor());
+            dpDateExpiration.promptTextProperty().bind(ObservableResourceFactory.getStringBinding("date.format"));
+            dpDateExpiration.setConverter(TextFieldUtil.dateStringConverter());
             buildInfoTooltip();
             // Force Name text field can not input digit and special chars
             TextFieldUtil.applyAlphabeticFilter(tfName);
@@ -145,6 +151,7 @@ public class EmployerCreatePopupController implements Initializable {
         alert.setHeaderText(header);
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
+                channel.shutdown();
                 Stage stage = (Stage) tfName.getScene().getWindow();
                 stage.close();
             }

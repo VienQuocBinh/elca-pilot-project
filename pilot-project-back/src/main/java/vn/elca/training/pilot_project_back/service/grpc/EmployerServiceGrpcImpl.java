@@ -13,6 +13,7 @@ import vn.elca.training.pilot_project_back.exception.handler.GrpcExceptionHandle
 import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
+import vn.elca.training.proto.common.EmployerId;
 import vn.elca.training.proto.employer.*;
 
 import java.util.List;
@@ -40,6 +41,14 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
             log.error(e.getMessage());
             responseObserver.onError(GrpcExceptionHandler.handleException(e));
         }
+    }
+
+    @Override
+    public void getEmployerNextNumber(Empty request, StreamObserver<EmployerNextNumberResponse> responseObserver) {
+        responseObserver.onNext(EmployerNextNumberResponse.newBuilder()
+                .setNumber(String.format("%06d", employerService.getEmployerNextNumber()))
+                .build());
+        responseObserver.onCompleted();
     }
 
     @Override

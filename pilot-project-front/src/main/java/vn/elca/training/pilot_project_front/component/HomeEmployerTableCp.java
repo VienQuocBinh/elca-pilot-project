@@ -161,10 +161,10 @@ public class HomeEmployerTableCp implements FXComponent {
     private void bindingResource() {
         btnAdd.textProperty().bind(ObservableResourceFactory.getStringBinding("add"));
         pensionTypeCol.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
-        numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number.required"));
-        ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber.required"));
-        nameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("name.required"));
-        dateCreationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation.required"));
+        numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
+        ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
+        nameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("name"));
+        dateCreationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
         dateExpirationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         btnAdd.setOnMouseClicked(event -> showCreatePopup());
     }
