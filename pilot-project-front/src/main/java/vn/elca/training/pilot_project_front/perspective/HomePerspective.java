@@ -41,7 +41,7 @@ public class HomePerspective implements FXPerspective {
     @FXML
     private Label lbTotalElements;
     @FXML
-    private Pagination pagination;
+    private Pagination pgEmployer;
     private int totalPages;
 
     @Override
@@ -57,14 +57,14 @@ public class HomePerspective implements FXPerspective {
             // From init table of HomeEmployerTableCp
             PagingResponse pagingResponse = message.getTypedMessageBody(PagingResponse.class);
             totalPages = pagingResponse.getTotalPages();
-            pagination.setPageCount(totalPages);
-            pagination.setVisible(true);
+            pgEmployer.setPageCount(totalPages);
+            pgEmployer.setVisible(true);
             lbTotalElements.setText("Total items: " + pagingResponse.getTotalElements());
         } else if (message.getMessageBody() instanceof EmployerSearchRequest) {
             // Get from HomeSearchEmployerCp to append paging info then send to callback
             EmployerSearchRequest searchRequest = message.getTypedMessageBody(EmployerSearchRequest.class);
             searchRequest.toBuilder().setPagingRequest(PagingRequest.newBuilder()
-                    .setPageIndex(pagination.getCurrentPageIndex())
+                    .setPageIndex(pgEmployer.getCurrentPageIndex())
                     .build());
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, searchRequest);
         }
@@ -72,13 +72,13 @@ public class HomePerspective implements FXPerspective {
 
     @PostConstruct
     public void onPostConstruct() {
-        pagination.setMaxPageIndicatorCount(5);
-        pagination.setPageCount(totalPages);
-        pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) ->
+        pgEmployer.setMaxPageIndicatorCount(5);
+        pgEmployer.setPageCount(totalPages);
+        pgEmployer.currentPageIndexProperty().addListener((observable, oldValue, newValue) ->
                 // Send message to callback
                 context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder()
                         .setPagingRequest(PagingRequest.newBuilder()
-                                .setPageIndex(pagination.getCurrentPageIndex())
+                                .setPageIndex(pgEmployer.getCurrentPageIndex())
                                 .build())
                         .build())
         );

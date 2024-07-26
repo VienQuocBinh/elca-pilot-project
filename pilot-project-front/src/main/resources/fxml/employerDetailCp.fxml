@@ -117,6 +117,14 @@
             <!--            <TableColumn fx:id="actionCol" prefWidth="200"/>-->
         </columns>
     </TableView>
+    <BorderPane>
+        <left>
+            <Label fx:id="lbTotalElements"/>
+        </left>
+        <right>
+            <Pagination fx:id="pgSalary"/>
+        </right>
+    </BorderPane>
     <HBox alignment="CENTER_RIGHT" spacing="20">
         <Button fx:id="btnReturn" text="%return" prefWidth="100"/>
         <Button fx:id="btnSave" text="%save" prefWidth="100"/>

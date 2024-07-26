@@ -104,13 +104,17 @@ public class EmployerDetailCp implements FXComponent {
     private Label lbSalDeclaration;
     @FXML
     private Label fileInput;
+    @FXML
+    private Label lbTotalElements;
+    @FXML
+    private Pagination pgSalary;
     @Getter
     private File file;
     private Employer employer;
     private List<Salary> importedSalaries = new ArrayList<>();
 
     @Override
-    public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
+    public Node postHandle(Node node, Message<Event, Object> message) {
         if (message.getMessageBody() instanceof Employer) {
             // From EmployerDetailPerspective
             clearErrors();
@@ -183,7 +187,7 @@ public class EmployerDetailCp implements FXComponent {
     }
 
     @Override
-    public Node handle(Message<Event, Object> message) throws Exception {
+    public Node handle(Message<Event, Object> message) {
         return null;
     }
 

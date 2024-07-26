@@ -1,9 +1,9 @@
 package vn.elca.training.pilot_project_back.service;
 
+import org.springframework.data.domain.Page;
 import vn.elca.training.pilot_project_back.dto.SalaryResponseDto;
-
-import java.util.List;
+import vn.elca.training.proto.salary.SalaryListRequest;
 
 public interface SalaryService {
-    List<SalaryResponseDto> getSalariesByEmployerId(Long employerId);
+    Page<SalaryResponseDto> getSalariesByEmployerId(SalaryListRequest request);
 }
