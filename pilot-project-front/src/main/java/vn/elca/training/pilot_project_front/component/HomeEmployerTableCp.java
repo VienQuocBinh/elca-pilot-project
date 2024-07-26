@@ -1,5 +1,6 @@
 package vn.elca.training.pilot_project_front.component;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -85,12 +86,12 @@ public class HomeEmployerTableCp implements FXComponent {
     }
 
     @Override
-    public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
+    public Node postHandle(Node node, Message<Event, Object> message) {
         return null;
     }
 
     @Override
-    public Node handle(Message<Event, Object> message) throws Exception {
+    public Node handle(Message<Event, Object> message) {
         if (message.getMessageBody() instanceof Empty) {
             // Reload the employer list
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
@@ -108,9 +109,11 @@ public class HomeEmployerTableCp implements FXComponent {
                             .dateExpiration(employer.getDateExpiration())
                             .build())
                     .collect(Collectors.toList());
-
-            tbvEmployer.getItems().clear();
-            tbvEmployer.setItems(FXCollections.observableList(collect));
+            Platform.runLater(() -> {
+                tbvEmployer.getItems().clear();
+                tbvEmployer.setItems(FXCollections.observableList(collect));
+            });
+            context.send(PerspectiveId.HOME_PERSPECTIVE, listResponse.getPagingResponse());
         }
         return null;
     }

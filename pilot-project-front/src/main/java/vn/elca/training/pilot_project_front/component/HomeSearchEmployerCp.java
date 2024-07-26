@@ -59,12 +59,12 @@ public class HomeSearchEmployerCp implements FXComponent {
     private ComboBox<PensionTypeProto> cbPensionType;
 
     @Override
-    public Node postHandle(Node node, Message<Event, Object> message) throws Exception {
+    public Node postHandle(Node node, Message<Event, Object> message) {
         return null;
     }
 
     @Override
-    public Node handle(Message<Event, Object> message) throws Exception {
+    public Node handle(Message<Event, Object> message) {
 
         return null;
     }
@@ -102,7 +102,8 @@ public class HomeSearchEmployerCp implements FXComponent {
                 .setDateCreation(dpDateCreation.getValue() != null ? dpDateCreation.getValue().format(dateTimeFormatter) : "")
                 .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateTimeFormatter) : "")
                 .build();
-        context.send(ComponentId.EMPLOYER_CALLBACK_CP, searchRequest);
+        // Send to parent perspective to append paging info
+        context.send(PerspectiveId.HOME_PERSPECTIVE, searchRequest);
     }
 
     private void resetSearchFields() {

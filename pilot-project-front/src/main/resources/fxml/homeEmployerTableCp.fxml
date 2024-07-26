@@ -68,7 +68,4 @@
             </columns>
         </TableView>
     </GridPane>
-    <HBox alignment="CENTER_RIGHT">
-        <Pagination fx:id="pagination"/>
-    </HBox>
 </VBox>
