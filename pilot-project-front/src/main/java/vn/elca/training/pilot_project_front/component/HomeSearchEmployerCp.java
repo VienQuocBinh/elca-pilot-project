@@ -13,6 +13,7 @@ import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
+import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.TextFieldUtil;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
@@ -80,8 +81,11 @@ public class HomeSearchEmployerCp implements FXComponent {
         lbDateExpiration.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         btnSearch.textProperty().bind(ObservableResourceFactory.getStringBinding("search"));
         btnReset.textProperty().bind(ObservableResourceFactory.getStringBinding("reset"));
-        cbPensionType.getItems().addAll(PensionTypeProto.NONE, PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
-        cbPensionType.getSelectionModel().selectFirst();
+
+        // Initialize the ComboBox with the current locale
+        PensionTypeService.getInstance().setCbPensionTypeSearch(cbPensionType);
+        PensionTypeService.getInstance().updateCbPensionTypeSearch();
+
         TextFieldUtil.applyDateFilter(dpDateCreation.getEditor());
         dpDateCreation.promptTextProperty().bind(ObservableResourceFactory.getStringBinding("date.format"));
         dpDateCreation.setConverter(TextFieldUtil.dateStringConverter());

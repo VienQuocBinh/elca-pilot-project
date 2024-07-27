@@ -22,7 +22,7 @@
     <TextField fx:id="tfName"/>
     <Label fx:id="lbNameError" styleClass="error-label" visible="false"/>
 
-    <Label fx:id="lbPensionType" text="%pensionType"/>
+    <Label fx:id="lbPensionType" text="%pensionType.required"/>
     <ComboBox fx:id="cbPensionType" prefWidth="200"/>
     <Region styleClass="blankSpacing"/>
 

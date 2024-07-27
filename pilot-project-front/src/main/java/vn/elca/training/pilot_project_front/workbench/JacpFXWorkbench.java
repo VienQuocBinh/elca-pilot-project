@@ -13,6 +13,7 @@ import org.jacpfx.rcp.componentLayout.FXComponentLayout;
 import org.jacpfx.rcp.components.toolBar.JACPToolBar;
 import org.jacpfx.rcp.workbench.FXWorkbench;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
+import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 
 import java.util.Locale;
@@ -38,6 +39,8 @@ public class JacpFXWorkbench implements FXWorkbench {
                 .addListener((observable, oldValue, newValue) -> {
                     if (newValue != null) {
                         ObservableResourceFactory.setProperty(ResourceBundle.getBundle("bundles/languageBundle", newValue));
+                        PensionTypeService.getInstance().updateCbPensionTypeSearch();
+                        PensionTypeService.getInstance().updateCbPensionType();
                     }
                 });
     }

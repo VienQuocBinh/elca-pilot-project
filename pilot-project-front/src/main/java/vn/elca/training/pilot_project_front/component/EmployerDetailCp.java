@@ -21,6 +21,7 @@ import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.*;
+import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.*;
 import vn.elca.training.proto.common.PagingRequest;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
@@ -127,8 +128,8 @@ public class EmployerDetailCp implements FXComponent {
             lbNumberValue.setText(employer.getNumber());
             tfName.setText(employer.getName());
             tfIdeNumber.setText(employer.getIdeNumber());
-            cbPensionType.getItems().clear();
-            cbPensionType.getItems().addAll(PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
+            PensionTypeService.getInstance().setCbPensionTypeMandatory(cbPensionType);
+            PensionTypeService.getInstance().updateCbPensionType();
             cbPensionType.setValue(employer.getPensionType());
             dpDateCreation.setValue(LocalDate.parse(employer.getDateCreation(), formatter));
             if (!StringUtils.isBlank(employer.getDateExpiration()))
