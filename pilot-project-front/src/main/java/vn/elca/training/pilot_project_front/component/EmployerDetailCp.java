@@ -130,7 +130,7 @@ public class EmployerDetailCp implements FXComponent {
             tfIdeNumber.setText(employer.getIdeNumber());
             PensionTypeService.getInstance().setCbPensionTypeMandatory(cbPensionType);
             PensionTypeService.getInstance().updateCbPensionType();
-            cbPensionType.setValue(employer.getPensionType());
+            cbPensionType.setValue(PensionTypeUtil.getLocalizedPensionType(employer.getPensionType()));
             dpDateCreation.setValue(LocalDate.parse(employer.getDateCreation(), formatter));
             if (!StringUtils.isBlank(employer.getDateExpiration()))
                 dpDateExpiration.setValue(LocalDate.parse(employer.getDateExpiration(), formatter));

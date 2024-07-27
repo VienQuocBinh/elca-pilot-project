@@ -25,6 +25,7 @@ import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.controller.EmployerCreatePopupController;
 import vn.elca.training.pilot_project_front.model.Employer;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
+import vn.elca.training.pilot_project_front.util.PensionTypeUtil;
 import vn.elca.training.proto.common.PagingRequest;
 import vn.elca.training.proto.employer.EmployerListResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
@@ -101,7 +102,7 @@ public class HomeEmployerTableCp implements FXComponent {
             List<Employer> collect = listResponse.getEmployersList().stream()
                     .map(employer -> Employer.builder()
                             .id(employer.getId())
-                            .pensionType(employer.getPensionType())
+                            .pensionType(PensionTypeUtil.getLocalizedPensionType(employer.getPensionType()))
                             .name(employer.getName())
                             .number(employer.getNumber())
                             .ideNumber(employer.getIdeNumber())
@@ -193,7 +194,7 @@ public class HomeEmployerTableCp implements FXComponent {
                     .name(employer.getName())
                     .number(employer.getNumber())
                     .ideNumber(employer.getIdeNumber())
-                    .pensionType(employer.getPensionType())
+                    .pensionType(PensionTypeUtil.getLocalizedPensionType(employer.getPensionType()))
                     .dateCreation(employer.getDateCreation())
                     .dateExpiration(employer.getDateExpiration())
                     .build()));
@@ -204,7 +205,6 @@ public class HomeEmployerTableCp implements FXComponent {
             stagePopup.setScene(new Scene(parent));
             stagePopup.setResizable(false);
             stagePopup.showAndWait();
-
         } catch (Exception e) {
             log.warning(e.getMessage());
         }

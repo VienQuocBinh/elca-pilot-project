@@ -26,7 +26,7 @@ public class PensionTypeService {
     }
 
     public void updateCbPensionTypeSearch() {
-        cbPensionTypeSearch.getItems().clear();
+        if (cbPensionTypeSearch.getItems() != null) cbPensionTypeSearch.getItems().clear();
         cbPensionTypeSearch.getItems().addAll(PensionTypeProto.NONE, PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
         cbPensionTypeSearch.setConverter(stringConverter());
         cbPensionTypeSearch.setButtonCell(pensionTypeListCell());
@@ -34,11 +34,13 @@ public class PensionTypeService {
     }
 
     public void updateCbPensionType() {
-        cbPensionTypeMandatory.getItems().clear();
-        cbPensionTypeMandatory.getItems().addAll(PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
-        cbPensionTypeMandatory.setConverter(stringConverter());
-        cbPensionTypeMandatory.setButtonCell(pensionTypeListCell());
-        cbPensionTypeMandatory.getSelectionModel().selectFirst();
+        if (cbPensionTypeMandatory != null) {
+            cbPensionTypeMandatory.getItems().clear();
+            cbPensionTypeMandatory.getItems().addAll(PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
+            cbPensionTypeMandatory.setConverter(stringConverter());
+            cbPensionTypeMandatory.setButtonCell(pensionTypeListCell());
+            cbPensionTypeMandatory.getSelectionModel().selectFirst();
+        }
     }
 
     private StringConverter<PensionTypeProto> stringConverter() {
