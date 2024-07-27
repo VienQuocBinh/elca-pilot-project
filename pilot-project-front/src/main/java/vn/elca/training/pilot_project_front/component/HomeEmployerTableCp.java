@@ -112,6 +112,9 @@ public class HomeEmployerTableCp implements FXComponent {
             Platform.runLater(() -> {
                 tbvEmployer.getItems().clear();
                 tbvEmployer.setItems(FXCollections.observableList(collect));
+                // Default sort
+                tbvEmployer.getSortOrder().add(numberCol);
+                tbvEmployer.sort(); // Trigger sort
             });
             context.send(PerspectiveId.HOME_PERSPECTIVE, listResponse.getPagingResponse());
         }

@@ -23,7 +23,6 @@ import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.*;
 import vn.elca.training.pilot_project_front.util.*;
 import vn.elca.training.proto.common.PagingRequest;
-import vn.elca.training.proto.employer.EmployerResponse;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 import vn.elca.training.proto.salary.SalaryCreateRequest;
@@ -34,7 +33,10 @@ import vn.elca.training.proto.salary.SalaryResponse;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 @DeclarativeView(id = ComponentId.EMPLOYER_DETAIL_CP,
@@ -142,29 +144,14 @@ public class EmployerDetailCp implements FXComponent {
         } else if (message.getMessageBody() instanceof EmployerResponseWrapper) {
             // From update stub callback
             EmployerResponseWrapper employerResponseWrapper = message.getTypedMessageBody(EmployerResponseWrapper.class);
-            EmployerResponse employerResponse = employerResponseWrapper.getEmployerResponse();
             if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)) {
-                List<SalaryResponse> salariesResponse = employerResponse.getSalariesList();
-                Comparator<Salary> salaryComparator = Comparator
-                        .comparing(Salary::getLastName)
-                        .thenComparing(Salary::getFirstName);
-                List<Salary> salaries = salariesResponse
-                        .stream()
-                        .map(salaryResponse -> Salary.builder()
-                                .id(salaryResponse.getId())
-                                .avsNumber(salaryResponse.getAvsNumber())
-                                .firstName(salaryResponse.getFirstName())
-                                .lastName(salaryResponse.getLastName())
-                                .startDate(salaryResponse.getStartDate())
-                                .endDate(salaryResponse.getEndDate())
-                                .avsAmount(salaryResponse.getAvsAmount())
-                                .acAmount(salaryResponse.getAcAmount())
-                                .afAmount(salaryResponse.getAfAmount())
+                // Update Salary table
+                context.send(ComponentId.SALARY_CALLBACK_CP, SalaryListRequest.newBuilder()
+                        .setEmployerId(employer.getId())
+                        .setPagingRequest(PagingRequest.newBuilder()
+                                .setPageIndex(pgSalary.getCurrentPageIndex())
                                 .build())
-                        .sorted(salaryComparator)
-                        .collect(Collectors.toList());
-                tbvSalary.getItems().clear();
-                tbvSalary.setItems(FXCollections.observableList(salaries));
+                        .build());
                 showSuccessAlert("Update employer", "Update employer successfully");
             }
         } else if (message.getMessageBody() instanceof ExceptionMessage) {
@@ -173,8 +160,8 @@ public class EmployerDetailCp implements FXComponent {
             showErrorDetails(JsonStringify.convertStringErrorDetailToList(errorMessage));
         } else if (message.getMessageBody() instanceof SalaryListResponse) {
             // From SalaryCallbackCp to get salaries of Employer
-            SalaryListResponse typedMessageBody = message.getTypedMessageBody(SalaryListResponse.class);
-            List<SalaryResponse> salariesResponse = typedMessageBody.getSalariesList();
+            SalaryListResponse listResponse = message.getTypedMessageBody(SalaryListResponse.class);
+            List<SalaryResponse> salariesResponse = listResponse.getSalariesList();
             List<Salary> salaries = salariesResponse
                     .stream()
                     .map(salaryResponse -> Salary.builder()
@@ -191,8 +178,14 @@ public class EmployerDetailCp implements FXComponent {
                     .collect(Collectors.toList());
             tbvSalary.getItems().clear();
             tbvSalary.setItems(FXCollections.observableList(salaries));
-            pgSalary.setPageCount(typedMessageBody.getPagingResponse().getTotalPages());
-            pgSalary.setVisible(typedMessageBody.getPagingResponse().getTotalPages() != 0);
+            // Default sort
+            tbvSalary.getSortOrder().add(lastNameCol);
+            tbvSalary.getSortOrder().add(firstNameCol);
+            tbvSalary.sort(); // Trigger sort
+            // Paging
+            pgSalary.setPageCount(listResponse.getPagingResponse().getTotalPages());
+            pgSalary.setVisible(listResponse.getPagingResponse().getTotalPages() != 0);
+            lbTotalElements.setText("Total: " + listResponse.getPagingResponse().getTotalElements());
         }
         return null;
     }
@@ -284,7 +277,7 @@ public class EmployerDetailCp implements FXComponent {
     }
 
     private void bindingResource() {
-        lbPensionType.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
+        lbPensionType.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType.required"));
         lbNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
         lbIdeNumber.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber.required"));
         lbName.textProperty().bind(ObservableResourceFactory.getStringBinding("name.required"));
