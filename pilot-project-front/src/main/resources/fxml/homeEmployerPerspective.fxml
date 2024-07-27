@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainContainer" styleClass="mainContainer"
       stylesheets="@../style/styleHome.css">
     <HBox fx:id="searchBox" alignment="CENTER"/>
     <HBox fx:id="employerTable"/>
+    <BorderPane>
+        <left>
+            <Label fx:id="lbTotalElements"/>
+        </left>
+        <right>
+            <Pagination fx:id="pgEmployer" visible="false"/>
+        </right>
+    </BorderPane>
+
 </VBox>

@@ -1,8 +1,11 @@
 package vn.elca.training.pilot_project_back.service.impl;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.elca.training.pilot_project_back.constant.PensionType;
@@ -19,10 +22,8 @@ import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.repository.EmployerRepository;
 import vn.elca.training.pilot_project_back.service.EmployerService;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -31,15 +32,26 @@ public class EmployerServiceImpl implements EmployerService {
     private final EmployerRepository employerRepository;
     private final EmployerMapper employerMapper;
     private final SalaryMapper salaryMapper;
+    @Value("${paging.default.page.size}")
+    private String pageSize;
 
     @Override
-    public List<EmployerResponseDto> getEmployers(EmployerSearchRequestDto searchRequest) {
-        BooleanBuilder builder = buildSearchCriteria(searchRequest);
-        Iterable<Employer> employers = employerRepository.findAll(builder);
-        return StreamSupport.stream(employers.spliterator(), false)
-                .map(employerMapper::mapEntityToResponseDto)
-                .sorted(Comparator.comparing(EmployerResponseDto::getNumber))
-                .collect(Collectors.toList());
+    public Page<EmployerResponseDto> getEmployers(EmployerSearchRequestDto searchRequest) {
+        Predicate predicate = buildSearchCriteria(searchRequest);
+        Sort sort = Sort.by(QEmployer.employer.number.getMetadata().getName());
+        Pageable pageable;
+        int size = Integer.parseInt(pageSize);
+        if (searchRequest.getPagingRequest() == null) {
+            pageable = PageRequest.of(0, size, sort);
+        } else {
+            pageable = PageRequest.of(searchRequest.getPagingRequest().getPageIndex(), size, sort);
+        }
+        Page<Employer> employers = employerRepository.findAll(predicate, pageable);
+        return new PageImpl<>(
+                employers.stream().map(employerMapper::mapEntityToResponseDto).collect(Collectors.toList()),
+                pageable,
+                employers.getTotalElements()
+        );
     }
 
     @Override
@@ -85,7 +97,7 @@ public class EmployerServiceImpl implements EmployerService {
         return employerMapper.mapEntityToResponseDto(employer);
     }
 
-    private BooleanBuilder buildSearchCriteria(EmployerSearchRequestDto searchRequest) {
+    private Predicate buildSearchCriteria(EmployerSearchRequestDto searchRequest) {
         BooleanBuilder builder = new BooleanBuilder();
         QEmployer employer = QEmployer.employer;
 

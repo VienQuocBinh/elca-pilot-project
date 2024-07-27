@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
 import vn.elca.training.pilot_project_back.dto.EmployerSearchRequestDto;
 import vn.elca.training.pilot_project_back.dto.EmployerUpdateRequestDto;
@@ -14,6 +15,7 @@ import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
 import vn.elca.training.proto.common.EmployerId;
+import vn.elca.training.proto.common.PagingResponse;
 import vn.elca.training.proto.employer.*;
 
 import java.util.List;
@@ -55,11 +57,17 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     public void getEmployers(EmployerSearchRequest request, StreamObserver<EmployerListResponse> responseObserver) {
         try {
             EmployerSearchRequestDto searchRequestDto = employerMapper.mapSearchRequestProtoToDto(request);
-            List<EmployerResponseDto> employers = employerService.getEmployers(searchRequestDto);
-            List<EmployerResponse> responses = employers.stream()
+            Page<EmployerResponseDto> employers = employerService.getEmployers(searchRequestDto);
+            List<EmployerResponse> responses = employers.getContent().stream()
                     .map(employerMapper::mapResponseDtoToResponseProto)
                     .collect(Collectors.toList());
             responseObserver.onNext(EmployerListResponse.newBuilder()
+                    .setPagingResponse(PagingResponse.newBuilder()
+                            .setPageIndex(request.getPagingRequest().getPageIndex())
+                            .setTotalPages(employers.getTotalPages())
+                            .setPageSize(employers.getPageable().getPageSize())
+                            .setTotalElements(employers.getTotalElements())
+                            .build())
                     .addAllEmployers(responses)
                     .build());
             responseObserver.onCompleted();

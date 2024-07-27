@@ -36,10 +36,16 @@ message SalaryCreateRequest {
     string af_amount = 9;
 }
 
+message SalaryListRequest {
+    uint64 employer_id = 1;
+    PagingRequest paging_request = 2;
+}
+
 message SalaryListResponse {
-    repeated SalaryResponse salaries = 1;
+    PagingResponse paging_response = 1;
+    repeated SalaryResponse salaries = 2;
 }
 
 service SalaryService {
-    rpc GetSalariesByEmployerId (EmployerId) returns (SalaryListResponse);
+    rpc GetSalariesByEmployerId (SalaryListRequest) returns (SalaryListResponse);
 }

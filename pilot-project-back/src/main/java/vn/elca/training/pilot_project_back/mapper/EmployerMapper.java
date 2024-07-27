@@ -17,7 +17,7 @@ import vn.elca.training.proto.employer.EmployerResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 
-@Mapper(uses = {DateMapper.class, PensionTypeMapper.class})
+@Mapper(uses = {DateMapper.class, PensionTypeMapper.class, PageMapper.class})
 @Component
 public abstract class EmployerMapper {
     @Autowired
@@ -30,6 +30,7 @@ public abstract class EmployerMapper {
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionProtoToDto")
     @Mapping(target = "dateExpiration", source = "dateExpiration", qualifiedByName = "mapStringDateToDate")
     @Mapping(target = "dateCreation", source = "dateCreation", qualifiedByName = "mapStringDateToDate")
+    @Mapping(target = "pagingRequest", source = "pagingRequest", qualifiedByName = "mapPagingRequestProtoToDto")
     public abstract EmployerSearchRequestDto mapSearchRequestProtoToDto(EmployerSearchRequest searchRequest);
 
     @Mapping(target = "pensionType", source = "pensionType", qualifiedByName = "pensionProtoToDto")

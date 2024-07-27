@@ -6,14 +6,14 @@ import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import vn.elca.training.pilot_project_back.dto.SalaryResponseDto;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.SalaryService;
-import vn.elca.training.proto.common.EmployerId;
+import vn.elca.training.proto.common.PagingResponse;
+import vn.elca.training.proto.salary.SalaryListRequest;
 import vn.elca.training.proto.salary.SalaryListResponse;
 import vn.elca.training.proto.salary.SalaryServiceGrpc;
-
-import java.util.List;
 
 @GrpcService
 @RequiredArgsConstructor
@@ -23,12 +23,18 @@ public class SalaryServiceGrpcImpl extends SalaryServiceGrpc.SalaryServiceImplBa
     private final SalaryMapper salaryMapper;
 
     @Override
-    public void getSalariesByEmployerId(EmployerId request, StreamObserver<SalaryListResponse> responseObserver) {
+    public void getSalariesByEmployerId(SalaryListRequest request, StreamObserver<SalaryListResponse> responseObserver) {
         try {
-            List<SalaryResponseDto> salaryResponseDtos = salaryService.getSalariesByEmployerId(request.getId());
+            Page<SalaryResponseDto> salaryResponseDtos = salaryService.getSalariesByEmployerId(request);
             responseObserver.onNext(SalaryListResponse
                     .newBuilder()
-                    .addAllSalaries(salaryMapper.mapResponseDtoListToResponseProtoList(salaryResponseDtos))
+                    .setPagingResponse(PagingResponse.newBuilder()
+                            .setPageIndex(request.getPagingRequest().getPageIndex())
+                            .setPageSize(salaryResponseDtos.getPageable().getPageSize())
+                            .setTotalElements(salaryResponseDtos.getTotalElements())
+                            .setTotalPages(salaryResponseDtos.getTotalPages())
+                            .build())
+                    .addAllSalaries(salaryMapper.mapResponseDtoListToResponseProtoList(salaryResponseDtos.getContent()))
                     .build());
             responseObserver.onCompleted();
         } catch (StatusRuntimeException e) {
