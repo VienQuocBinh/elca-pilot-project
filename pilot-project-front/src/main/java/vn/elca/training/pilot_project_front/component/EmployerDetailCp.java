@@ -9,6 +9,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.Getter;
+import model.SalaryError;
+import model.SalaryFileResult;
 import org.apache.commons.lang3.StringUtils;
 import org.jacpfx.api.annotations.Resource;
 import org.jacpfx.api.annotations.component.DeclarativeView;
@@ -16,6 +18,7 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
+import util.FileUtil;
 import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
@@ -235,13 +238,16 @@ public class EmployerDetailCp implements FXComponent {
             context.send(PerspectiveId.HOME_PERSPECTIVE, ActionType.RETURN);
         });
         btnImport.setOnMouseClicked(e -> {
-            List<FileError> errors = ValidationUtil.validateSalaryFile(file);
+            SalaryFileResult salaryFileResult = FileUtil.processSalaryCsvFiles(file);
+            importedSalaries = salaryFileResult.getSalaries().stream().map(this::mapFromFileModel).collect(Collectors.toList());
+            List<SalaryError> errors = salaryFileResult.getErrors();
             if (errors.isEmpty()) {
-                importedSalaries = FileUtil.processSalaryCsvFiles(file);
                 tbvSalary.getItems().addAll(importedSalaries);
                 showSuccessAlert("Import salary success dialog", "Import successfully");
             } else {
-                showWarningAlert("Import salary warning dialog", "Import fail", errors);
+                String[] header = new String[]{"No", "avsNumber", "lastName", "firstName", "startDate", "endDate", "avsAmount", "acAmount", "afAmount", "errorMessage"};
+                FileUtil.writeCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+                showWarningAlert("Import Error", "Please check folder \"error\" for detail");
             }
         });
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
@@ -387,15 +393,10 @@ public class EmployerDetailCp implements FXComponent {
         alert.show();
     }
 
-    private void showWarningAlert(String title, String headerText, List<FileError> fileErrors) {
+    private void showWarningAlert(String title, String headerText) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
-        List<String> errorMessages = fileErrors.stream()
-                .map(e -> "At line " + e.getLineNumber() + ": " + e.getErrorMessage() + " value: " + e.getErrorValue())
-                .collect(Collectors.toList());
-
-        alert.setContentText(String.join("\n", errorMessages));
         alert.show();
     }
 
@@ -407,5 +408,19 @@ public class EmployerDetailCp implements FXComponent {
         dpDateCreation.getStyleClass().remove(ERROR_STYLE_CLASS);
         dpDateExpiration.getStyleClass().remove(ERROR_STYLE_CLASS);
         lbDateExpirationError.setVisible(false);
+    }
+
+    private Salary mapFromFileModel(model.Salary fileSalary) {
+        return Salary.builder()
+                .id(fileSalary.getId())
+                .avsNumber(fileSalary.getAvsNumber())
+                .lastName(fileSalary.getLastName())
+                .firstName(fileSalary.getFirstName())
+                .startDate(fileSalary.getStartDate())
+                .endDate(fileSalary.getEndDate())
+                .avsAmount(fileSalary.getAvsAmount())
+                .acAmount(fileSalary.getAcAmount())
+                .afAmount(fileSalary.getAfAmount())
+                .build();
     }
 }

@@ -10,6 +10,7 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
+import util.FileUtil;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
@@ -117,5 +118,6 @@ public class HomeSearchEmployerCp implements FXComponent {
         tfIdeNumber.clear();
         dpDateCreation.setValue(null);
         dpDateExpiration.setValue(null);
+        FileUtil.writeCsvFile("test", null, null);
     }
 }

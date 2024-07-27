@@ -9,5 +9,6 @@
         <module>grpc-proto</module>
         <module>pilot-project-front</module>
         <module>pilot-project-back</module>
+        <module>file-validation</module>
     </modules>
 </project>
