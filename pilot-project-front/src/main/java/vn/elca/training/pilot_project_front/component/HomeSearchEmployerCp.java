@@ -106,7 +106,7 @@ public class HomeSearchEmployerCp implements FXComponent {
                 .setDateCreation(dpDateCreation.getValue() != null ? dpDateCreation.getValue().format(dateTimeFormatter) : "")
                 .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateTimeFormatter) : "")
                 .build();
-        // Send to parent perspective to append paging info
+        // Send to parent perspective to append paging info and store search params
         context.send(PerspectiveId.HOME_PERSPECTIVE, searchRequest);
     }
 

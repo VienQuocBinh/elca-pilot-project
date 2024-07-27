@@ -97,7 +97,7 @@ public class HomeEmployerTableCp implements FXComponent {
             // Reload the employer list
             context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder().build());
         } else if (message.getMessageBody() instanceof EmployerListResponse) {
-            // For init table data and
+            // For init table data and search
             EmployerListResponse listResponse = message.getTypedMessageBody(EmployerListResponse.class);
             List<Employer> collect = listResponse.getEmployersList().stream()
                     .map(employer -> Employer.builder()
