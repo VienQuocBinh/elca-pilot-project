@@ -12,9 +12,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class FileUtil {
@@ -26,11 +24,13 @@ public class FileUtil {
     public static SalaryFileResult processSalaryCsvFiles(File file) {
         String invalidNumber = "Invalid number value";
         String invalidAvsNumberFormat = "Invalid AVS number format";
+        String duplicateAvsNumber = "Duplicate AVS number";
         String invalidDateOrder = "Invalid Date Order";
         String invalidDate = "Invalid date";
         String invalidRequiredName = "The name is required";
         List<Salary> salaries = new ArrayList<>();
         List<SalaryError> errors = new ArrayList<>();
+        Map<String, List<Salary>> mapSalary = new HashMap<>(); // Key: Avs number. Value: list of salary has that AVS number
         if (file.getName().endsWith(".csv")) {
             try (CSVReader reader = new CSVReader(new FileReader(file))) {
                 String[] header = reader.readNext(); // Read the header
@@ -44,11 +44,29 @@ public class FileUtil {
                     for (int i = 0; i < header.length; i++) {
                         switch (header[i]) {
                             case "AVSNumber":
-                                salary.setAvsNumber(line[i]);
-                                if (!ValidationUtil.isValidAvsNumber(line[i])) {
-                                    salary.setAvsNumber(line[i]);
+                                String avsNumber = line[i];
+                                salary.setAvsNumber(avsNumber);
+                                if (!ValidationUtil.isValidAvsNumber(avsNumber)) {
                                     hasError = true;
                                     errorMessage.append(invalidAvsNumberFormat).append(";");
+                                }
+                                // Check duplicate avs number in the file
+                                if (mapSalary.containsKey(avsNumber)) {
+                                    // Put to existed list salary with the same Avs number
+                                    // and update the duplicate error message for the previous items
+                                    mapSalary.get(avsNumber).add(salary);
+                                    for (SalaryError er : errors) {
+                                        if (er.getSalary().getAvsNumber().equals(avsNumber)) {
+                                            er.setMessage(duplicateAvsNumber + ";" + er.getMessage());
+                                        }
+                                    }
+                                    errorMessage.append(duplicateAvsNumber).append(";");
+                                    hasError = true;
+                                } else {
+                                    // Put as new item
+                                    List<Salary> duplicateItems = new ArrayList<>();
+                                    duplicateItems.add(salary);
+                                    mapSalary.put(avsNumber, duplicateItems);
                                 }
                                 break;
                             case "LastName":
