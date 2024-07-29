@@ -1,30 +1,35 @@
 package vn.elca.training.pilot_project_back.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import model.SalaryError;
+import model.SalaryFileResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import vn.elca.training.pilot_project_back.constant.LanguageBundleKey;
+import vn.elca.training.pilot_project_back.dto.SalaryCreateRequestDto;
 import vn.elca.training.pilot_project_back.entity.Employer;
 import vn.elca.training.pilot_project_back.exception.ValidationException;
 import vn.elca.training.pilot_project_back.exception.model.ErrorDetail;
 import vn.elca.training.pilot_project_back.repository.EmployerRepository;
+import vn.elca.training.pilot_project_back.repository.SalaryRepository;
 import vn.elca.training.pilot_project_back.service.ValidationService;
 import vn.elca.training.proto.employer.EmployerCreateRequest;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ValidationServiceImpl implements ValidationService {
     private final SimpleDateFormat simpleDateFormat;
     private final EmployerRepository employerRepository;
+    private final SalaryRepository salaryRepository;
     @Value("${ide.regexp}")
     private String ideNumberRegex;
 
@@ -226,6 +231,43 @@ public class ValidationServiceImpl implements ValidationService {
         if (!errorDetails.isEmpty()) {
             throw new ValidationException(errorDetails);
         }
+    }
+
+    @Override
+    public SalaryFileResult validateFileSalary(List<SalaryCreateRequestDto> salaryCreateRequestDtos) {
+        List<model.Salary> salaries = new ArrayList<>();
+        List<SalaryError> errors = new ArrayList<>();
+        SalaryFileResult salaryFileResult = new SalaryFileResult(salaries, errors);
+        List<model.Salary> collect = salaryCreateRequestDtos.stream().map(salary -> model.Salary.builder()
+                .avsNumber(salary.getAvsNumber())
+                .firstName(salary.getFirstName())
+                .lastName(salary.getLastName())
+                .startDate(simpleDateFormat.format(salary.getStartDate()))
+                .endDate(simpleDateFormat.format(salary.getEndDate()))
+                .avsAmount(String.valueOf(salary.getAvsAmount()))
+                .afAmount(String.valueOf(salary.getAfAmount()))
+                .acAmount(String.valueOf(salary.getAcAmount()))
+                .build()).collect(Collectors.toList());
+        Set<String> salariesToBeRemoved = new HashSet<>();
+        for (model.Salary salary : collect) {
+            try {
+                Date startDateDate = simpleDateFormat.parse(salary.getStartDate());
+                Date endDateDate = simpleDateFormat.parse(salary.getEndDate());
+                List<String> avsNumbersBetweenDates = salaryRepository.findAvsNumbersBetweenDates(startDateDate, endDateDate);
+                if (avsNumbersBetweenDates.contains(salary.getAvsNumber())) {
+                    errors.add(SalaryError.builder()
+                            .salary(salary)
+                            .message("AVS number " + salary.getAvsNumber() + " already existed between " + salary.getStartDate() + " and " + salary.getEndDate())
+                            .build());
+                    salariesToBeRemoved.add(salary.getAvsNumber());
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+
+        salaryCreateRequestDtos.removeIf(request -> salariesToBeRemoved.contains(request.getAvsNumber()));
+        return salaryFileResult;
     }
 
     private boolean isValidDate(String date) {

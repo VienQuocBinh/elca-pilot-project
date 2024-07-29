@@ -19,6 +19,7 @@ import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
 import util.FileUtil;
+import util.SalaryHeaderBuild;
 import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
@@ -146,9 +147,10 @@ public class EmployerDetailCp implements FXComponent {
                             .build())
                     .build());
         } else if (message.getMessageBody() instanceof EmployerResponseWrapper) {
-            // From update stub callback
+            // From update stub callback or update catch ALREADY_EXISTS code
             EmployerResponseWrapper employerResponseWrapper = message.getTypedMessageBody(EmployerResponseWrapper.class);
-            if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)) {
+            if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)
+                    || employerResponseWrapper.getActionType().equals(ActionType.RELOAD)) {
                 // Update Salary table
                 context.send(ComponentId.SALARY_CALLBACK_CP, SalaryListRequest.newBuilder()
                         .setEmployerId(employer.getId())
@@ -156,7 +158,8 @@ public class EmployerDetailCp implements FXComponent {
                                 .setPageIndex(pgSalary.getCurrentPageIndex())
                                 .build())
                         .build());
-                showSuccessAlert("Update employer", "Update employer successfully");
+                if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE))
+                    showSuccessAlert("Update employer", "Update employer successfully");
             }
         } else if (message.getMessageBody() instanceof ExceptionMessage) {
             // From EmployerCallbackCp catch
@@ -245,9 +248,9 @@ public class EmployerDetailCp implements FXComponent {
                 tbvSalary.getItems().addAll(importedSalaries);
                 showSuccessAlert("Import salary success dialog", "Import successfully");
             } else {
-                String[] header = new String[]{"No", "avsNumber", "lastName", "firstName", "startDate", "endDate", "avsAmount", "acAmount", "afAmount", "errorMessage"};
-                FileUtil.writeCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
-                showWarningAlert("Import Error", "Please check folder \"error\" for detail");
+                String[] header = SalaryHeaderBuild.buildErrorHeader();
+                String filename = FileUtil.writErrorCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+                showWarningAlert("Import Error", ("Please check file: " + filename + " for detail"));
             }
         });
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {

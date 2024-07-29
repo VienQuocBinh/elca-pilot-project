@@ -2,18 +2,25 @@ package vn.elca.training.pilot_project_back.service.grpc;
 
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
+import model.SalaryError;
+import model.SalaryFileResult;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import util.FileUtil;
+import util.SalaryHeaderBuild;
 import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
 import vn.elca.training.pilot_project_back.dto.EmployerSearchRequestDto;
 import vn.elca.training.pilot_project_back.dto.EmployerUpdateRequestDto;
+import vn.elca.training.pilot_project_back.dto.SalaryCreateRequestDto;
+import vn.elca.training.pilot_project_back.exception.AvsNumberExistedException;
 import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 import vn.elca.training.pilot_project_back.exception.handler.GrpcExceptionHandler;
 import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
+import vn.elca.training.pilot_project_back.service.ValidationService;
 import vn.elca.training.proto.common.EmployerId;
 import vn.elca.training.proto.common.PagingResponse;
 import vn.elca.training.proto.employer.*;
@@ -28,6 +35,7 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     private final EmployerService employerService;
     private final EmployerMapper employerMapper;
     private final SalaryMapper salaryMapper;
+    private final ValidationService validationService;
 
     @Override
     public void getEmployerById(EmployerId request, StreamObserver<EmployerResponse> responseObserver) {
@@ -102,10 +110,19 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     public void updateEmployer(EmployerUpdateRequest request, StreamObserver<EmployerResponse> responseObserver) {
         try {
             EmployerUpdateRequestDto employerUpdateRequestDto = employerMapper.mapUpdateRequestProtoToCreateRequestDto(request);
-            employerUpdateRequestDto.setSalaries(salaryMapper.mapCreateListRequestProtoToDtoList(request.getSalariesList()));
+            List<SalaryCreateRequestDto> salaryCreateRequestDtos = salaryMapper.mapCreateListRequestProtoToDtoList(request.getSalariesList());
 
+            SalaryFileResult salaryFileResult = validationService.validateFileSalary(salaryCreateRequestDtos);
+            employerUpdateRequestDto.setSalaries(salaryCreateRequestDtos);
+            if (!salaryFileResult.getErrors().isEmpty()) {
+                String[] header = SalaryHeaderBuild.buildErrorHeader();
+                FileUtil.writErrorCsvFile("error", header, salaryFileResult.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+            }
             EmployerResponseDto employerResponseDto = employerService.updateEmployer(employerUpdateRequestDto);
             EmployerResponse employerResponseProto = employerMapper.mapResponseDtoToResponseProto(employerResponseDto);
+            if (!salaryFileResult.getErrors().isEmpty()) {
+                throw new AvsNumberExistedException("Some Avs numbers are already existed. Please check \"error\" folder");
+            }
 
             responseObserver.onNext(employerResponseProto.toBuilder()
                     .addAllSalaries(salaryMapper.mapResponseDtoListToResponseProtoList(employerResponseDto.getSalaries()))

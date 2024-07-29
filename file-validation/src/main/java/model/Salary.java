@@ -17,6 +17,7 @@ public class Salary {
     private String avsAmount;
     private String acAmount;
     private String afAmount;
+    private String employerIdeNumber;
 
     // Method to convert Salary object to String array
     public String[] toStringArray() {
@@ -29,7 +30,8 @@ public class Salary {
                 endDate,
                 avsAmount,
                 acAmount,
-                afAmount
+                afAmount,
+                employerIdeNumber != null ? employerIdeNumber : ""
         };
     }
 }

@@ -3,6 +3,7 @@ package util;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
+import config.ErrorConfig;
 import model.Salary;
 import model.SalaryError;
 import model.SalaryFileResult;
@@ -126,6 +127,10 @@ public class FileUtil {
                                     errorMessage.append(invalidNumber).append(";");
                                 }
                                 break;
+                            case "EmployerIdeNumber":
+                                String employerIdeNumber = line[i];
+                                salary.setEmployerIdeNumber(employerIdeNumber);
+                                break;
                             default:
                                 break;
                         }
@@ -150,18 +155,16 @@ public class FileUtil {
                 .build();
     }
 
-    public static void writeCsvFile(String fileName, String[] header, List<String[]> data) {
-        String directoryPath = "error";
-        String dateTimePattern = "yyyyMMdd_HHmmss";
-        SimpleDateFormat sdf = new SimpleDateFormat(dateTimePattern);
+    public static String writErrorCsvFile(String fileName, String[] header, List<String[]> data) {
+        SimpleDateFormat sdf = new SimpleDateFormat(ErrorConfig.ERROR_DATE_FILE_NAME_PATTERN);
         String dateTime = sdf.format(new Date());
         fileName += "_errors_" + dateTime + ".csv";
         // Create the directory if it does not exist
-        File directory = new File(directoryPath);
+        File directory = new File(ErrorConfig.ERROR_DIR);
         if (!directory.exists()) {
             directory.mkdirs();
         }
-        String filePath = directoryPath + File.separator + fileName;
+        String filePath = ErrorConfig.ERROR_DIR + File.separator + fileName;
         try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {
             writer.writeNext(header);
             for (String[] datum : data) {
@@ -170,6 +173,6 @@ public class FileUtil {
         } catch (IOException e) {
             log.warning(e.getMessage());
         }
-
+        return fileName;
     }
 }

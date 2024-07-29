@@ -118,6 +118,6 @@ public class HomeSearchEmployerCp implements FXComponent {
         tfIdeNumber.clear();
         dpDateCreation.setValue(null);
         dpDateExpiration.setValue(null);
-        FileUtil.writeCsvFile("test", null, null);
+        FileUtil.writErrorCsvFile("test", null, null);
     }
 }
