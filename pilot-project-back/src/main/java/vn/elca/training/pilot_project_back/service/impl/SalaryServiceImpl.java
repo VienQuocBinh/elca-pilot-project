@@ -6,7 +6,6 @@ import model.SalaryError;
 import model.SalaryFileResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import util.FileUtil;
@@ -57,7 +56,7 @@ public class SalaryServiceImpl implements SalaryService {
         );
     }
 
-    @Scheduled(cron = "${salary.csv.process.cron}")
+    //    @Scheduled(cron = "${salary.csv.process.cron}")
 //    @Scheduled(fixedDelay = 5000)
     public void processSalaryCsvFilesJob() {
         File directory = new File(directoryPath);

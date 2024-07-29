@@ -4,7 +4,6 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -33,39 +32,25 @@ public class EmployerCreatePopupController implements Initializable {
     private final EmployerServiceGrpc.EmployerServiceBlockingStub stub;
     private final ManagedChannel channel;
     @FXML
-    private Label lbPensionType;
-    @FXML
     private ComboBox<PensionTypeProto> cbPensionType;
-    @FXML
-    private Label lbName;
     @FXML
     private TextField tfName;
     @FXML
     private Label lbNameError;
     @FXML
-    private Label lbNumber;
-    @FXML
     private Label lbNumberValue;
-    @FXML
-    private Label lbIdeNumber;
     @FXML
     private TextField tfIdeNumber;
     @FXML
     private Label lbIdeNumberError;
     @FXML
-    private Label lbDateCreation;
-    @FXML
     private DatePicker dpDateCreation;
     @FXML
     private Label lbDateCreationError;
     @FXML
-    private Label lbDateExpiration;
-    @FXML
     private DatePicker dpDateExpiration;
     @FXML
     private Label lbDateOrderError;
-    //    @FXML
-//    private Label lbDateOrderError;
     @FXML
     private ImageView infoName;
     @FXML
@@ -103,17 +88,21 @@ public class EmployerCreatePopupController implements Initializable {
             buildInfoTooltip();
             // Force Name text field can not input digit and special chars
             TextFieldUtil.applyAlphabeticFilter(tfName);
+            tfIdeNumber.setText(TextFieldUtil.IDE_NUMBER_PATTERN);
+            tfIdeNumber.positionCaret(0);
+            tfIdeNumber.setTextFormatter(TextFieldUtil.applyIdeNumberTextFormatter(tfIdeNumber));
         });
     }
 
+
     @FXML
-    private void handleSave(ActionEvent event) {
+    private void handleSave() {
         boolean valid = validateInputs();
         if (!valid) return;
         try {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
             EmployerCreateRequest.Builder builder = EmployerCreateRequest.newBuilder()
-                    .setName(tfName.getText())
+                    .setName(tfName.getText().trim())
                     .setIdeNumber(tfIdeNumber.getText())
                     .setPensionType(cbPensionType.getValue())
                     .setDateCreation(dpDateCreation.getValue().format(dateTimeFormatter));
@@ -135,7 +124,7 @@ public class EmployerCreatePopupController implements Initializable {
     }
 
     @FXML
-    private void handleCancel(ActionEvent event) {
+    private void handleCancel() {
         showConfirmationDialog();
     }
 

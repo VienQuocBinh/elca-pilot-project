@@ -131,7 +131,9 @@ public class EmployerDetailCp implements FXComponent {
             employer = message.getTypedMessageBody(Employer.class);
             lbNumberValue.setText(employer.getNumber());
             tfName.setText(employer.getName());
+            tfIdeNumber.setTextFormatter(null); // Clear formatter
             tfIdeNumber.setText(employer.getIdeNumber());
+            tfIdeNumber.setTextFormatter(TextFieldUtil.applyIdeNumberTextFormatter(tfIdeNumber));
             PensionTypeService.getInstance().setCbPensionTypeMandatory(cbPensionType);
             PensionTypeService.getInstance().updateCbPensionType();
             cbPensionType.setValue(PensionTypeUtil.getLocalizedPensionType(employer.getPensionType()));
@@ -223,7 +225,7 @@ public class EmployerDetailCp implements FXComponent {
                 DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
                 context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerUpdateRequest.newBuilder()
                         .setId(employer.getId())
-                        .setName(tfName.getText())
+                        .setName(tfName.getText().trim())
                         .setDateCreation(dpDateCreation.getValue().format(dateFormater))
                         .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateFormater) : "")
                         .setIdeNumber(tfIdeNumber.getText())
