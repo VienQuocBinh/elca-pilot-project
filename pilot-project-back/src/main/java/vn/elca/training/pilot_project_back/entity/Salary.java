@@ -21,7 +21,6 @@ public class Salary {
     private Long id;
     @NotNull
     @Length(max = 36)
-    @Column(unique = true)
     @Pattern(regexp = "^756.\\d{4}.\\d{4}.\\d{2}$")
     private String avsNumber;
     @NotNull

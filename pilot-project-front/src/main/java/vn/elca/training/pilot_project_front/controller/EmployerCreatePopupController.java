@@ -17,6 +17,7 @@ import vn.elca.training.pilot_project_front.callback.EmployerCreationCallback;
 import vn.elca.training.pilot_project_front.config.GrpcConfig;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.model.ErrorDetail;
+import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.JsonStringify;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.TextFieldUtil;
@@ -91,8 +92,8 @@ public class EmployerCreatePopupController implements Initializable {
             stage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::handleWindowClose);
             EmployerNextNumberResponse employerNextNumber = stub.getEmployerNextNumber(Empty.newBuilder().build());
             lbNumberValue.setText(employerNextNumber.getNumber());
-            cbPensionType.getItems().addAll(PensionTypeProto.REGIONAL, PensionTypeProto.PROFESSIONAL);
-            cbPensionType.getSelectionModel().selectFirst();
+            PensionTypeService.getInstance().setCbPensionTypeMandatory(cbPensionType);
+            PensionTypeService.getInstance().updateCbPensionType();
             TextFieldUtil.applyDateFilter(dpDateCreation.getEditor());
             dpDateCreation.promptTextProperty().bind(ObservableResourceFactory.getStringBinding("date.format"));
             dpDateCreation.setConverter(TextFieldUtil.dateStringConverter());

@@ -37,7 +37,8 @@ public class EmployerCallbackCp implements CallbackComponent {
     private Context context;
 
     @Override
-    public Object handle(Message<Event, Object> message) throws Exception {
+    public Object handle(Message<Event, Object> message) {
+        EmployerResponse employerResponse = null;
         try {
             if (message.getMessageBody() instanceof EmployerSearchRequest) {
                 // Get list (search) employers
@@ -51,12 +52,12 @@ public class EmployerCallbackCp implements CallbackComponent {
                 return empty;
             } else if (message.getMessageBody() instanceof EmployerId) {
                 // Get employer detail
-                EmployerResponse employerResponse = stub.getEmployerById(message.getTypedMessageBody(EmployerId.class));
+                employerResponse = stub.getEmployerById(message.getTypedMessageBody(EmployerId.class));
                 context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
                 return new EmployerResponseWrapper(employerResponse, ActionType.GET_DETAIL);
             } else if (message.getMessageBody() instanceof EmployerUpdateRequest) {
                 // Update employer
-                EmployerResponse employerResponse = stub.updateEmployer(message.getTypedMessageBody(EmployerUpdateRequest.class));
+                employerResponse = stub.updateEmployer(message.getTypedMessageBody(EmployerUpdateRequest.class));
                 context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
                 return new EmployerResponseWrapper(employerResponse, ActionType.UPDATE);
             }
@@ -64,6 +65,16 @@ public class EmployerCallbackCp implements CallbackComponent {
             log.warning(e.getMessage());
             if (e.getStatus().getCode() == Status.UNKNOWN.getCode()) {
                 Platform.runLater(() -> showAlert(e));
+            } else if (e.getStatus().getCode() == Status.ALREADY_EXISTS.getCode()) {
+                EmployerResponse finalEmployerResponse = employerResponse;
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Warning");
+                    alert.setHeaderText(e.getMessage());
+                    alert.show();
+                    context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
+                    context.send(ComponentId.EMPLOYER_DETAIL_CP, new EmployerResponseWrapper(finalEmployerResponse, ActionType.RELOAD));
+                });
             } else {
                 // Forward error message to ComponentId.EMPLOYER_DETAIL_CP if update fail
                 if (message.getMessageBody() instanceof EmployerUpdateRequest) {

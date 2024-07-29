@@ -7,6 +7,7 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import vn.elca.training.pilot_project_back.exception.AvsNumberExistedException;
 import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 import vn.elca.training.pilot_project_back.exception.ValidationException;
 import vn.elca.training.pilot_project_back.exception.model.ErrorDetail;
@@ -35,6 +36,10 @@ public class GrpcExceptionHandler {
         } else if (e instanceof ValidationException) {
             status = Status.INVALID_ARGUMENT
                     .withDescription(jsonStringify(((ValidationException) e).getErrors()))
+                    .withCause(e);
+        } else if (e instanceof AvsNumberExistedException) {
+            status = Status.ALREADY_EXISTS
+                    .withDescription(e.getMessage())
                     .withCause(e);
         } else {
             status = Status.UNKNOWN.withDescription(e.getMessage()).withCause(e);

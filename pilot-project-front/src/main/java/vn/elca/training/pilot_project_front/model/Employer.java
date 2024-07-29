@@ -1,7 +1,6 @@
 package vn.elca.training.pilot_project_front.model;
 
 import lombok.*;
-import vn.elca.training.proto.employer.PensionTypeProto;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Employer {
     private Long id;
-    private PensionTypeProto pensionType;
+    private String pensionType;
     private String name;
     private String number;
     private String ideNumber;

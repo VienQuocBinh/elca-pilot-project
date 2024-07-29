@@ -1,4 +1,5 @@
-package vn.elca.training.pilot_project_front.model;
+package model;
+
 
 import lombok.Builder;
 import lombok.Getter;
