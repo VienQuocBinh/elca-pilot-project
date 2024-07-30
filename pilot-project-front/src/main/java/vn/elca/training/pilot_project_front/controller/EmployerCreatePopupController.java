@@ -53,10 +53,6 @@ public class EmployerCreatePopupController implements Initializable {
     @FXML
     private Label lbDateOrderError;
     @FXML
-    private ImageView infoName;
-    @FXML
-    private ImageView infoNumber;
-    @FXML
     private ImageView infoIdeNumber;
     private ResourceBundle resourceBundle;
     @Setter
@@ -151,11 +147,7 @@ public class EmployerCreatePopupController implements Initializable {
 
     private void buildInfoTooltip() {
         Image infoImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/image/info_icon.png")));
-        infoName.setImage(infoImage);
-        infoNumber.setImage(infoImage);
         infoIdeNumber.setImage(infoImage);
-        Tooltip.install(infoName, new Tooltip(resourceBundle.getString("tooltip.name")));
-        Tooltip.install(infoNumber, new Tooltip(resourceBundle.getString("tooltip.number")));
         Tooltip.install(infoIdeNumber, new Tooltip(resourceBundle.getString("tooltip.ideNumber")));
     }
 

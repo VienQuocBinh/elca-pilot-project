@@ -15,15 +15,12 @@
     </HBox>
     <Label fx:id="lbNumberValue" style="-fx-font-weight: bold"/>
     <Region styleClass="blankSpacing"/>
-    <HBox spacing="5" alignment="CENTER_LEFT">
-        <Label fx:id="lbName" text="%name.required"/>
-        <ImageView fx:id="infoName" pickOnBounds="true" fitWidth="16" fitHeight="16" styleClass="image-info"/>
-    </HBox>
+    <Label fx:id="lbName" text="%name.required"/>
     <TextField fx:id="tfName"/>
     <Label fx:id="lbNameError" styleClass="error-label" visible="false"/>
 
     <Label fx:id="lbPensionType" text="%pensionType.required"/>
-    <ComboBox fx:id="cbPensionType" prefWidth="200"/>
+    <ComboBox fx:id="cbPensionType" prefWidth="520"/>
     <Region styleClass="blankSpacing"/>
 
     <HBox spacing="5" alignment="CENTER_LEFT">
