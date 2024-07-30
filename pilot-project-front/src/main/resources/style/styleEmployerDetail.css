@@ -25,3 +25,8 @@
     -fx-padding: 5;
     -fx-text-alignment: left;
 }
+
+.delete-button {
+    -fx-background-color: #ff5c33;
+    -fx-text-fill: white;
+}

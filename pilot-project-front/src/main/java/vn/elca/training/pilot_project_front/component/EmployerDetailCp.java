@@ -5,11 +5,14 @@ import io.grpc.ManagedChannelBuilder;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import lombok.Getter;
 import model.SalaryError;
 import model.SalaryFileResult;
@@ -48,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @DeclarativeView(id = ComponentId.EMPLOYER_DETAIL_CP,
@@ -57,6 +61,7 @@ import java.util.stream.Collectors;
         resourceBundleLocation = "bundles.languageBundle")
 public class EmployerDetailCp implements FXComponent {
     private static final String ERROR_STYLE_CLASS = "error";
+    private final Logger log = Logger.getLogger(HomeEmployerTableCp.class.getName());
     @Resource
     private Context context;
     @FXML
@@ -123,6 +128,8 @@ public class EmployerDetailCp implements FXComponent {
     private Label lbTotalElements;
     @FXML
     private Pagination pgSalary;
+    @FXML
+    private TableColumn<Salary, Void> actionCol;
     @Getter
     private File file;
     private Employer employer;
@@ -324,6 +331,7 @@ public class EmployerDetailCp implements FXComponent {
         avsAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avs.ai.apg"));
         acAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ac"));
         afAmountCol.textProperty().bind(ObservableResourceFactory.getStringBinding("af"));
+        actionCol.setCellFactory(createActionCellFactory());
     }
 
     // Validate on UI layer
@@ -436,6 +444,7 @@ public class EmployerDetailCp implements FXComponent {
                 .avsAmount(fileSalary.getAvsAmount())
                 .acAmount(fileSalary.getAcAmount())
                 .afAmount(fileSalary.getAfAmount())
+                .isImported(true)
                 .build();
     }
 
@@ -445,5 +454,54 @@ public class EmployerDetailCp implements FXComponent {
                 .usePlaintext()
                 .build();
         this.configStub = ConfigServiceGrpc.newBlockingStub(channel);
+    }
+
+    private Callback<TableColumn<Salary, Void>, TableCell<Salary, Void>> createActionCellFactory() {
+        return param -> new TableCell<Salary, Void>() {
+            private final Button btnDelete = new Button(ObservableResourceFactory.getProperty().getString("delete"));
+            private final HBox pane = new HBox(btnDelete);
+
+            {
+                // Listen for locale changes
+                ObservableResourceFactory.resourceProperty().addListener((observable, oldValue, newValue) ->
+                        btnDelete.setText(ObservableResourceFactory.getProperty().getString("delete"))
+                );
+                btnDelete.setMinWidth(80);
+
+                btnDelete.setOnMouseClicked(event -> {
+                    Salary salary = getTableView().getItems().get(getIndex());
+                    log.info("Button clicked for: " + salary);
+                    Optional<ButtonType> buttonType = showConfirmDialog(salary);
+                    if (buttonType.isPresent() && buttonType.get().equals(ButtonType.OK)) {
+                        // Remove from list
+                        tbvSalary.getItems().removeAll(importedSalaries);
+                        importedSalaries.remove(salary);
+                        tbvSalary.getItems().addAll(importedSalaries);
+                    }
+                });
+
+                btnDelete.getStyleClass().add("delete-button");
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || !getTableView().getItems().get(getIndex()).isImported()) {
+                    setGraphic(null);
+                } else {
+                    pane.setAlignment(Pos.CENTER);
+                    setGraphic(pane);
+                }
+            }
+        };
+    }
+
+    private Optional<ButtonType> showConfirmDialog(Salary salary) {
+        String title = ObservableResourceFactory.getProperty().getString("dialog.confirmation.delete.title");
+        String header = ObservableResourceFactory.getProperty().getString("dialog.confirmation.delete.header");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header + " \"" + salary.getAvsNumber() + "\"?");
+        return alert.showAndWait();
     }
 }
