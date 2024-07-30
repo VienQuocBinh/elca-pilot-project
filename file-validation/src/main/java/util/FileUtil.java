@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -174,5 +175,25 @@ public class FileUtil {
             log.warning(e.getMessage());
         }
         return fileName;
+    }
+
+    public static void moveFile(String sourcePath, String destinationPath) {
+        Path sourceDir = Paths.get(sourcePath);
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(sourceDir, "*.csv")) {
+            for (Path file : stream) {
+                Path source = Paths.get(sourcePath + File.separator + file.getFileName());
+                Path destination = Paths.get(destinationPath + File.separator + file.getFileName());
+                Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+                log.info("Moved: " + file.getFileName());
+            }
+        } catch (IOException e) {
+            log.warning("I/O error occurred: " + e.getMessage());
+        } catch (SecurityException e) {
+            log.warning("Permission denied: " + e.getMessage());
+        } catch (UnsupportedOperationException e) {
+            log.warning("File system does not support this operation: " + e.getMessage());
+        } catch (Exception e) {
+            log.warning("An unexpected error occurred: " + e.getMessage());
+        }
     }
 }

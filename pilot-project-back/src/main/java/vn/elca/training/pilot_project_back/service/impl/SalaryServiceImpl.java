@@ -39,6 +39,8 @@ public class SalaryServiceImpl implements SalaryService {
     private String pageSize;
     @Value("${salary.csv.file.path}")
     private String directoryPath;
+    @Value("${salary.csv.file.processed.path}")
+    private String processedPath;
 
     @Override
     public Page<SalaryResponseDto> getSalariesByEmployerId(SalaryListRequest request) {
@@ -54,13 +56,12 @@ public class SalaryServiceImpl implements SalaryService {
         );
     }
 
-    //    @Scheduled(cron = "${salary.csv.process.cron}")
-//    @Scheduled(fixedDelay = 5000)
+    @Override
     public void processSalaryCsvFilesJob() {
         File directory = new File(directoryPath);
         if (directory.isDirectory()) {
             File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".csv"));
-            if (files != null) {
+            if (files != null && files.length > 0) {
                 Arrays.stream(files).forEach(file -> {
                     SalaryFileResult result = FileUtil.processSalaryCsvFiles(file);
                     // Handle the result as needed
@@ -91,6 +92,8 @@ public class SalaryServiceImpl implements SalaryService {
                     }
                     saveAllSalaries(result.getSalaries());
                 });
+                // Move processed file to new dir in order to not re-process
+                FileUtil.moveFile(directoryPath, processedPath);
             }
         } else {
             log.error("The path is not a directory: {}", directoryPath);

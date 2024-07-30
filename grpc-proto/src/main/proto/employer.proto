@@ -5,7 +5,6 @@ package proto;
 import "common.proto";
 import "salary.proto";
 
-
 option java_multiple_files = true;
 option java_package = "vn.elca.training.proto.employer";
 
@@ -15,7 +14,7 @@ enum PensionTypeProto {
     PROFESSIONAL = 2;
 }
 
-message Empty {}
+//message Empty {}
 
 message EmployerNextNumberResponse {
     string number = 1;

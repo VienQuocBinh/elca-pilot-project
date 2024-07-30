@@ -22,6 +22,7 @@ import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.EmployerService;
 import vn.elca.training.pilot_project_back.service.ValidationService;
 import vn.elca.training.proto.common.EmployerId;
+import vn.elca.training.proto.common.Empty;
 import vn.elca.training.proto.common.PagingResponse;
 import vn.elca.training.proto.employer.*;
 

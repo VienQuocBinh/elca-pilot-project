@@ -1,5 +1,7 @@
 package vn.elca.training.pilot_project_front.component;
 
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -20,6 +22,7 @@ import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
 import util.FileUtil;
 import util.SalaryHeaderBuild;
+import vn.elca.training.pilot_project_front.config.GrpcConfig;
 import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
@@ -27,7 +30,10 @@ import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.*;
 import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.*;
+import vn.elca.training.proto.common.ConfigServiceGrpc;
+import vn.elca.training.proto.common.Empty;
 import vn.elca.training.proto.common.PagingRequest;
+import vn.elca.training.proto.common.ScheduleEnabledResponse;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 import vn.elca.training.proto.salary.SalaryCreateRequest;
@@ -121,6 +127,7 @@ public class EmployerDetailCp implements FXComponent {
     private File file;
     private Employer employer;
     private List<Salary> importedSalaries = new ArrayList<>();
+    private ConfigServiceGrpc.ConfigServiceBlockingStub configStub;
 
     @Override
     public Node postHandle(Node node, Message<Event, Object> message) {
@@ -131,7 +138,9 @@ public class EmployerDetailCp implements FXComponent {
             employer = message.getTypedMessageBody(Employer.class);
             lbNumberValue.setText(employer.getNumber());
             tfName.setText(employer.getName());
+            tfIdeNumber.setTextFormatter(null); // Clear formatter
             tfIdeNumber.setText(employer.getIdeNumber());
+            tfIdeNumber.setTextFormatter(TextFieldUtil.applyIdeNumberTextFormatter(tfIdeNumber));
             PensionTypeService.getInstance().setCbPensionTypeMandatory(cbPensionType);
             PensionTypeService.getInstance().updateCbPensionType();
             cbPensionType.setValue(PensionTypeUtil.getLocalizedPensionType(employer.getPensionType()));
@@ -204,6 +213,7 @@ public class EmployerDetailCp implements FXComponent {
 
     @PostConstruct
     public void onPostConstruct() {
+        initGrpc();
         bindingResource();
         btnSave.setOnMouseClicked(event -> {
             if (validateInputs()) {
@@ -223,7 +233,7 @@ public class EmployerDetailCp implements FXComponent {
                 DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
                 context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerUpdateRequest.newBuilder()
                         .setId(employer.getId())
-                        .setName(tfName.getText())
+                        .setName(tfName.getText().trim())
                         .setDateCreation(dpDateCreation.getValue().format(dateFormater))
                         .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateFormater) : "")
                         .setIdeNumber(tfIdeNumber.getText())
@@ -303,6 +313,8 @@ public class EmployerDetailCp implements FXComponent {
         btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
         btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));
         btnImport.textProperty().bind(ObservableResourceFactory.getStringBinding("import"));
+        ScheduleEnabledResponse scheduleEnabled = configStub.getScheduleEnabled(Empty.newBuilder().build());
+        if (scheduleEnabled.getEnabled()) btnImport.setDisable(true);
         // Table view col
         avsNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avsNumber"));
         lastNameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("employee.lastName"));
@@ -425,5 +437,13 @@ public class EmployerDetailCp implements FXComponent {
                 .acAmount(fileSalary.getAcAmount())
                 .afAmount(fileSalary.getAfAmount())
                 .build();
+    }
+
+    private void initGrpc() {
+        ManagedChannel channel = ManagedChannelBuilder
+                .forAddress(GrpcConfig.ADDRESS, GrpcConfig.PORT)
+                .usePlaintext()
+                .build();
+        this.configStub = ConfigServiceGrpc.newBlockingStub(channel);
     }
 }

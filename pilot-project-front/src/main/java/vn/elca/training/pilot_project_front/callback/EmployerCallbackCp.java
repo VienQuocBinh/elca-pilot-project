@@ -21,6 +21,7 @@ import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
 import vn.elca.training.pilot_project_front.model.ExceptionMessage;
 import vn.elca.training.proto.common.EmployerId;
+import vn.elca.training.proto.common.Empty;
 import vn.elca.training.proto.employer.*;
 
 import java.util.logging.Logger;

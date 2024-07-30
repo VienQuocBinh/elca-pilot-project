@@ -26,10 +26,10 @@ import vn.elca.training.pilot_project_front.controller.EmployerCreatePopupContro
 import vn.elca.training.pilot_project_front.model.Employer;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.PensionTypeUtil;
+import vn.elca.training.proto.common.Empty;
 import vn.elca.training.proto.common.PagingRequest;
 import vn.elca.training.proto.employer.EmployerListResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
-import vn.elca.training.proto.employer.Empty;
 
 import java.util.List;
 import java.util.Locale;
