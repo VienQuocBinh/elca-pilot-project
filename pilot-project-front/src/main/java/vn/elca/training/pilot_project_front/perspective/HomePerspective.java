@@ -111,8 +111,4 @@ public class HomePerspective implements FXPerspective {
                         .build())
         );
     }
-
-    private void storeSearchParam(EmployerSearchRequest searchRequest) {
-
-    }
 }
