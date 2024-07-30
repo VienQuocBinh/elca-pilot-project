@@ -21,7 +21,10 @@
         </HBox>
 
         <Label fx:id="lbPensionType" text="%pensionType" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="cbPensionType" GridPane.rowIndex="2" GridPane.columnIndex="1" prefWidth="350"/>
+        <HBox GridPane.rowIndex="2" GridPane.columnIndex="1">
+            <ComboBox fx:id="cbPensionType" prefWidth="350"/>
+            <Label fx:id="lbPensionTypeError" styleClass="error-label" visible="false"/>
+        </HBox>
         <Label fx:id="lbIdeNumber" text="%ideNumber.required" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
         <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" alignment="CENTER_LEFT" spacing="10">
             <TextField fx:id="tfIdeNumber" minWidth="350"/>

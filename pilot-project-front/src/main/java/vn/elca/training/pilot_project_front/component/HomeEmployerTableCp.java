@@ -76,7 +76,7 @@ public class HomeEmployerTableCp implements FXComponent {
                         .build())
                 .build());
         addButtonToTable();
-        // Make TableView resize with the window. Delay the binding until the scene is available
+        // Make TableView resize with the window.
         tbvEmployer.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
                 tbvEmployer.prefHeightProperty().bind(tbvEmployer.getScene().heightProperty());
@@ -114,6 +114,8 @@ public class HomeEmployerTableCp implements FXComponent {
                 tbvEmployer.getItems().clear();
                 tbvEmployer.setItems(FXCollections.observableList(collect));
                 // Default sort
+                tbvEmployer.getSortOrder().clear();
+                numberCol.setSortType(TableColumn.SortType.ASCENDING);
                 tbvEmployer.getSortOrder().add(numberCol);
                 tbvEmployer.sort(); // Trigger sort
             });
@@ -198,14 +200,10 @@ public class HomeEmployerTableCp implements FXComponent {
             Parent parent = fxmlLoader.load();
             // Add new employer to current observable list by callback
             EmployerCreatePopupController popupController = fxmlLoader.getController();
-            popupController.setCallback(employer -> tbvEmployer.getItems().add(Employer.builder()
-                    .id(employer.getId())
-                    .name(employer.getName())
-                    .number(employer.getNumber())
-                    .ideNumber(employer.getIdeNumber())
-                    .pensionType(PensionTypeUtil.getLocalizedPensionType(employer.getPensionType()))
-                    .dateCreation(employer.getDateCreation())
-                    .dateExpiration(employer.getDateExpiration())
+            popupController.setCallback(employer -> context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder()
+                    .setPagingRequest(PagingRequest.newBuilder()
+                            .setPageIndex(0)
+                            .build())
                     .build()));
 
             Stage stagePopup = new Stage();

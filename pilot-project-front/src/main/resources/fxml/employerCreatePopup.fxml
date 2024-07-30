@@ -21,7 +21,7 @@
 
     <Label fx:id="lbPensionType" text="%pensionType.required"/>
     <ComboBox fx:id="cbPensionType" prefWidth="520"/>
-    <Region styleClass="blankSpacing"/>
+    <Label fx:id="lbPensionTypeError" styleClass="error-label" visible="false"/>
 
     <HBox spacing="5" alignment="CENTER_LEFT">
         <Label fx:id="lbIdeNumber" text="%ideNumber.required"/>

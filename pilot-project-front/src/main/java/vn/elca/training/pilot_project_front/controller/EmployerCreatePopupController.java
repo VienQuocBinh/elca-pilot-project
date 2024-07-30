@@ -39,6 +39,8 @@ public class EmployerCreatePopupController implements Initializable {
     @FXML
     private Label lbNameError;
     @FXML
+    private Label lbPensionTypeError;
+    @FXML
     private Label lbNumberValue;
     @FXML
     private TextField tfIdeNumber;
@@ -164,6 +166,15 @@ public class EmployerCreatePopupController implements Initializable {
         } else {
             tfName.getStyleClass().remove(errorStyleClass);
             lbNameError.setVisible(false);
+        }
+        if (cbPensionType.getSelectionModel().getSelectedItem() == null) {
+            cbPensionType.getStyleClass().add(errorStyleClass);
+            lbPensionTypeError.setVisible(true);
+            lbPensionTypeError.setText(resourceBundle.getString("error.pensionType.required"));
+            isValid = false;
+        } else {
+            cbPensionType.getStyleClass().remove(errorStyleClass);
+            lbPensionTypeError.setVisible(false);
         }
         if (tfIdeNumber.getText().isEmpty()) {
             tfIdeNumber.getStyleClass().add(errorStyleClass);

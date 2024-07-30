@@ -69,6 +69,8 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private ComboBox<PensionTypeProto> cbPensionType;
     @FXML
+    private Label lbPensionTypeError;
+    @FXML
     private Label lbName;
     @FXML
     private TextField tfName;
@@ -344,6 +346,15 @@ public class EmployerDetailCp implements FXComponent {
         } else {
             tfName.getStyleClass().remove(ERROR_STYLE_CLASS);
             lbNameError.setVisible(false);
+        }
+        if (cbPensionType.getSelectionModel().getSelectedItem() == null) {
+            cbPensionType.getStyleClass().add(ERROR_STYLE_CLASS);
+            lbPensionTypeError.setVisible(true);
+            lbPensionTypeError.setText(resourceBundle.getString("error.pensionType.required"));
+            isValid = false;
+        } else {
+            cbPensionType.getStyleClass().remove(ERROR_STYLE_CLASS);
+            lbPensionTypeError.setVisible(false);
         }
         if (tfIdeNumber.getText().isEmpty()) {
             tfIdeNumber.getStyleClass().add(ERROR_STYLE_CLASS);

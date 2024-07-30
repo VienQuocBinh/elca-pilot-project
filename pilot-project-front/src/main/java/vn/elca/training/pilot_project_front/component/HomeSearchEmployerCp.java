@@ -16,6 +16,7 @@ import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.TextFieldUtil;
+import vn.elca.training.proto.common.PagingRequest;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 
@@ -107,6 +108,7 @@ public class HomeSearchEmployerCp implements FXComponent {
                 .setNumber(tfNumber.getText())
                 .setDateCreation(dpDateCreation.getValue() != null ? dpDateCreation.getValue().format(dateTimeFormatter) : "")
                 .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateTimeFormatter) : "")
+                .setPagingRequest(PagingRequest.newBuilder().setPageIndex(0).build())
                 .build();
         // Send to parent perspective to append paging info and store search params
         context.send(PerspectiveId.HOME_PERSPECTIVE, searchRequest);
