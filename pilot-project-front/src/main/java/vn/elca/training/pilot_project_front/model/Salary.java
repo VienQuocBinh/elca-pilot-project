@@ -17,4 +17,6 @@ public class Salary {
     private String avsAmount;
     private String acAmount;
     private String afAmount;
+    @Builder.Default
+    private boolean isImported = false; // true: newly; false: from db
 }

@@ -114,7 +114,7 @@
                     <FormattedTableCell alignment="RIGHT"/>
                 </cellFactory>
             </TableColumn>
-            <!--            <TableColumn fx:id="actionCol" prefWidth="100"/>-->
+            <TableColumn fx:id="actionCol" prefWidth="100"/>
         </columns>
     </TableView>
     <BorderPane>
