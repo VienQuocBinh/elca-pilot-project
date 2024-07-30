@@ -56,8 +56,7 @@ public class SalaryServiceImpl implements SalaryService {
         );
     }
 
-    //    @Scheduled(cron = "${salary.csv.process.cron}")
-//    @Scheduled(fixedDelay = 5000)
+    @Override
     public void processSalaryCsvFilesJob() {
         File directory = new File(directoryPath);
         if (directory.isDirectory()) {

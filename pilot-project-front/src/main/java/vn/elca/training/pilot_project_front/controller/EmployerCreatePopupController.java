@@ -20,6 +20,7 @@ import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.JsonStringify;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.TextFieldUtil;
+import vn.elca.training.proto.common.Empty;
 import vn.elca.training.proto.employer.*;
 
 import java.net.URL;

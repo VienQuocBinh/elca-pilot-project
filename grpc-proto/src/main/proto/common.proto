@@ -5,6 +5,11 @@ package proto;
 option java_multiple_files = true;
 option java_package = "vn.elca.training.proto.common";
 
+service ConfigService {
+    rpc GetScheduleEnabled (Empty) returns (ScheduleEnabledResponse);
+}
+message Empty {}
+
 message EmployerId {
     uint64 id = 1;
 }
@@ -18,4 +23,8 @@ message PagingResponse {
     uint32 page_size = 2;
     uint32 total_pages = 3;
     uint64 total_elements = 4;
+}
+
+message ScheduleEnabledResponse {
+    bool enabled = 1;
 }
