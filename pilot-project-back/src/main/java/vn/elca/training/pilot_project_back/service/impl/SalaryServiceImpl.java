@@ -88,7 +88,7 @@ public class SalaryServiceImpl implements SalaryService {
                     result.getSalaries().removeAll(salariesToBeRemoved);
                     if (!result.getErrors().isEmpty()) {
                         String[] header = SalaryHeaderBuild.buildErrorHeader();
-                        FileUtil.writErrorCsvFile(file.getName(), header, result.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+                        FileUtil.writeErrorCsvFile(file.getName(), header, result.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
                     }
                     saveAllSalaries(result.getSalaries());
                 });

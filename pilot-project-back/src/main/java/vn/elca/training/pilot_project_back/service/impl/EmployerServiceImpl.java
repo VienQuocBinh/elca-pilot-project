@@ -108,10 +108,10 @@ public class EmployerServiceImpl implements EmployerService {
             builder.and(employer.name.containsIgnoreCase(searchRequest.getName()));
         }
         if (searchRequest.getNumber() != null && !searchRequest.getNumber().isEmpty()) {
-            builder.and(employer.number.eq(searchRequest.getNumber()));
+            builder.and(employer.number.contains(searchRequest.getNumber()));
         }
         if (searchRequest.getIdeNumber() != null && !searchRequest.getIdeNumber().isEmpty()) {
-            builder.and(employer.ideNumber.eq(searchRequest.getIdeNumber()));
+            builder.and(employer.ideNumber.containsIgnoreCase(searchRequest.getIdeNumber()));
         }
         if (searchRequest.getDateCreation() != null) {
             // Compare only the date part

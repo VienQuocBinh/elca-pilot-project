@@ -117,7 +117,7 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
             employerUpdateRequestDto.setSalaries(salaryCreateRequestDtos);
             if (!salaryFileResult.getErrors().isEmpty()) {
                 String[] header = SalaryHeaderBuild.buildErrorHeader();
-                FileUtil.writErrorCsvFile("error", header, salaryFileResult.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+                FileUtil.writeErrorCsvFile("error", header, salaryFileResult.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
             }
             EmployerResponseDto employerResponseDto = employerService.updateEmployer(employerUpdateRequestDto);
             EmployerResponse employerResponseProto = employerMapper.mapResponseDtoToResponseProto(employerResponseDto);

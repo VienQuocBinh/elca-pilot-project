@@ -10,7 +10,6 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
-import util.FileUtil;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
@@ -95,6 +94,8 @@ public class HomeSearchEmployerCp implements FXComponent {
         dpDateExpiration.setConverter(TextFieldUtil.dateStringConverter());
         btnSearch.setOnMouseClicked(event -> searchEmployers());
         btnReset.setOnMouseClicked(event -> resetSearchFields());
+        TextFieldUtil.applyIdeNumberFilter(tfIdeNumber);
+        TextFieldUtil.applyNumberFilter(tfNumber);
     }
 
     private void searchEmployers() {
@@ -118,6 +119,5 @@ public class HomeSearchEmployerCp implements FXComponent {
         tfIdeNumber.clear();
         dpDateCreation.setValue(null);
         dpDateExpiration.setValue(null);
-        FileUtil.writErrorCsvFile("test", null, null);
     }
 }

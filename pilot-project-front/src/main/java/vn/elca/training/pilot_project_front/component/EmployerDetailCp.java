@@ -266,7 +266,7 @@ public class EmployerDetailCp implements FXComponent {
                 showSuccessAlert("Import salary success dialog", "Import successfully");
             } else {
                 String[] header = SalaryHeaderBuild.buildErrorHeader();
-                String filename = FileUtil.writErrorCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+                String filename = FileUtil.writeErrorCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
                 showWarningAlert("Import Error", ("Please check file: " + filename + " for detail"));
             }
         });

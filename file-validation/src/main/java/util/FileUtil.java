@@ -156,7 +156,7 @@ public class FileUtil {
                 .build();
     }
 
-    public static String writErrorCsvFile(String fileName, String[] header, List<String[]> data) {
+    public static String writeErrorCsvFile(String fileName, String[] header, List<String[]> data) {
         SimpleDateFormat sdf = new SimpleDateFormat(ErrorConfig.ERROR_DATE_FILE_NAME_PATTERN);
         String dateTime = sdf.format(new Date());
         fileName += "_errors_" + dateTime + ".csv";
