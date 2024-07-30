@@ -174,7 +174,7 @@ public class FileUtil {
         } catch (IOException e) {
             log.warning(e.getMessage());
         }
-        return fileName;
+        return new File(filePath).getAbsolutePath();
     }
 
     public static void moveFile(String sourcePath, String destinationPath) {

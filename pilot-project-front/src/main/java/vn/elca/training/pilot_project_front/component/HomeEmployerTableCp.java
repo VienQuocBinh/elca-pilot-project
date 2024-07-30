@@ -27,6 +27,7 @@ import vn.elca.training.pilot_project_front.model.Employer;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.PensionTypeUtil;
 import vn.elca.training.proto.common.Empty;
+import vn.elca.training.proto.common.FilePath;
 import vn.elca.training.proto.common.PagingRequest;
 import vn.elca.training.proto.employer.EmployerListResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
@@ -50,6 +51,8 @@ public class HomeEmployerTableCp implements FXComponent {
     private Context context;
     @FXML
     private Button btnAdd;
+    @FXML
+    private Button btnExport;
     @FXML
     private TableView<Employer> tbvEmployer;
     @FXML
@@ -120,6 +123,13 @@ public class HomeEmployerTableCp implements FXComponent {
                 tbvEmployer.sort(); // Trigger sort
             });
             context.send(PerspectiveId.HOME_PERSPECTIVE, listResponse.getPagingResponse());
+        } else if (message.isMessageBodyTypeOf(FilePath.class)) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Export file");
+                alert.setHeaderText(message.getTypedMessageBody(FilePath.class).getPath());
+                alert.show();
+            });
         }
         return null;
     }
@@ -183,6 +193,7 @@ public class HomeEmployerTableCp implements FXComponent {
 
     private void bindingResource() {
         btnAdd.textProperty().bind(ObservableResourceFactory.getStringBinding("add"));
+        btnExport.textProperty().bind(ObservableResourceFactory.getStringBinding("export"));
         pensionTypeCol.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
         numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
         ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
@@ -190,6 +201,7 @@ public class HomeEmployerTableCp implements FXComponent {
         dateCreationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
         dateExpirationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         btnAdd.setOnMouseClicked(event -> showCreatePopup());
+        btnExport.setOnMouseClicked(event -> context.send(ComponentId.EMPLOYER_CALLBACK_CP, Empty.newBuilder().build()));
     }
 
     private void showCreatePopup() {

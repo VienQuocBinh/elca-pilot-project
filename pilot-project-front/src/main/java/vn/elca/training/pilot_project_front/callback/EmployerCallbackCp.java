@@ -22,6 +22,7 @@ import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
 import vn.elca.training.pilot_project_front.model.ExceptionMessage;
 import vn.elca.training.proto.common.EmployerId;
 import vn.elca.training.proto.common.Empty;
+import vn.elca.training.proto.common.FilePath;
 import vn.elca.training.proto.employer.*;
 
 import java.util.logging.Logger;
@@ -61,6 +62,11 @@ public class EmployerCallbackCp implements CallbackComponent {
                 employerResponse = stub.updateEmployer(message.getTypedMessageBody(EmployerUpdateRequest.class));
                 context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
                 return new EmployerResponseWrapper(employerResponse, ActionType.UPDATE);
+            } else if (message.getMessageBody() instanceof Empty) {
+                // Get all employers
+                FilePath filePath = stub.exportFileEmployers(message.getTypedMessageBody(Empty.class));
+                context.setReturnTarget(ComponentId.HOME_EMPLOYER_TABLE_CP);
+                return filePath;
             }
         } catch (StatusRuntimeException e) {
             log.warning(e.getMessage());

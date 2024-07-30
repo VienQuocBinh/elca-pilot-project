@@ -22,4 +22,16 @@ public class EmployerResponseDto {
     private Date dateCreation;
     private Date dateExpiration;
     private List<SalaryResponseDto> salaries;
+
+    public String[] toStringArray() {
+        return new String[]{
+                id.toString(),
+                String.valueOf(pensionType),
+                name,
+                number,
+                ideNumber,
+                String.valueOf(dateCreation),
+                String.valueOf(dateExpiration)
+        };
+    }
 }

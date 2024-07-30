@@ -9,7 +9,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import util.FileUtil;
-import util.SalaryHeaderBuild;
+import util.HeaderBuild;
 import vn.elca.training.pilot_project_back.dto.SalaryResponseDto;
 import vn.elca.training.pilot_project_back.entity.QSalary;
 import vn.elca.training.pilot_project_back.entity.Salary;
@@ -87,7 +87,7 @@ public class SalaryServiceImpl implements SalaryService {
                     // Remove dup sal in import success list
                     result.getSalaries().removeAll(salariesToBeRemoved);
                     if (!result.getErrors().isEmpty()) {
-                        String[] header = SalaryHeaderBuild.buildErrorHeader();
+                        String[] header = HeaderBuild.buildSalaryErrorHeader();
                         FileUtil.writeErrorCsvFile(file.getName(), header, result.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
                     }
                     saveAllSalaries(result.getSalaries());

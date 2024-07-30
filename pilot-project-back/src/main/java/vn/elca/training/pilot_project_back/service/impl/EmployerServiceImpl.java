@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import util.HeaderBuild;
 import vn.elca.training.pilot_project_back.constant.PensionType;
 import vn.elca.training.pilot_project_back.dto.EmployerCreateRequestDto;
 import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
@@ -21,7 +22,9 @@ import vn.elca.training.pilot_project_back.mapper.EmployerMapper;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.repository.EmployerRepository;
 import vn.elca.training.pilot_project_back.service.EmployerService;
+import vn.elca.training.pilot_project_back.util.FileUtil;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +37,10 @@ public class EmployerServiceImpl implements EmployerService {
     private final SalaryMapper salaryMapper;
     @Value("${paging.default.page.size}")
     private String pageSize;
+    @Value("${employer.csv.file.export.path}")
+    private String exportPath;
+    @Value("${employer.csv.file.export.name}")
+    private String exportFileName;
 
     @Override
     public Page<EmployerResponseDto> getEmployers(EmployerSearchRequestDto searchRequest) {
@@ -52,6 +59,16 @@ public class EmployerServiceImpl implements EmployerService {
                 pageable,
                 employers.getTotalElements()
         );
+    }
+
+    @Override
+    public String exportFile() {
+        List<EmployerResponseDto> collect = employerRepository.findAll().stream()
+                .map(employerMapper::mapEntityToResponseDto)
+                .sorted(Comparator.comparing(EmployerResponseDto::getNumber))
+                .collect(Collectors.toList());
+        List<String[]> data = collect.stream().map(EmployerResponseDto::toStringArray).collect(Collectors.toList());
+        return FileUtil.writeCsvFile(exportPath, exportFileName, HeaderBuild.buildEmployerHeader(), data);
     }
 
     @Override

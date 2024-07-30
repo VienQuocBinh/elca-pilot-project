@@ -24,7 +24,7 @@ import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
 import util.FileUtil;
-import util.SalaryHeaderBuild;
+import util.HeaderBuild;
 import vn.elca.training.pilot_project_front.config.GrpcConfig;
 import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
@@ -268,9 +268,9 @@ public class EmployerDetailCp implements FXComponent {
             if (errors.isEmpty()) {
                 showSuccessAlert("Import salary success dialog", "Import successfully");
             } else {
-                String[] header = SalaryHeaderBuild.buildErrorHeader();
+                String[] header = HeaderBuild.buildSalaryErrorHeader();
                 String filename = FileUtil.writeErrorCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
-                showWarningAlert("Import Error", ("Please check file: " + filename + " for detail"));
+                showWarningAlert("Import Error", ("Error happens while importing file. Please check folder: " + filename + " more details."));
             }
         });
         ScheduleEnabledResponse scheduleEnabled = configStub.getScheduleEnabled(Empty.newBuilder().build());
