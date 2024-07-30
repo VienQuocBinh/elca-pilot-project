@@ -124,11 +124,20 @@ public class HomeEmployerTableCp implements FXComponent {
 
     private void addButtonToTable() {
         Callback<TableColumn<Employer, Void>, TableCell<Employer, Void>> cellFactory = param -> new TableCell<Employer, Void>() {
-            private final Button btnDetail = new Button("Detail");
-            private final Button btnDelete = new Button("Delete");
+            private final Button btnDetail = new Button(ObservableResourceFactory.getProperty().getString("detail"));
+            private final Button btnDelete = new Button(ObservableResourceFactory.getProperty().getString("delete"));
             private final HBox pane = new HBox(10, btnDetail, btnDelete);
 
             {
+                // Listen for locale changes
+                ObservableResourceFactory.resourceProperty().addListener((observable, oldValue, newValue) ->
+                        {
+                            btnDetail.setText(ObservableResourceFactory.getProperty().getString("detail"));
+                            btnDelete.setText(ObservableResourceFactory.getProperty().getString("delete"));
+                        }
+                );
+                btnDetail.setMinWidth(65);
+                btnDelete.setMinWidth(80);
                 btnDetail.setOnMouseClicked(event -> {
                     // Switch to EmployerDetailPerspective
                     Employer employer = getTableView().getItems().get(getIndex());

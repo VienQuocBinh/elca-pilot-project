@@ -77,7 +77,7 @@ public class JacpFXWorkbench implements FXWorkbench {
 
     @Override
     public void handleInitialLayout(Message<Event, Object> message, WorkbenchLayout<Node> workbenchLayout, Stage stage) {
-        workbenchLayout.setWorkbenchXYSize(1110, 800);
+        workbenchLayout.setWorkbenchXYSize(1300, 800);
         workbenchLayout.registerToolBar(ToolbarPosition.NORTH);
         workbenchLayout.setStyle(StageStyle.DECORATED);
     }
