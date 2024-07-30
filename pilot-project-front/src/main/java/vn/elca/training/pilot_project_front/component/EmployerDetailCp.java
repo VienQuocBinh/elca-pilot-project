@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
         resourceBundleLocation = "bundles.languageBundle")
 public class EmployerDetailCp implements FXComponent {
     private static final String ERROR_STYLE_CLASS = "error";
-    private final Logger log = Logger.getLogger(HomeEmployerTableCp.class.getName());
+    private final Logger log = Logger.getLogger(EmployerDetailCp.class.getName());
     @Resource
     private Context context;
     @FXML
@@ -133,7 +133,7 @@ public class EmployerDetailCp implements FXComponent {
     @Getter
     private File file;
     private Employer employer;
-    private List<Salary> importedSalaries = new ArrayList<>();
+    private List<Salary> importedSalaries;
     private ConfigServiceGrpc.ConfigServiceBlockingStub configStub;
 
     @Override
@@ -141,6 +141,7 @@ public class EmployerDetailCp implements FXComponent {
         if (message.getMessageBody() instanceof Employer) {
             // From EmployerDetailPerspective
             clearErrors();
+            clearFileImport();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
             employer = message.getTypedMessageBody(Employer.class);
             lbNumberValue.setText(employer.getNumber());
@@ -261,8 +262,8 @@ public class EmployerDetailCp implements FXComponent {
             SalaryFileResult salaryFileResult = FileUtil.processSalaryCsvFiles(file);
             importedSalaries = salaryFileResult.getSalaries().stream().map(this::mapFromFileModel).collect(Collectors.toList());
             List<SalaryError> errors = salaryFileResult.getErrors();
+            tbvSalary.getItems().addAll(importedSalaries);
             if (errors.isEmpty()) {
-                tbvSalary.getItems().addAll(importedSalaries);
                 showSuccessAlert("Import salary success dialog", "Import successfully");
             } else {
                 String[] header = SalaryHeaderBuild.buildErrorHeader();
@@ -270,18 +271,16 @@ public class EmployerDetailCp implements FXComponent {
                 showWarningAlert("Import Error", ("Please check file: " + filename + " for detail"));
             }
         });
+        ScheduleEnabledResponse scheduleEnabled = configStub.getScheduleEnabled(Empty.newBuilder().build());
+        fileInput.setDisable(scheduleEnabled.getEnabled());
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             FileChooser fileChooser = new FileChooser();
-
             FileChooser.ExtensionFilter csvFilter = new FileChooser
                     .ExtensionFilter("CSV Files (*.csv)", "*.csv");
-            FileChooser.ExtensionFilter xlsxFilter = new FileChooser
-                    .ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx");
-
-            fileChooser.getExtensionFilters().addAll(csvFilter, xlsxFilter);
+            fileChooser.getExtensionFilters().addAll(csvFilter);
             Optional<File> selectedFile = Optional.ofNullable(fileChooser.showOpenDialog(fileInput.getScene().getWindow()));
             if (selectedFile.isPresent()) {
-                fileInput.setText(selectedFile.get().getName());
+                fileInput.setText(selectedFile.get().getAbsolutePath());
                 file = selectedFile.get();
                 btnImport.setDisable(false);
             }
@@ -320,8 +319,6 @@ public class EmployerDetailCp implements FXComponent {
         btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
         btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));
         btnImport.textProperty().bind(ObservableResourceFactory.getStringBinding("import"));
-        ScheduleEnabledResponse scheduleEnabled = configStub.getScheduleEnabled(Empty.newBuilder().build());
-        if (scheduleEnabled.getEnabled()) btnImport.setDisable(true);
         // Table view col
         avsNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avsNumber"));
         lastNameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("employee.lastName"));
@@ -431,6 +428,13 @@ public class EmployerDetailCp implements FXComponent {
         dpDateCreation.getStyleClass().remove(ERROR_STYLE_CLASS);
         dpDateExpiration.getStyleClass().remove(ERROR_STYLE_CLASS);
         lbDateExpirationError.setVisible(false);
+    }
+
+    private void clearFileImport() {
+        file = null;
+        btnImport.setDisable(true);
+        fileInput.setText("C:/ipension");
+        importedSalaries = new ArrayList<>();
     }
 
     private Salary mapFromFileModel(model.Salary fileSalary) {
