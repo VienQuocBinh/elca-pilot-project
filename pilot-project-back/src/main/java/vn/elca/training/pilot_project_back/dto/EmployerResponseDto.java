@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import vn.elca.training.pilot_project_back.constant.PensionType;
 
 import java.text.SimpleDateFormat;
@@ -24,8 +23,6 @@ public class EmployerResponseDto {
     private Date dateCreation;
     private Date dateExpiration;
     private List<SalaryResponseDto> salaries;
-    @Value("${date.format}")
-    private String dateFormat;
 
     public String[] toStringArray(SimpleDateFormat simpleDateFormat) {
         return new String[]{
@@ -34,7 +31,7 @@ public class EmployerResponseDto {
                 number,
                 ideNumber,
                 simpleDateFormat.format(dateCreation),
-                simpleDateFormat.format(dateExpiration)
+                dateExpiration != null ? simpleDateFormat.format(dateExpiration) : ""
         };
     }
 }

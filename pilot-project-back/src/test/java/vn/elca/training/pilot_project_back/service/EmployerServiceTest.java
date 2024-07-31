@@ -2,9 +2,11 @@ package vn.elca.training.pilot_project_back.service;
 
 import com.querydsl.core.types.Predicate;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,17 +22,23 @@ import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.repository.EmployerRepository;
 import vn.elca.training.pilot_project_back.service.impl.EmployerServiceImpl;
 
+import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EmployerServiceTest {
+    private static SimpleDateFormat simpleDateFormat;
+    @TempDir
+    Path tempDir;
     @Mock
     private EmployerMapper employerMapper;
     @Mock
@@ -40,9 +48,17 @@ class EmployerServiceTest {
     @InjectMocks
     private EmployerServiceImpl employerService;
 
+    @BeforeAll
+    public static void setup() {
+        simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    }
+
     @BeforeEach
     public void setUp() {
         ReflectionTestUtils.setField(employerService, "pageSize", "10");
+        ReflectionTestUtils.setField(employerService, "exportPath", tempDir.toString());
+        ReflectionTestUtils.setField(employerService, "exportFileName", "employer_test");
+        ReflectionTestUtils.setField(employerService, "simpleDateFormat", simpleDateFormat);
     }
 
     @Test
@@ -94,6 +110,24 @@ class EmployerServiceTest {
         Assertions.assertEquals(10, result.getSize());
         Assertions.assertEquals(2, result.getTotalPages());
         Assertions.assertEquals(20, result.getTotalElements());
+    }
+
+    @Test
+    void testGetEmployersAllCriteria() {
+        EmployerSearchRequestDto searchRequestDto = EmployerSearchRequestDto.builder()
+                .pensionType(PensionType.REGIONAL)
+                .name("Employer")
+                .number("1")
+                .ideNumber("CHE-998.345.143")
+                .dateCreation(new Date())
+                .dateExpiration(new Date())
+                .build();
+       
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("number"));
+        when(employerRepository.findAll(any(Predicate.class), eq(pageable))).thenReturn(new PageImpl<>(new ArrayList<>()));
+        Page<EmployerResponseDto> result = employerService.getEmployers(searchRequestDto);
+
+        Assertions.assertEquals(0, result.getTotalElements());
     }
 
     @Test
@@ -169,20 +203,43 @@ class EmployerServiceTest {
     @Test
     void testUpdateEmployer() throws EntityNotFoundException {
         long id = 1L;
+        List<Salary> salaries = new ArrayList<>();
+        salaries.add(Salary.builder()
+                .id(1L)
+                .avsNumber("756.3125.8978.12")
+                .lastName("Last")
+                .firstName("first")
+                .startDate(new Date())
+                .endDate(new Date())
+                .avsAmount(BigDecimal.valueOf(200.8))
+                .afAmount(BigDecimal.valueOf(12))
+                .acAmount(BigDecimal.valueOf(15))
+                .build());
         Employer employer = Employer.builder()
                 .id(1L)
                 .name("A")
                 .number("000001")
                 .ideNumber("CHE-123.456.789")
-                .salaries(new ArrayList<>())
+                .salaries(salaries)
                 .build();
+        List<SalaryCreateRequestDto> salariesDto = new ArrayList<>();
+        salariesDto.add(SalaryCreateRequestDto.builder()
+                .avsNumber("756.3125.8978.12")
+                .lastName("Last")
+                .firstName("first")
+                .startDate(new Date())
+                .endDate(new Date())
+                .avsAmount(BigDecimal.valueOf(200.8))
+                .afAmount(BigDecimal.valueOf(12))
+                .acAmount(BigDecimal.valueOf(15))
+                .build());
         EmployerUpdateRequestDto requestDto = EmployerUpdateRequestDto.builder()
                 .id(id)
                 .name("A1")
-                .salaries(new ArrayList<>())
+                .salaries(salariesDto)
                 .build();
 
-        List<Salary> salaries = new ArrayList<>();
+
         when(salaryMapper.mapCreateListRequestDtoToEntityList(requestDto.getSalaries())).thenReturn(salaries);
         when(employerRepository.findById(id)).thenReturn(Optional.of(employer));
 
@@ -214,5 +271,57 @@ class EmployerServiceTest {
 
         assertThrows(EntityNotFoundException.class, () -> employerService.updateEmployer(requestDto));
         verify(employerRepository, times(0)).saveAndFlush(employer);
+    }
+
+    @Test
+    void testGetEmployerNextNumber() {
+        int i = 1;
+        when(employerRepository.findMaxNumber()).thenReturn(i);
+        int nextNumber = employerService.getEmployerNextNumber();
+        verify(employerRepository).findMaxNumber();
+        assertEquals(i + 1, nextNumber);
+    }
+
+    @Test
+    void testGetEmployerNextNumberNoEmployer() {
+        when(employerRepository.findMaxNumber()).thenReturn(0);
+        int nextNumber = employerService.getEmployerNextNumber();
+        verify(employerRepository).findMaxNumber();
+        assertEquals(1, nextNumber);
+    }
+
+    @Test
+    void testExportFileSuccess() {
+        List<Employer> employers = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            employers.add(Employer.builder()
+                    .id((long) i)
+                    .name("A" + i)
+                    .number("00000" + i)
+                    .ideNumber("CHE-123.456.78" + i)
+                    .pensionType(PensionType.REGIONAL)
+                    .dateCreation(new Date())
+                    .dateExpiration(new Date())
+                    .build());
+        }
+        when(employerRepository.findAll()).thenReturn(employers);
+        when(employerMapper.mapEntityToResponseDto(any(Employer.class))).thenAnswer(invocation -> {
+            Employer employer = invocation.getArgument(0);
+            return EmployerResponseDto.builder()
+                    .id(employer.getId())
+                    .name(employer.getName())
+                    .number(employer.getNumber())
+                    .ideNumber(employer.getIdeNumber())
+                    .pensionType(employer.getPensionType())
+                    .dateCreation(employer.getDateCreation())
+                    .dateExpiration(employer.getDateExpiration())
+                    .build();
+        });
+
+        String filePath = employerService.exportFile();
+        verify(employerRepository).findAll();
+        verify(employerMapper, times(employers.size())).mapEntityToResponseDto(any(Employer.class));
+        assertNotEquals("", filePath);
+        assertTrue(filePath.contains(tempDir.toString()));
     }
 }
