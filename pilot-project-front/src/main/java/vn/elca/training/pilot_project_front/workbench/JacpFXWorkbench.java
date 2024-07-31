@@ -64,6 +64,7 @@ public class JacpFXWorkbench implements FXWorkbench {
                         ObservableResourceFactory.setProperty(ResourceBundle.getBundle("bundles/languageBundle", newValue));
                         PensionTypeService.getInstance().updateCbPensionTypeSearch();
                         PensionTypeService.getInstance().updateCbPensionType();
+                        Locale.setDefault(newValue);
                         // Reload employer table to re-convert pension type
                         context.send(PerspectiveId.HOME_PERSPECTIVE + "." + ComponentId.EMPLOYER_CALLBACK_CP,
                                 EmployerSearchRequest.newBuilder()

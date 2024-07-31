@@ -12,6 +12,7 @@ public class ObservableResourceFactory {
 
     static {
         property.set(ResourceBundle.getBundle("bundles/languageBundle", Locale.FRENCH));
+        Locale.setDefault(Locale.FRENCH);
     }
 
     private ObservableResourceFactory() {
