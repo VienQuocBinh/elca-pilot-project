@@ -127,14 +127,13 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
 
             SalaryFileResult salaryFileResult = validationService.validateFileSalary(salaryCreateRequestDtos);
             employerUpdateRequestDto.setSalaries(salaryCreateRequestDtos);
-            if (!salaryFileResult.getErrors().isEmpty()) {
-                String[] header = HeaderBuild.buildSalaryErrorHeader();
-                FileUtil.writeErrorCsvFile("error", header, salaryFileResult.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
-            }
             EmployerResponseDto employerResponseDto = employerService.updateEmployer(employerUpdateRequestDto);
             EmployerResponse employerResponseProto = employerMapper.mapResponseDtoToResponseProto(employerResponseDto);
             if (!salaryFileResult.getErrors().isEmpty()) {
-                throw new AvsNumberExistedException("Some Avs numbers are already existed. Please check \"error\" folder");
+                String[] header = HeaderBuild.buildSalaryErrorHeader();
+                String filePath = FileUtil.writeErrorCsvFile("error", header, salaryFileResult.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+
+                throw new AvsNumberExistedException(filePath);
             }
 
             responseObserver.onNext(employerResponseProto.toBuilder()

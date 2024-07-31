@@ -125,9 +125,11 @@ public class HomeEmployerTableCp implements FXComponent {
             context.send(PerspectiveId.HOME_PERSPECTIVE, listResponse.getPagingResponse());
         } else if (message.isMessageBodyTypeOf(FilePath.class)) {
             Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Export file");
-                alert.setHeaderText(message.getTypedMessageBody(FilePath.class).getPath());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(ObservableResourceFactory.getProperty().getString("alert.info.title.export.employer"));
+                alert.setHeaderText(
+                        ObservableResourceFactory.getProperty().getString("alert.info.header.export.employer")
+                                + " " + message.getTypedMessageBody(FilePath.class).getPath());
                 alert.show();
             });
         }

@@ -177,7 +177,8 @@ public class EmployerDetailCp implements FXComponent {
                                 .build())
                         .build());
                 if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE))
-                    showSuccessAlert("Update employer", "Update employer successfully");
+                    showSuccessAlert(ObservableResourceFactory.getProperty().getString("alert.info.title.update.employer"),
+                            ObservableResourceFactory.getProperty().getString("alert.info.header.update.employer"));
             }
         } else if (message.getMessageBody() instanceof ExceptionMessage) {
             // From EmployerCallbackCp catch
@@ -212,7 +213,9 @@ public class EmployerDetailCp implements FXComponent {
             pgSalary.setVisible(listResponse.getPagingResponse().getTotalPages() != 0);
             lbTotalElements.setText("Total: " + listResponse.getPagingResponse().getTotalElements());
         } else if (message.isMessageBodyTypeOf(FilePath.class)) {
-            showSuccessAlert("export", message.getTypedMessageBody(FilePath.class).getPath());
+            showSuccessAlert(ObservableResourceFactory.getProperty().getString("alert.info.title.export.salary"),
+                    ObservableResourceFactory.getProperty().getString("alert.info.header.export.salary")
+                            + " " + message.getTypedMessageBody(FilePath.class).getPath());
         }
         return null;
     }
@@ -267,11 +270,15 @@ public class EmployerDetailCp implements FXComponent {
             List<SalaryError> errors = salaryFileResult.getErrors();
             tbvSalary.getItems().addAll(importedSalaries);
             if (errors.isEmpty()) {
-                showSuccessAlert("Import salary success dialog", "Import successfully");
+                showSuccessAlert(ObservableResourceFactory.getProperty().getString("alert.info.title.import.salary"),
+                        ObservableResourceFactory.getProperty().getString("alert.info.header.import.salary"));
             } else {
                 String[] header = HeaderBuild.buildSalaryErrorHeader();
                 String filename = FileUtil.writeErrorCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
-                showWarningAlert("Import Error", ("Error happens while importing file. Please check folder: " + filename + " more details."));
+                showErrorAlert(ObservableResourceFactory.getProperty().getString("alert.error.title.import.salary"),
+                        (ObservableResourceFactory.getProperty().getString("alert.error.header.prefix.import.salary")
+                                + " " + filename + " "
+                                + ObservableResourceFactory.getProperty().getString("alert.error.header.suffix.import.salary")));
             }
         });
 
@@ -428,8 +435,8 @@ public class EmployerDetailCp implements FXComponent {
         alert.show();
     }
 
-    private void showWarningAlert(String title, String headerText) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
+    private void showErrorAlert(String title, String headerText) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.show();

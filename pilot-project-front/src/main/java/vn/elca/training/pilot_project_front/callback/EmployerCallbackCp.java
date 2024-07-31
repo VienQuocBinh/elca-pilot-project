@@ -20,6 +20,7 @@ import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.model.EmployerResponseWrapper;
 import vn.elca.training.pilot_project_front.model.ExceptionMessage;
+import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.proto.common.EmployerId;
 import vn.elca.training.proto.common.Empty;
 import vn.elca.training.proto.common.FilePath;
@@ -75,10 +76,7 @@ public class EmployerCallbackCp implements CallbackComponent {
             } else if (e.getStatus().getCode() == Status.ALREADY_EXISTS.getCode()) {
                 EmployerResponse finalEmployerResponse = employerResponse;
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Warning");
-                    alert.setHeaderText(e.getMessage());
-                    alert.show();
+                    showUpdateEmployerErrorAlert(e);
                     context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
                     context.send(ComponentId.EMPLOYER_DETAIL_CP, new EmployerResponseWrapper(finalEmployerResponse, ActionType.RELOAD));
                 });
@@ -117,5 +115,15 @@ public class EmployerCallbackCp implements CallbackComponent {
         alert.setHeaderText("gRPC Error");
         alert.setContentText("An error occurred: " + e.getStatus().getDescription());
         alert.showAndWait();
+    }
+
+    private void showUpdateEmployerErrorAlert(StatusRuntimeException e) {
+        int colonIndex = e.getMessage().indexOf(':');
+        String filepath = e.getMessage().substring(colonIndex + 1).trim();
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(ObservableResourceFactory.getProperty().getString("alert.error.title.update.employer"));
+        alert.setHeaderText(ObservableResourceFactory.getProperty().getString("alert.error.header.salary.existed")
+                + " " + filepath);
+        alert.show();
     }
 }
