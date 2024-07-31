@@ -275,7 +275,7 @@ public class EmployerDetailCp implements FXComponent {
                 showSuccessAlert(ObservableResourceFactory.getProperty().getString("alert.info.title.import.salary"),
                         ObservableResourceFactory.getProperty().getString("alert.info.header.import.salary"));
             } else {
-                String[] header = HeaderBuild.buildSalaryErrorHeader();
+                String[] header = HeaderBuild.buildSalaryImportErrorHeader();
                 String filename = FileUtil.writeErrorCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
                 showErrorAlert(ObservableResourceFactory.getProperty().getString("alert.error.title.import.salary"),
                         (ObservableResourceFactory.getProperty().getString("alert.error.header.prefix.import.salary")

@@ -15,7 +15,7 @@ public class SalaryError {
         String[] errors = salary.toStringArray();
         String[] resultArray = new String[errors.length + 1];
         System.arraycopy(errors, 0, resultArray, 0, errors.length);
-        resultArray[errors.length] = message;
+        resultArray[errors.length - 1] = message;
         return resultArray;
     }
 }

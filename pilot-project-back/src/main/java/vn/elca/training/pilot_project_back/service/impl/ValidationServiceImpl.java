@@ -249,12 +249,14 @@ public class ValidationServiceImpl implements ValidationService {
                 .acAmount(String.valueOf(salary.getAcAmount()))
                 .build()).collect(Collectors.toList());
         Set<String> salariesToBeRemoved = new HashSet<>();
+        long no = 1;
         for (model.Salary salary : collect) {
             try {
                 Date startDateDate = simpleDateFormat.parse(salary.getStartDate());
                 Date endDateDate = simpleDateFormat.parse(salary.getEndDate());
                 List<String> avsNumbersBetweenDates = salaryRepository.findAvsNumbersBetweenDates(startDateDate, endDateDate);
                 if (avsNumbersBetweenDates.contains(salary.getAvsNumber())) {
+                    salary.setId(no++);
                     errors.add(SalaryError.builder()
                             .salary(salary)
                             .message("AVS number " + salary.getAvsNumber() + " already existed between " + salary.getStartDate() + " and " + salary.getEndDate())

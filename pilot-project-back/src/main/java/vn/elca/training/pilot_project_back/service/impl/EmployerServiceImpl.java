@@ -24,6 +24,7 @@ import vn.elca.training.pilot_project_back.repository.EmployerRepository;
 import vn.elca.training.pilot_project_back.service.EmployerService;
 import vn.elca.training.pilot_project_back.util.FileUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ public class EmployerServiceImpl implements EmployerService {
     private final EmployerRepository employerRepository;
     private final EmployerMapper employerMapper;
     private final SalaryMapper salaryMapper;
+    private final SimpleDateFormat simpleDateFormat;
     @Value("${paging.default.page.size}")
     private String pageSize;
     @Value("${employer.csv.file.export.path}")
@@ -67,7 +69,7 @@ public class EmployerServiceImpl implements EmployerService {
                 .map(employerMapper::mapEntityToResponseDto)
                 .sorted(Comparator.comparing(EmployerResponseDto::getNumber))
                 .collect(Collectors.toList());
-        List<String[]> data = collect.stream().map(EmployerResponseDto::toStringArray).collect(Collectors.toList());
+        List<String[]> data = collect.stream().map(dto -> dto.toStringArray(simpleDateFormat)).collect(Collectors.toList());
         return FileUtil.writeCsvFile(exportPath, exportFileName, HeaderBuild.buildEmployerHeader(), data);
     }
 

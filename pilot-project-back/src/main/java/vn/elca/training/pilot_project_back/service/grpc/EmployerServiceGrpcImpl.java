@@ -131,7 +131,7 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
             EmployerResponse employerResponseProto = employerMapper.mapResponseDtoToResponseProto(employerResponseDto);
             if (!salaryFileResult.getErrors().isEmpty()) {
                 String[] header = HeaderBuild.buildSalaryErrorHeader();
-                String filePath = FileUtil.writeErrorCsvFile("error", header, salaryFileResult.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+                String filePath = FileUtil.writeErrorCsvFile("employer_salary", header, salaryFileResult.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
 
                 throw new AvsNumberExistedException(filePath);
             }

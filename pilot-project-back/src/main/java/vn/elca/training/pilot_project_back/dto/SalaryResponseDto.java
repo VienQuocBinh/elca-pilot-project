@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Getter
@@ -21,13 +22,13 @@ public class SalaryResponseDto {
     private BigDecimal acAmount;
     private BigDecimal afAmount;
 
-    public String[] toStringArray() {
-        return new String[]{id.toString(),
+    public String[] toStringArray(SimpleDateFormat simpleDateFormat) {
+        return new String[]{
                 avsNumber,
                 lastName,
                 firstName,
-                String.valueOf(startDate),
-                String.valueOf(endDate),
+                simpleDateFormat.format(startDate),
+                simpleDateFormat.format(endDate),
                 String.valueOf(avsAmount),
                 String.valueOf(acAmount),
                 String.valueOf(afAmount)};

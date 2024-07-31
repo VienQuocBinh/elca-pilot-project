@@ -72,7 +72,7 @@ public class SalaryServiceImpl implements SalaryService {
                 .sorted(Comparator.comparing(SalaryResponseDto::getLastName)
                         .thenComparing(SalaryResponseDto::getFirstName))
                 .collect(Collectors.toList());
-        List<String[]> data = collect.stream().map(SalaryResponseDto::toStringArray).collect(Collectors.toList());
+        List<String[]> data = collect.stream().map(dto -> dto.toStringArray(simpleDateFormat)).collect(Collectors.toList());
         return FileUtil.writeCsvFile(exportPath, exportFileName, HeaderBuild.buildSalaryHeader(), data);
     }
 
@@ -114,7 +114,7 @@ public class SalaryServiceImpl implements SalaryService {
                     // Remove dup sal in import success list
                     result.getSalaries().removeAll(salariesToBeRemoved);
                     if (!result.getErrors().isEmpty()) {
-                        String[] header = HeaderBuild.buildSalaryErrorHeader();
+                        String[] header = HeaderBuild.buildSalaryImportErrorHeader();
                         util.FileUtil.writeErrorCsvFile(file.getName(), header, result.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
                     }
                     saveAllSalaries(result.getSalaries());
