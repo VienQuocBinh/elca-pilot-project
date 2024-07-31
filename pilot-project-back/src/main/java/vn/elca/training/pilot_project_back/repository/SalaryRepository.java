@@ -15,6 +15,8 @@ import java.util.List;
 public interface SalaryRepository extends JpaRepository<Salary, Long> {
     Page<Salary> findByEmployerId(Long employerId, Pageable pageable);
 
+    List<Salary> findByEmployerId(Long employerId);
+
     @Query(value = "select avs_number from salary " +
             "where DATE(start_date)= :startDate " +
             "and DATE(end_date) = :endDate " +

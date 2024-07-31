@@ -28,3 +28,6 @@ message PagingResponse {
 message ScheduleEnabledResponse {
     bool enabled = 1;
 }
+message FilePath {
+    string path = 1;
+}

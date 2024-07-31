@@ -8,15 +8,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import util.FileUtil;
-import util.SalaryHeaderBuild;
+import util.HeaderBuild;
 import vn.elca.training.pilot_project_back.dto.SalaryResponseDto;
+import vn.elca.training.pilot_project_back.entity.Employer;
 import vn.elca.training.pilot_project_back.entity.QSalary;
 import vn.elca.training.pilot_project_back.entity.Salary;
+import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.repository.EmployerRepository;
 import vn.elca.training.pilot_project_back.repository.SalaryRepository;
 import vn.elca.training.pilot_project_back.service.SalaryService;
+import vn.elca.training.pilot_project_back.util.FileUtil;
 import vn.elca.training.proto.salary.SalaryListRequest;
 
 import java.io.File;
@@ -41,6 +43,10 @@ public class SalaryServiceImpl implements SalaryService {
     private String directoryPath;
     @Value("${salary.csv.file.processed.path}")
     private String processedPath;
+    @Value("${salary.csv.file.export.path}")
+    private String exportPath;
+    @Value("${salary.csv.file.export.name}")
+    private String exportFileName;
 
     @Override
     public Page<SalaryResponseDto> getSalariesByEmployerId(SalaryListRequest request) {
@@ -57,13 +63,27 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override
+    public String exportSalariesFile(Long employerId) throws EntityNotFoundException {
+        Employer employer = employerRepository.findById(employerId).orElseThrow(() ->
+                new EntityNotFoundException(Employer.class, "id", employerId));
+
+        List<SalaryResponseDto> collect = salaryRepository.findByEmployerId(employer.getId()).stream()
+                .map(salaryMapper::mapEntityToResponseDto)
+                .sorted(Comparator.comparing(SalaryResponseDto::getLastName)
+                        .thenComparing(SalaryResponseDto::getFirstName))
+                .collect(Collectors.toList());
+        List<String[]> data = collect.stream().map(dto -> dto.toStringArray(simpleDateFormat)).collect(Collectors.toList());
+        return FileUtil.writeCsvFile(exportPath, exportFileName, HeaderBuild.buildSalaryHeader(), data);
+    }
+
+    @Override
     public void processSalaryCsvFilesJob() {
         File directory = new File(directoryPath);
         if (directory.isDirectory()) {
             File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".csv"));
             if (files != null && files.length > 0) {
                 Arrays.stream(files).forEach(file -> {
-                    SalaryFileResult result = FileUtil.processSalaryCsvFiles(file);
+                    SalaryFileResult result = util.FileUtil.processSalaryCsvFiles(file);
                     // Handle the result as needed
                     log.info("Processed file: {}", file.getName());
                     // Check AVS number of import success list with the DB
@@ -80,6 +100,13 @@ public class SalaryServiceImpl implements SalaryService {
                                         .build());
                                 salariesToBeRemoved.add(salary);
                             }
+                            if (!employerRepository.findByIdeNumber(salary.getEmployerIdeNumber()).isPresent()) {
+                                result.getErrors().add(SalaryError.builder()
+                                        .salary(salary)
+                                        .message("Employer with ide number " + salary.getEmployerIdeNumber() + " is not exist")
+                                        .build());
+                                salariesToBeRemoved.add(salary);
+                            }
                         } catch (Exception e) {
                             log.error(e.getMessage());
                         }
@@ -87,8 +114,8 @@ public class SalaryServiceImpl implements SalaryService {
                     // Remove dup sal in import success list
                     result.getSalaries().removeAll(salariesToBeRemoved);
                     if (!result.getErrors().isEmpty()) {
-                        String[] header = SalaryHeaderBuild.buildErrorHeader();
-                        FileUtil.writErrorCsvFile(file.getName(), header, result.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+                        String[] header = HeaderBuild.buildSalaryImportErrorHeader();
+                        util.FileUtil.writeErrorCsvFile(file.getName(), header, result.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
                     }
                     saveAllSalaries(result.getSalaries());
                 });

@@ -27,6 +27,7 @@ import vn.elca.training.pilot_project_front.model.Employer;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.PensionTypeUtil;
 import vn.elca.training.proto.common.Empty;
+import vn.elca.training.proto.common.FilePath;
 import vn.elca.training.proto.common.PagingRequest;
 import vn.elca.training.proto.employer.EmployerListResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
@@ -50,6 +51,8 @@ public class HomeEmployerTableCp implements FXComponent {
     private Context context;
     @FXML
     private Button btnAdd;
+    @FXML
+    private Button btnExport;
     @FXML
     private TableView<Employer> tbvEmployer;
     @FXML
@@ -76,7 +79,7 @@ public class HomeEmployerTableCp implements FXComponent {
                         .build())
                 .build());
         addButtonToTable();
-        // Make TableView resize with the window. Delay the binding until the scene is available
+        // Make TableView resize with the window.
         tbvEmployer.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
                 tbvEmployer.prefHeightProperty().bind(tbvEmployer.getScene().heightProperty());
@@ -114,10 +117,21 @@ public class HomeEmployerTableCp implements FXComponent {
                 tbvEmployer.getItems().clear();
                 tbvEmployer.setItems(FXCollections.observableList(collect));
                 // Default sort
+                tbvEmployer.getSortOrder().clear();
+                numberCol.setSortType(TableColumn.SortType.ASCENDING);
                 tbvEmployer.getSortOrder().add(numberCol);
                 tbvEmployer.sort(); // Trigger sort
             });
             context.send(PerspectiveId.HOME_PERSPECTIVE, listResponse.getPagingResponse());
+        } else if (message.isMessageBodyTypeOf(FilePath.class)) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(ObservableResourceFactory.getProperty().getString("alert.info.title.export.employer"));
+                alert.setHeaderText(
+                        ObservableResourceFactory.getProperty().getString("alert.info.header.export.employer")
+                                + " " + message.getTypedMessageBody(FilePath.class).getPath());
+                alert.show();
+            });
         }
         return null;
     }
@@ -181,6 +195,7 @@ public class HomeEmployerTableCp implements FXComponent {
 
     private void bindingResource() {
         btnAdd.textProperty().bind(ObservableResourceFactory.getStringBinding("add"));
+        btnExport.textProperty().bind(ObservableResourceFactory.getStringBinding("export"));
         pensionTypeCol.textProperty().bind(ObservableResourceFactory.getStringBinding("pensionType"));
         numberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("number"));
         ideNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("ideNumber"));
@@ -188,6 +203,7 @@ public class HomeEmployerTableCp implements FXComponent {
         dateCreationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateCreation"));
         dateExpirationCol.textProperty().bind(ObservableResourceFactory.getStringBinding("dateExpiration"));
         btnAdd.setOnMouseClicked(event -> showCreatePopup());
+        btnExport.setOnMouseClicked(event -> context.send(ComponentId.EMPLOYER_CALLBACK_CP, Empty.newBuilder().build()));
     }
 
     private void showCreatePopup() {
@@ -198,14 +214,10 @@ public class HomeEmployerTableCp implements FXComponent {
             Parent parent = fxmlLoader.load();
             // Add new employer to current observable list by callback
             EmployerCreatePopupController popupController = fxmlLoader.getController();
-            popupController.setCallback(employer -> tbvEmployer.getItems().add(Employer.builder()
-                    .id(employer.getId())
-                    .name(employer.getName())
-                    .number(employer.getNumber())
-                    .ideNumber(employer.getIdeNumber())
-                    .pensionType(PensionTypeUtil.getLocalizedPensionType(employer.getPensionType()))
-                    .dateCreation(employer.getDateCreation())
-                    .dateExpiration(employer.getDateExpiration())
+            popupController.setCallback(employer -> context.send(ComponentId.EMPLOYER_CALLBACK_CP, EmployerSearchRequest.newBuilder()
+                    .setPagingRequest(PagingRequest.newBuilder()
+                            .setPageIndex(0)
+                            .build())
                     .build()));
 
             Stage stagePopup = new Stage();

@@ -41,6 +41,30 @@ public class TextFieldUtil {
         textField.setTextFormatter(textFormatter);
     }
 
+    public static void applyIdeNumberFilter(TextField textField) {
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("[a-zA-z0-9-.]*") && newText.length() <= IDE_NUMBER_PATTERN.length()) {
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+        textField.setTextFormatter(textFormatter);
+    }
+
+    public static void applyNumberFilter(TextField textField) {
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("[0-9]*") && newText.length() <= 50) {
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+        textField.setTextFormatter(textFormatter);
+    }
+
     public static StringConverter<LocalDate> dateStringConverter() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
         return new StringConverter<LocalDate>() {

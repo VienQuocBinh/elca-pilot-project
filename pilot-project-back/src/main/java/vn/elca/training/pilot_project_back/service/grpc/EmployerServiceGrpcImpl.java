@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import util.FileUtil;
-import util.SalaryHeaderBuild;
+import util.HeaderBuild;
 import vn.elca.training.pilot_project_back.dto.EmployerResponseDto;
 import vn.elca.training.pilot_project_back.dto.EmployerSearchRequestDto;
 import vn.elca.training.pilot_project_back.dto.EmployerUpdateRequestDto;
@@ -23,6 +23,7 @@ import vn.elca.training.pilot_project_back.service.EmployerService;
 import vn.elca.training.pilot_project_back.service.ValidationService;
 import vn.elca.training.proto.common.EmployerId;
 import vn.elca.training.proto.common.Empty;
+import vn.elca.training.proto.common.FilePath;
 import vn.elca.training.proto.common.PagingResponse;
 import vn.elca.training.proto.employer.*;
 
@@ -86,6 +87,17 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
     }
 
     @Override
+    public void exportFileEmployers(Empty request, StreamObserver<FilePath> responseObserver) {
+        try {
+            String filePath = employerService.exportFile();
+            responseObserver.onNext(FilePath.newBuilder().setPath(filePath).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(GrpcExceptionHandler.handleException(e));
+        }
+    }
+
+    @Override
     public void createEmployer(EmployerCreateRequest request, StreamObserver<EmployerResponse> responseObserver) {
         try {
             EmployerResponseDto employer = employerService.createEmployer(employerMapper.mapCreateRequestProtoToCreateRequestDto(request));
@@ -115,14 +127,13 @@ public class EmployerServiceGrpcImpl extends EmployerServiceGrpc.EmployerService
 
             SalaryFileResult salaryFileResult = validationService.validateFileSalary(salaryCreateRequestDtos);
             employerUpdateRequestDto.setSalaries(salaryCreateRequestDtos);
-            if (!salaryFileResult.getErrors().isEmpty()) {
-                String[] header = SalaryHeaderBuild.buildErrorHeader();
-                FileUtil.writErrorCsvFile("error", header, salaryFileResult.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
-            }
             EmployerResponseDto employerResponseDto = employerService.updateEmployer(employerUpdateRequestDto);
             EmployerResponse employerResponseProto = employerMapper.mapResponseDtoToResponseProto(employerResponseDto);
             if (!salaryFileResult.getErrors().isEmpty()) {
-                throw new AvsNumberExistedException("Some Avs numbers are already existed. Please check \"error\" folder");
+                String[] header = HeaderBuild.buildSalaryErrorHeader();
+                String filePath = FileUtil.writeErrorCsvFile("employer_salary", header, salaryFileResult.getErrors().stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+
+                throw new AvsNumberExistedException(filePath);
             }
 
             responseObserver.onNext(employerResponseProto.toBuilder()

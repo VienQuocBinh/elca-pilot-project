@@ -64,6 +64,7 @@ public class JacpFXWorkbench implements FXWorkbench {
                         ObservableResourceFactory.setProperty(ResourceBundle.getBundle("bundles/languageBundle", newValue));
                         PensionTypeService.getInstance().updateCbPensionTypeSearch();
                         PensionTypeService.getInstance().updateCbPensionType();
+                        Locale.setDefault(newValue);
                         // Reload employer table to re-convert pension type
                         context.send(PerspectiveId.HOME_PERSPECTIVE + "." + ComponentId.EMPLOYER_CALLBACK_CP,
                                 EmployerSearchRequest.newBuilder()
@@ -77,7 +78,7 @@ public class JacpFXWorkbench implements FXWorkbench {
 
     @Override
     public void handleInitialLayout(Message<Event, Object> message, WorkbenchLayout<Node> workbenchLayout, Stage stage) {
-        workbenchLayout.setWorkbenchXYSize(1300, 800);
+        workbenchLayout.setWorkbenchXYSize(1300, 900);
         workbenchLayout.registerToolBar(ToolbarPosition.NORTH);
         workbenchLayout.setStyle(StageStyle.DECORATED);
     }

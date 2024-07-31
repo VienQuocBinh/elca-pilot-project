@@ -14,8 +14,6 @@ enum PensionTypeProto {
     PROFESSIONAL = 2;
 }
 
-//message Empty {}
-
 message EmployerNextNumberResponse {
     string number = 1;
 }
@@ -70,4 +68,5 @@ service EmployerService {
     rpc CreateEmployer (EmployerCreateRequest) returns (EmployerResponse) {};
     rpc DeleteEmployer (EmployerId) returns (Empty) {}
     rpc UpdateEmployer (EmployerUpdateRequest) returns (EmployerResponse);
+    rpc ExportFileEmployers (Empty) returns (FilePath) {};
 }

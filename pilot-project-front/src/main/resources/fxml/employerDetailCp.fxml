@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.cell.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import vn.elca.training.pilot_project_front.callback.*?>
 <VBox xmlns:fx="http://javafx.com/fxml" fx:id="mainContainer"
@@ -21,7 +22,10 @@
         </HBox>
 
         <Label fx:id="lbPensionType" text="%pensionType" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="cbPensionType" GridPane.rowIndex="2" GridPane.columnIndex="1" prefWidth="350"/>
+        <HBox GridPane.rowIndex="2" GridPane.columnIndex="1">
+            <ComboBox fx:id="cbPensionType" prefWidth="350"/>
+            <Label fx:id="lbPensionTypeError" styleClass="error-label" visible="false"/>
+        </HBox>
         <Label fx:id="lbIdeNumber" text="%ideNumber.required" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
         <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" alignment="CENTER_LEFT" spacing="10">
             <TextField fx:id="tfIdeNumber" minWidth="350"/>
@@ -43,10 +47,20 @@
 
     <Separator/>
     <Label fx:id="lbSalDeclaration" styleClass="lbSalDeclaration" text="%label.salary.declaration"/>
-    <HBox spacing="20">
-        <Label fx:id="fileInput" text="C:\ipension" styleClass="file-selector"/>
-        <Button fx:id="btnImport" text="%import" disable="true"/>
-    </HBox>
+    <BorderPane>
+        <left>
+            <HBox spacing="20" alignment="CENTER">
+                <Label fx:id="fileInput" text="C:\ipension" styleClass="file-selector"/>
+                <Button fx:id="btnImport" text="%import" disable="true"/>
+                <ImageView fx:id="infoEnableSchedule" pickOnBounds="true" fitWidth="16" fitHeight="16"
+                           styleClass="image-info"/>
+            </HBox>
+        </left>
+        <right>
+            <Button fx:id="btnExport" text="%export"/>
+        </right>
+    </BorderPane>
+
 
     <TableView fx:id="tbvSalary" GridPane.rowIndex="0" GridPane.columnIndex="0">
         <columns>

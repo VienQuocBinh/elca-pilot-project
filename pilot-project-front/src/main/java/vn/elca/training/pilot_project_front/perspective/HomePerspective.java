@@ -16,6 +16,7 @@ import org.jacpfx.rcp.perspective.FXPerspective;
 import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
+import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.proto.common.PagingRequest;
 import vn.elca.training.proto.common.PagingResponse;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
@@ -75,7 +76,7 @@ public class HomePerspective implements FXPerspective {
             PagingResponse pagingResponse = message.getTypedMessageBody(PagingResponse.class);
             pgEmployer.setPageCount(pagingResponse.getTotalPages());
             pgEmployer.setVisible(pagingResponse.getTotalPages() != 0);
-            lbTotalElements.setText("Total items: " + pagingResponse.getTotalElements());
+            lbTotalElements.setText(ObservableResourceFactory.getProperty().getString("total") + " " + pagingResponse.getTotalElements());
         } else if (message.getMessageBody() instanceof EmployerSearchRequest) {
             // Get from HomeSearchEmployerCp to append paging info then send to callback
             EmployerSearchRequest searchRequest = message.getTypedMessageBody(EmployerSearchRequest.class);

@@ -10,13 +10,13 @@ import org.jacpfx.api.annotations.lifecycle.PostConstruct;
 import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
-import util.FileUtil;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
 import vn.elca.training.pilot_project_front.constant.DatePattern;
 import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.ObservableResourceFactory;
 import vn.elca.training.pilot_project_front.util.TextFieldUtil;
+import vn.elca.training.proto.common.PagingRequest;
 import vn.elca.training.proto.employer.EmployerSearchRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 
@@ -95,17 +95,21 @@ public class HomeSearchEmployerCp implements FXComponent {
         dpDateExpiration.setConverter(TextFieldUtil.dateStringConverter());
         btnSearch.setOnMouseClicked(event -> searchEmployers());
         btnReset.setOnMouseClicked(event -> resetSearchFields());
+        TextFieldUtil.applyIdeNumberFilter(tfIdeNumber);
+        TextFieldUtil.applyNumberFilter(tfNumber);
+        TextFieldUtil.applyAlphabeticFilter(tfName);
     }
 
     private void searchEmployers() {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
         EmployerSearchRequest searchRequest = EmployerSearchRequest.newBuilder()
                 .setPensionType(cbPensionType.getSelectionModel().getSelectedItem())
-                .setName(tfName.getText())
+                .setName(tfName.getText().trim())
                 .setIdeNumber(tfIdeNumber.getText())
                 .setNumber(tfNumber.getText())
                 .setDateCreation(dpDateCreation.getValue() != null ? dpDateCreation.getValue().format(dateTimeFormatter) : "")
                 .setDateExpiration(dpDateExpiration.getValue() != null ? dpDateExpiration.getValue().format(dateTimeFormatter) : "")
+                .setPagingRequest(PagingRequest.newBuilder().setPageIndex(0).build())
                 .build();
         // Send to parent perspective to append paging info and store search params
         context.send(PerspectiveId.HOME_PERSPECTIVE, searchRequest);
@@ -118,6 +122,5 @@ public class HomeSearchEmployerCp implements FXComponent {
         tfIdeNumber.clear();
         dpDateCreation.setValue(null);
         dpDateExpiration.setValue(null);
-        FileUtil.writErrorCsvFile("test", null, null);
     }
 }

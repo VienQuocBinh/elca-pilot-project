@@ -10,6 +10,8 @@ import vn.elca.training.pilot_project_back.exception.EntityNotFoundException;
 public interface EmployerService {
     Page<EmployerResponseDto> getEmployers(EmployerSearchRequestDto searchRequestDto);
 
+    String exportFile();
+
     EmployerResponseDto getEmployerById(long id) throws EntityNotFoundException;
 
     int getEmployerNextNumber();

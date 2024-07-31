@@ -8,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
@@ -24,7 +26,7 @@ import org.jacpfx.api.message.Message;
 import org.jacpfx.rcp.component.FXComponent;
 import org.jacpfx.rcp.context.Context;
 import util.FileUtil;
-import util.SalaryHeaderBuild;
+import util.HeaderBuild;
 import vn.elca.training.pilot_project_front.config.GrpcConfig;
 import vn.elca.training.pilot_project_front.constant.ActionType;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
@@ -33,10 +35,7 @@ import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.*;
 import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.*;
-import vn.elca.training.proto.common.ConfigServiceGrpc;
-import vn.elca.training.proto.common.Empty;
-import vn.elca.training.proto.common.PagingRequest;
-import vn.elca.training.proto.common.ScheduleEnabledResponse;
+import vn.elca.training.proto.common.*;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 import vn.elca.training.proto.salary.SalaryCreateRequest;
@@ -47,10 +46,7 @@ import vn.elca.training.proto.salary.SalaryResponse;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -61,13 +57,15 @@ import java.util.stream.Collectors;
         resourceBundleLocation = "bundles.languageBundle")
 public class EmployerDetailCp implements FXComponent {
     private static final String ERROR_STYLE_CLASS = "error";
-    private final Logger log = Logger.getLogger(HomeEmployerTableCp.class.getName());
+    private final Logger log = Logger.getLogger(EmployerDetailCp.class.getName());
     @Resource
     private Context context;
     @FXML
     private Label lbPensionType;
     @FXML
     private ComboBox<PensionTypeProto> cbPensionType;
+    @FXML
+    private Label lbPensionTypeError;
     @FXML
     private Label lbName;
     @FXML
@@ -101,6 +99,8 @@ public class EmployerDetailCp implements FXComponent {
     @FXML
     private Button btnImport;
     @FXML
+    private Button btnExport;
+    @FXML
     private Button btnSave;
     @FXML
     private TableView<Salary> tbvSalary;
@@ -130,10 +130,12 @@ public class EmployerDetailCp implements FXComponent {
     private Pagination pgSalary;
     @FXML
     private TableColumn<Salary, Void> actionCol;
+    @FXML
+    private ImageView infoEnableSchedule;
     @Getter
     private File file;
     private Employer employer;
-    private List<Salary> importedSalaries = new ArrayList<>();
+    private List<Salary> importedSalaries;
     private ConfigServiceGrpc.ConfigServiceBlockingStub configStub;
 
     @Override
@@ -141,6 +143,8 @@ public class EmployerDetailCp implements FXComponent {
         if (message.getMessageBody() instanceof Employer) {
             // From EmployerDetailPerspective
             clearErrors();
+            clearFileImport();
+            fetchScheduleConfig();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
             employer = message.getTypedMessageBody(Employer.class);
             lbNumberValue.setText(employer.getNumber());
@@ -175,7 +179,8 @@ public class EmployerDetailCp implements FXComponent {
                                 .build())
                         .build());
                 if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE))
-                    showSuccessAlert("Update employer", "Update employer successfully");
+                    showSuccessAlert(ObservableResourceFactory.getProperty().getString("alert.info.title.update.employer"),
+                            ObservableResourceFactory.getProperty().getString("alert.info.header.update.employer"));
             }
         } else if (message.getMessageBody() instanceof ExceptionMessage) {
             // From EmployerCallbackCp catch
@@ -208,7 +213,11 @@ public class EmployerDetailCp implements FXComponent {
             // Paging
             pgSalary.setPageCount(listResponse.getPagingResponse().getTotalPages());
             pgSalary.setVisible(listResponse.getPagingResponse().getTotalPages() != 0);
-            lbTotalElements.setText("Total: " + listResponse.getPagingResponse().getTotalElements());
+            lbTotalElements.setText(ObservableResourceFactory.getProperty().getString("total") + " " + listResponse.getPagingResponse().getTotalElements());
+        } else if (message.isMessageBodyTypeOf(FilePath.class)) {
+            showSuccessAlert(ObservableResourceFactory.getProperty().getString("alert.info.title.export.salary"),
+                    ObservableResourceFactory.getProperty().getString("alert.info.header.export.salary")
+                            + " " + message.getTypedMessageBody(FilePath.class).getPath());
         }
         return null;
     }
@@ -261,27 +270,29 @@ public class EmployerDetailCp implements FXComponent {
             SalaryFileResult salaryFileResult = FileUtil.processSalaryCsvFiles(file);
             importedSalaries = salaryFileResult.getSalaries().stream().map(this::mapFromFileModel).collect(Collectors.toList());
             List<SalaryError> errors = salaryFileResult.getErrors();
+            tbvSalary.getItems().addAll(importedSalaries);
             if (errors.isEmpty()) {
-                tbvSalary.getItems().addAll(importedSalaries);
-                showSuccessAlert("Import salary success dialog", "Import successfully");
+                showSuccessAlert(ObservableResourceFactory.getProperty().getString("alert.info.title.import.salary"),
+                        ObservableResourceFactory.getProperty().getString("alert.info.header.import.salary"));
             } else {
-                String[] header = SalaryHeaderBuild.buildErrorHeader();
-                String filename = FileUtil.writErrorCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
-                showWarningAlert("Import Error", ("Please check file: " + filename + " for detail"));
+                String[] header = HeaderBuild.buildSalaryImportErrorHeader();
+                String filename = FileUtil.writeErrorCsvFile(file.getName(), header, errors.stream().map(SalaryError::toStringArray).collect(Collectors.toList()));
+                showErrorAlert(ObservableResourceFactory.getProperty().getString("alert.error.title.import.salary"),
+                        (ObservableResourceFactory.getProperty().getString("alert.error.header.prefix.import.salary")
+                                + " " + filename + " "
+                                + ObservableResourceFactory.getProperty().getString("alert.error.header.suffix.import.salary")));
             }
         });
+
+        btnExport.setOnMouseClicked(e -> context.send(ComponentId.SALARY_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build()));
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             FileChooser fileChooser = new FileChooser();
-
             FileChooser.ExtensionFilter csvFilter = new FileChooser
                     .ExtensionFilter("CSV Files (*.csv)", "*.csv");
-            FileChooser.ExtensionFilter xlsxFilter = new FileChooser
-                    .ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx");
-
-            fileChooser.getExtensionFilters().addAll(csvFilter, xlsxFilter);
+            fileChooser.getExtensionFilters().addAll(csvFilter);
             Optional<File> selectedFile = Optional.ofNullable(fileChooser.showOpenDialog(fileInput.getScene().getWindow()));
             if (selectedFile.isPresent()) {
-                fileInput.setText(selectedFile.get().getName());
+                fileInput.setText(selectedFile.get().getAbsolutePath());
                 file = selectedFile.get();
                 btnImport.setDisable(false);
             }
@@ -320,8 +331,7 @@ public class EmployerDetailCp implements FXComponent {
         btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
         btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));
         btnImport.textProperty().bind(ObservableResourceFactory.getStringBinding("import"));
-        ScheduleEnabledResponse scheduleEnabled = configStub.getScheduleEnabled(Empty.newBuilder().build());
-        if (scheduleEnabled.getEnabled()) btnImport.setDisable(true);
+        btnExport.textProperty().bind(ObservableResourceFactory.getStringBinding("export"));
         // Table view col
         avsNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avsNumber"));
         lastNameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("employee.lastName"));
@@ -347,6 +357,15 @@ public class EmployerDetailCp implements FXComponent {
         } else {
             tfName.getStyleClass().remove(ERROR_STYLE_CLASS);
             lbNameError.setVisible(false);
+        }
+        if (cbPensionType.getSelectionModel().getSelectedItem() == null) {
+            cbPensionType.getStyleClass().add(ERROR_STYLE_CLASS);
+            lbPensionTypeError.setVisible(true);
+            lbPensionTypeError.setText(resourceBundle.getString("error.pensionType.required"));
+            isValid = false;
+        } else {
+            cbPensionType.getStyleClass().remove(ERROR_STYLE_CLASS);
+            lbPensionTypeError.setVisible(false);
         }
         if (tfIdeNumber.getText().isEmpty()) {
             tfIdeNumber.getStyleClass().add(ERROR_STYLE_CLASS);
@@ -416,8 +435,8 @@ public class EmployerDetailCp implements FXComponent {
         alert.show();
     }
 
-    private void showWarningAlert(String title, String headerText) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
+    private void showErrorAlert(String title, String headerText) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.show();
@@ -431,6 +450,13 @@ public class EmployerDetailCp implements FXComponent {
         dpDateCreation.getStyleClass().remove(ERROR_STYLE_CLASS);
         dpDateExpiration.getStyleClass().remove(ERROR_STYLE_CLASS);
         lbDateExpirationError.setVisible(false);
+    }
+
+    private void clearFileImport() {
+        file = null;
+        btnImport.setDisable(true);
+        fileInput.setText("C:/ipension");
+        importedSalaries = new ArrayList<>();
     }
 
     private Salary mapFromFileModel(model.Salary fileSalary) {
@@ -503,5 +529,16 @@ public class EmployerDetailCp implements FXComponent {
         alert.setTitle(title);
         alert.setHeaderText(header + " \"" + salary.getAvsNumber() + "\"?");
         return alert.showAndWait();
+    }
+
+    private void fetchScheduleConfig() {
+        ScheduleEnabledResponse scheduleEnabled = configStub.getScheduleEnabled(Empty.newBuilder().build());
+        fileInput.setDisable(scheduleEnabled.getEnabled());
+        infoEnableSchedule.setVisible(scheduleEnabled.getEnabled());
+        if (scheduleEnabled.getEnabled()) {
+            Image infoImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/image/info_icon.png")));
+            infoEnableSchedule.setImage(infoImage);
+            Tooltip.install(infoEnableSchedule, new Tooltip(ObservableResourceFactory.getProperty().getString("tooltip.schedule.enable")));
+        }
     }
 }
