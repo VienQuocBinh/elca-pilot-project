@@ -97,13 +97,14 @@ public class HomeSearchEmployerCp implements FXComponent {
         btnReset.setOnMouseClicked(event -> resetSearchFields());
         TextFieldUtil.applyIdeNumberFilter(tfIdeNumber);
         TextFieldUtil.applyNumberFilter(tfNumber);
+        TextFieldUtil.applyAlphabeticFilter(tfName);
     }
 
     private void searchEmployers() {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
         EmployerSearchRequest searchRequest = EmployerSearchRequest.newBuilder()
                 .setPensionType(cbPensionType.getSelectionModel().getSelectedItem())
-                .setName(tfName.getText())
+                .setName(tfName.getText().trim())
                 .setIdeNumber(tfIdeNumber.getText())
                 .setNumber(tfNumber.getText())
                 .setDateCreation(dpDateCreation.getValue() != null ? dpDateCreation.getValue().format(dateTimeFormatter) : "")

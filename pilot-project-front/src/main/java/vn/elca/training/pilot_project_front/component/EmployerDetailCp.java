@@ -8,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
@@ -44,10 +46,7 @@ import vn.elca.training.proto.salary.SalaryResponse;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -131,6 +130,8 @@ public class EmployerDetailCp implements FXComponent {
     private Pagination pgSalary;
     @FXML
     private TableColumn<Salary, Void> actionCol;
+    @FXML
+    private ImageView infoEnableSchedule;
     @Getter
     private File file;
     private Employer employer;
@@ -143,6 +144,7 @@ public class EmployerDetailCp implements FXComponent {
             // From EmployerDetailPerspective
             clearErrors();
             clearFileImport();
+            fetchScheduleConfig();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.PATTERN);
             employer = message.getTypedMessageBody(Employer.class);
             lbNumberValue.setText(employer.getNumber());
@@ -211,7 +213,7 @@ public class EmployerDetailCp implements FXComponent {
             // Paging
             pgSalary.setPageCount(listResponse.getPagingResponse().getTotalPages());
             pgSalary.setVisible(listResponse.getPagingResponse().getTotalPages() != 0);
-            lbTotalElements.setText("Total: " + listResponse.getPagingResponse().getTotalElements());
+            lbTotalElements.setText(ObservableResourceFactory.getProperty().getString("total") + " " + listResponse.getPagingResponse().getTotalElements());
         } else if (message.isMessageBodyTypeOf(FilePath.class)) {
             showSuccessAlert(ObservableResourceFactory.getProperty().getString("alert.info.title.export.salary"),
                     ObservableResourceFactory.getProperty().getString("alert.info.header.export.salary")
@@ -283,8 +285,6 @@ public class EmployerDetailCp implements FXComponent {
         });
 
         btnExport.setOnMouseClicked(e -> context.send(ComponentId.SALARY_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build()));
-        ScheduleEnabledResponse scheduleEnabled = configStub.getScheduleEnabled(Empty.newBuilder().build());
-        fileInput.setDisable(scheduleEnabled.getEnabled());
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             FileChooser fileChooser = new FileChooser();
             FileChooser.ExtensionFilter csvFilter = new FileChooser
@@ -529,5 +529,16 @@ public class EmployerDetailCp implements FXComponent {
         alert.setTitle(title);
         alert.setHeaderText(header + " \"" + salary.getAvsNumber() + "\"?");
         return alert.showAndWait();
+    }
+
+    private void fetchScheduleConfig() {
+        ScheduleEnabledResponse scheduleEnabled = configStub.getScheduleEnabled(Empty.newBuilder().build());
+        fileInput.setDisable(scheduleEnabled.getEnabled());
+        infoEnableSchedule.setVisible(scheduleEnabled.getEnabled());
+        if (scheduleEnabled.getEnabled()) {
+            Image infoImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/image/info_icon.png")));
+            infoEnableSchedule.setImage(infoImage);
+            Tooltip.install(infoEnableSchedule, new Tooltip(ObservableResourceFactory.getProperty().getString("tooltip.schedule.enable")));
+        }
     }
 }

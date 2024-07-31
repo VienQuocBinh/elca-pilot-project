@@ -10,7 +10,5 @@ public interface SalaryService {
 
     String exportSalariesFile(Long employerId) throws EntityNotFoundException;
 
-    //    @Scheduled(cron = "${salary.csv.process.cron}")
-//    @Scheduled(fixedDelay = 5000)
     void processSalaryCsvFilesJob();
 }

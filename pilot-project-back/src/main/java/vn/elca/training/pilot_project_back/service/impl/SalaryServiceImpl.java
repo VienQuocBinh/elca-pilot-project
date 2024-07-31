@@ -100,6 +100,13 @@ public class SalaryServiceImpl implements SalaryService {
                                         .build());
                                 salariesToBeRemoved.add(salary);
                             }
+                            if (!employerRepository.findByIdeNumber(salary.getEmployerIdeNumber()).isPresent()) {
+                                result.getErrors().add(SalaryError.builder()
+                                        .salary(salary)
+                                        .message("Employer with ide number " + salary.getEmployerIdeNumber() + " is not exist")
+                                        .build());
+                                salariesToBeRemoved.add(salary);
+                            }
                         } catch (Exception e) {
                             log.error(e.getMessage());
                         }

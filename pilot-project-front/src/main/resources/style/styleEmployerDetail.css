@@ -30,3 +30,7 @@
     -fx-background-color: #ff5c33;
     -fx-text-fill: white;
 }
+
+.image-info {
+    -fx-cursor: hand;
+}

@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.cell.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import vn.elca.training.pilot_project_front.callback.*?>
 <VBox xmlns:fx="http://javafx.com/fxml" fx:id="mainContainer"
@@ -48,9 +49,11 @@
     <Label fx:id="lbSalDeclaration" styleClass="lbSalDeclaration" text="%label.salary.declaration"/>
     <BorderPane>
         <left>
-            <HBox spacing="20">
+            <HBox spacing="20" alignment="CENTER">
                 <Label fx:id="fileInput" text="C:\ipension" styleClass="file-selector"/>
                 <Button fx:id="btnImport" text="%import" disable="true"/>
+                <ImageView fx:id="infoEnableSchedule" pickOnBounds="true" fitWidth="16" fitHeight="16"
+                           styleClass="image-info"/>
             </HBox>
         </left>
         <right>
