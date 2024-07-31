@@ -16,6 +16,8 @@ import org.jacpfx.rcp.component.CallbackComponent;
 import org.jacpfx.rcp.context.Context;
 import vn.elca.training.pilot_project_front.config.GrpcConfig;
 import vn.elca.training.pilot_project_front.constant.ComponentId;
+import vn.elca.training.proto.common.EmployerId;
+import vn.elca.training.proto.common.FilePath;
 import vn.elca.training.proto.salary.SalaryListRequest;
 import vn.elca.training.proto.salary.SalaryListResponse;
 import vn.elca.training.proto.salary.SalaryServiceGrpc;
@@ -41,6 +43,11 @@ public class SalaryCallbackCp implements CallbackComponent {
                 SalaryListResponse salaries = stub.getSalariesByEmployerId(message.getTypedMessageBody(SalaryListRequest.class));
                 context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
                 return salaries;
+            } else if (message.isMessageBodyTypeOf(EmployerId.class)) {
+                // Export
+                FilePath filePath = stub.exportFilSalaries(message.getTypedMessageBody(EmployerId.class));
+                context.setReturnTarget(ComponentId.EMPLOYER_DETAIL_CP);
+                return filePath;
             }
         } catch (StatusRuntimeException e) {
             log.warning(e.getMessage());

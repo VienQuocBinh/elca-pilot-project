@@ -48,4 +48,5 @@ message SalaryListResponse {
 
 service SalaryService {
     rpc GetSalariesByEmployerId (SalaryListRequest) returns (SalaryListResponse);
+    rpc ExportFilSalaries (EmployerId) returns (FilePath) {};
 }

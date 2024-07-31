@@ -46,10 +46,18 @@
 
     <Separator/>
     <Label fx:id="lbSalDeclaration" styleClass="lbSalDeclaration" text="%label.salary.declaration"/>
-    <HBox spacing="20">
-        <Label fx:id="fileInput" text="C:\ipension" styleClass="file-selector"/>
-        <Button fx:id="btnImport" text="%import" disable="true"/>
-    </HBox>
+    <BorderPane>
+        <left>
+            <HBox spacing="20">
+                <Label fx:id="fileInput" text="C:\ipension" styleClass="file-selector"/>
+                <Button fx:id="btnImport" text="%import" disable="true"/>
+            </HBox>
+        </left>
+        <right>
+            <Button fx:id="btnExport" text="%export"/>
+        </right>
+    </BorderPane>
+
 
     <TableView fx:id="tbvSalary" GridPane.rowIndex="0" GridPane.columnIndex="0">
         <columns>

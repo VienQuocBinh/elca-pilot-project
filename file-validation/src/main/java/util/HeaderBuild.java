@@ -11,4 +11,8 @@ public class HeaderBuild {
     public static String[] buildEmployerHeader() {
         return new String[]{"id", "pensionType", "name", "number", "ideNumber", "dateCreation", "dateExpiration"};
     }
+
+    public static String[] buildSalaryHeader() {
+        return new String[]{"id", "avsNumber", "lastName", "firstName", "startDate", "endDate", "avsAmount", "acAmount", "afAmount"};
+    }
 }

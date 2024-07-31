@@ -20,4 +20,16 @@ public class SalaryResponseDto {
     private BigDecimal avsAmount;
     private BigDecimal acAmount;
     private BigDecimal afAmount;
+
+    public String[] toStringArray() {
+        return new String[]{id.toString(),
+                avsNumber,
+                lastName,
+                firstName,
+                String.valueOf(startDate),
+                String.valueOf(endDate),
+                String.valueOf(avsAmount),
+                String.valueOf(acAmount),
+                String.valueOf(afAmount)};
+    }
 }

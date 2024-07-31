@@ -33,10 +33,7 @@ import vn.elca.training.pilot_project_front.constant.PerspectiveId;
 import vn.elca.training.pilot_project_front.model.*;
 import vn.elca.training.pilot_project_front.service.PensionTypeService;
 import vn.elca.training.pilot_project_front.util.*;
-import vn.elca.training.proto.common.ConfigServiceGrpc;
-import vn.elca.training.proto.common.Empty;
-import vn.elca.training.proto.common.PagingRequest;
-import vn.elca.training.proto.common.ScheduleEnabledResponse;
+import vn.elca.training.proto.common.*;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
 import vn.elca.training.proto.employer.PensionTypeProto;
 import vn.elca.training.proto.salary.SalaryCreateRequest;
@@ -102,6 +99,8 @@ public class EmployerDetailCp implements FXComponent {
     private Button btnReturn;
     @FXML
     private Button btnImport;
+    @FXML
+    private Button btnExport;
     @FXML
     private Button btnSave;
     @FXML
@@ -212,6 +211,8 @@ public class EmployerDetailCp implements FXComponent {
             pgSalary.setPageCount(listResponse.getPagingResponse().getTotalPages());
             pgSalary.setVisible(listResponse.getPagingResponse().getTotalPages() != 0);
             lbTotalElements.setText("Total: " + listResponse.getPagingResponse().getTotalElements());
+        } else if (message.isMessageBodyTypeOf(FilePath.class)) {
+            showSuccessAlert("export", message.getTypedMessageBody(FilePath.class).getPath());
         }
         return null;
     }
@@ -273,6 +274,8 @@ public class EmployerDetailCp implements FXComponent {
                 showWarningAlert("Import Error", ("Error happens while importing file. Please check folder: " + filename + " more details."));
             }
         });
+
+        btnExport.setOnMouseClicked(e -> context.send(ComponentId.SALARY_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build()));
         ScheduleEnabledResponse scheduleEnabled = configStub.getScheduleEnabled(Empty.newBuilder().build());
         fileInput.setDisable(scheduleEnabled.getEnabled());
         fileInput.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
@@ -321,6 +324,7 @@ public class EmployerDetailCp implements FXComponent {
         btnSave.textProperty().bind(ObservableResourceFactory.getStringBinding("save"));
         btnReturn.textProperty().bind(ObservableResourceFactory.getStringBinding("return"));
         btnImport.textProperty().bind(ObservableResourceFactory.getStringBinding("import"));
+        btnExport.textProperty().bind(ObservableResourceFactory.getStringBinding("export"));
         // Table view col
         avsNumberCol.textProperty().bind(ObservableResourceFactory.getStringBinding("avsNumber"));
         lastNameCol.textProperty().bind(ObservableResourceFactory.getStringBinding("employee.lastName"));

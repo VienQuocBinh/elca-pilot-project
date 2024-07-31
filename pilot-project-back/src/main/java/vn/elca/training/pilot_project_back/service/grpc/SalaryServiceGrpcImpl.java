@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import vn.elca.training.pilot_project_back.dto.SalaryResponseDto;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.SalaryService;
+import vn.elca.training.proto.common.EmployerId;
+import vn.elca.training.proto.common.FilePath;
 import vn.elca.training.proto.common.PagingResponse;
 import vn.elca.training.proto.salary.SalaryListRequest;
 import vn.elca.training.proto.salary.SalaryListResponse;
@@ -38,6 +40,18 @@ public class SalaryServiceGrpcImpl extends SalaryServiceGrpc.SalaryServiceImplBa
                     .build());
             responseObserver.onCompleted();
         } catch (StatusRuntimeException e) {
+            log.error(e.getMessage());
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void exportFilSalaries(EmployerId request, StreamObserver<FilePath> responseObserver) {
+        try {
+            String filePath = salaryService.exportSalariesFile(request.getId());
+            responseObserver.onNext(FilePath.newBuilder().setPath(filePath).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
             log.error(e.getMessage());
             responseObserver.onError(e);
         }
