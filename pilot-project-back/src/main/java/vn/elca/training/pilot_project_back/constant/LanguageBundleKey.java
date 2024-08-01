@@ -2,6 +2,7 @@ package vn.elca.training.pilot_project_back.constant;
 
 public class LanguageBundleKey {
     public static final String ERROR_NAME_REQUIRED = "error.name.required";
+    public static final String ERROR_PENSION_TYPE_REQUIRED = "error.pensionType.required";
     public static final String ERROR_IDE_NUMBER_FORMAT = "error.ideNumber.format";
     public static final String ERROR_IDE_NUMBER_DUPLICATE = "error.ideNumber.duplicate";
     public static final String ERROR_IDE_NUMBER_REQUIRED = "error.ideNumber.required";

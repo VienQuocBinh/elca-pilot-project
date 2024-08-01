@@ -51,6 +51,7 @@ class EmployerServiceTest {
     @BeforeAll
     public static void setup() {
         simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        simpleDateFormat.setLenient(false);
     }
 
     @BeforeEach
@@ -122,7 +123,7 @@ class EmployerServiceTest {
                 .dateCreation(new Date())
                 .dateExpiration(new Date())
                 .build();
-       
+
         Pageable pageable = PageRequest.of(0, 10, Sort.by("number"));
         when(employerRepository.findAll(any(Predicate.class), eq(pageable))).thenReturn(new PageImpl<>(new ArrayList<>()));
         Page<EmployerResponseDto> result = employerService.getEmployers(searchRequestDto);
