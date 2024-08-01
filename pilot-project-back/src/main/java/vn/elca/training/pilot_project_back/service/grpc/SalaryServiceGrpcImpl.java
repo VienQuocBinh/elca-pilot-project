@@ -7,6 +7,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import vn.elca.training.pilot_project_back.dto.SalaryListRequestDto;
 import vn.elca.training.pilot_project_back.dto.SalaryResponseDto;
 import vn.elca.training.pilot_project_back.mapper.SalaryMapper;
 import vn.elca.training.pilot_project_back.service.SalaryService;
@@ -27,7 +28,8 @@ public class SalaryServiceGrpcImpl extends SalaryServiceGrpc.SalaryServiceImplBa
     @Override
     public void getSalariesByEmployerId(SalaryListRequest request, StreamObserver<SalaryListResponse> responseObserver) {
         try {
-            Page<SalaryResponseDto> salaryResponseDtos = salaryService.getSalariesByEmployerId(request);
+            SalaryListRequestDto salaryListRequestDto = salaryMapper.mapListRequestProtoToDto(request);
+            Page<SalaryResponseDto> salaryResponseDtos = salaryService.getSalariesByEmployerId(salaryListRequestDto);
             responseObserver.onNext(SalaryListResponse
                     .newBuilder()
                     .setPagingResponse(PagingResponse.newBuilder()

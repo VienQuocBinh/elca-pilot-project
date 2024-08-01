@@ -4,15 +4,17 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 import vn.elca.training.pilot_project_back.dto.SalaryCreateRequestDto;
+import vn.elca.training.pilot_project_back.dto.SalaryListRequestDto;
 import vn.elca.training.pilot_project_back.dto.SalaryResponseDto;
 import vn.elca.training.pilot_project_back.entity.Salary;
 import vn.elca.training.proto.salary.SalaryCreateRequest;
+import vn.elca.training.proto.salary.SalaryListRequest;
 import vn.elca.training.proto.salary.SalaryResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(uses = {DateMapper.class, BigDecimalMapper.class})
+@Mapper(uses = {DateMapper.class, BigDecimalMapper.class, PageMapper.class})
 @Component
 public abstract class SalaryMapper {
     public abstract SalaryResponseDto mapEntityToResponseDto(Salary salary);
@@ -56,4 +58,7 @@ public abstract class SalaryMapper {
         }
         return salaries;
     }
+
+    @Mapping(target = "pagingRequest", source = "pagingRequest", qualifiedByName = "mapPagingRequestProtoToDto")
+    public abstract SalaryListRequestDto mapListRequestProtoToDto(SalaryListRequest request);
 }

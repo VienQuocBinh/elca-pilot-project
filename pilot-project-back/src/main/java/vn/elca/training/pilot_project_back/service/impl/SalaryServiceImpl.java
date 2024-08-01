@@ -9,6 +9,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import util.HeaderBuild;
+import vn.elca.training.pilot_project_back.dto.SalaryListRequestDto;
 import vn.elca.training.pilot_project_back.dto.SalaryResponseDto;
 import vn.elca.training.pilot_project_back.entity.Employer;
 import vn.elca.training.pilot_project_back.entity.QSalary;
@@ -19,7 +20,6 @@ import vn.elca.training.pilot_project_back.repository.EmployerRepository;
 import vn.elca.training.pilot_project_back.repository.SalaryRepository;
 import vn.elca.training.pilot_project_back.service.SalaryService;
 import vn.elca.training.pilot_project_back.util.FileUtil;
-import vn.elca.training.proto.salary.SalaryListRequest;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -49,8 +49,13 @@ public class SalaryServiceImpl implements SalaryService {
     private String exportFileName;
 
     @Override
-    public Page<SalaryResponseDto> getSalariesByEmployerId(SalaryListRequest request) {
-        Pageable pageable = PageRequest.of(request.getPagingRequest().getPageIndex(),
+    public Page<SalaryResponseDto> getSalariesByEmployerId(SalaryListRequestDto request) {
+        Pageable pageable;
+        int pageIndex = 0;
+        if (request.getPagingRequest() != null) {
+            pageIndex = request.getPagingRequest().getPageIndex();
+        }
+        pageable = PageRequest.of(pageIndex,
                 Integer.parseInt(pageSize),
                 Sort.by(QSalary.salary.lastName.getMetadata().getName(),
                         QSalary.salary.firstName.getMetadata().getName()));
