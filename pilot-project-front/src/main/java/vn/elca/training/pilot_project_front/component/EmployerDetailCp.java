@@ -152,6 +152,7 @@ public class EmployerDetailCp implements FXComponent {
             tfIdeNumber.setTextFormatter(null); // Clear formatter
             tfIdeNumber.setText(employer.getIdeNumber());
             tfIdeNumber.setTextFormatter(TextFieldUtil.applyIdeNumberTextFormatter(tfIdeNumber));
+            actionCol.setVisible(!importedSalaries.isEmpty());
             PensionTypeService.getInstance().setCbPensionTypeMandatory(cbPensionType);
             PensionTypeService.getInstance().updateCbPensionType();
             cbPensionType.setValue(PensionTypeUtil.getLocalizedPensionType(employer.getPensionType()));
@@ -282,6 +283,7 @@ public class EmployerDetailCp implements FXComponent {
                                 + " " + filename + " "
                                 + ObservableResourceFactory.getProperty().getString("alert.error.header.suffix.import.salary")));
             }
+            actionCol.setVisible(!importedSalaries.isEmpty());
         });
 
         btnExport.setOnMouseClicked(e -> context.send(ComponentId.SALARY_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build()));
@@ -503,6 +505,7 @@ public class EmployerDetailCp implements FXComponent {
                         tbvSalary.getItems().removeAll(importedSalaries);
                         importedSalaries.remove(salary);
                         tbvSalary.getItems().addAll(importedSalaries);
+                        actionCol.setVisible(!importedSalaries.isEmpty());
                     }
                 });
 
