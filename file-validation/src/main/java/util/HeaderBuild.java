@@ -21,6 +21,10 @@ public class HeaderBuild {
         return commonSalaryHeader();
     }
 
+    public static String[] buildImportSalaryHeader() {
+        return new String[]{"No", "AVSNumber", "LastName", "FirstName", "StartDate", "EndDate", "AVSAmount", "ACAmount", "AFAmount", "EmployerIdeNumber"};
+    }
+
     private static String[] commonSalaryHeader() {
         return new String[]{"avsNumber", "lastName", "firstName", "startDate", "endDate", "avsAmount", "acAmount", "afAmount"};
     }
