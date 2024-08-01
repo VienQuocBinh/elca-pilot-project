@@ -6,11 +6,15 @@ public class HeaderBuild {
     }
 
     public static String[] buildSalaryErrorHeader() {
-        return prependToHeader("No", commonSalaryHeader());
+        String[] header = commonSalaryHeader();
+        header = appendErrorColToHeader(header);
+        return prependToHeader("No", header);
     }
 
     public static String[] buildSalaryImportErrorHeader() {
-        return prependToHeader("LineNo", commonSalaryHeader());
+        String[] header = commonSalaryHeader();
+        header = appendErrorColToHeader(header);
+        return prependToHeader("LineNo", header);
     }
 
     public static String[] buildEmployerHeader() {
@@ -33,6 +37,13 @@ public class HeaderBuild {
         String[] result = new String[header.length + 1];
         result[0] = firstElement;
         System.arraycopy(header, 0, result, 1, header.length);
+        return result;
+    }
+
+    private static String[] appendErrorColToHeader(String[] header) {
+        String[] result = new String[header.length + 1];
+        result[header.length] = "errorMessage";
+        System.arraycopy(header, 0, result, 0, header.length);
         return result;
     }
 }

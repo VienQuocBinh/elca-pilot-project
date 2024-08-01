@@ -16,6 +16,7 @@ import vn.elca.training.pilot_project_back.repository.SalaryRepository;
 import vn.elca.training.pilot_project_back.service.ValidationService;
 import vn.elca.training.proto.employer.EmployerCreateRequest;
 import vn.elca.training.proto.employer.EmployerUpdateRequest;
+import vn.elca.training.proto.employer.PensionTypeProto;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,6 +39,7 @@ public class ValidationServiceImpl implements ValidationService {
         List<ErrorDetail> errorDetails = new ArrayList<>();
         String nameField = "name";
         String ideNumberField = "ideNumber";
+        String pensionTypeField = "pensionType";
         String dateCreationField = "dateCreation";
         String dateExpirationField = "dateExpiration";
         // Validate name
@@ -49,6 +51,15 @@ public class ValidationServiceImpl implements ValidationService {
                     .value(name)
                     .message("The name is required")
                     .fxErrorKey(LanguageBundleKey.ERROR_NAME_REQUIRED)
+                    .build());
+        }
+        if (createRequest.getPensionType().equals(PensionTypeProto.NONE)) {
+            errorDetails.add(ErrorDetail.builder()
+                    .object(createRequest.getClass().getSimpleName())
+                    .field(pensionTypeField)
+                    .value(createRequest.getPensionType().name())
+                    .message("Invalid pension type")
+                    .fxErrorKey(LanguageBundleKey.ERROR_PENSION_TYPE_REQUIRED)
                     .build());
         }
         // Validate ideNumber
@@ -137,6 +148,7 @@ public class ValidationServiceImpl implements ValidationService {
     public void validateEmployerUpdateRequestProto(EmployerUpdateRequest updateRequest) throws ValidationException {
         List<ErrorDetail> errorDetails = new ArrayList<>();
         String nameField = "name";
+        String pensionTypeField = "pensionType";
         String ideNumberField = "ideNumber";
         String dateCreationField = "dateCreation";
         String dateExpirationField = "dateExpiration";
@@ -149,6 +161,15 @@ public class ValidationServiceImpl implements ValidationService {
                     .value(name)
                     .message("The name is required")
                     .fxErrorKey(LanguageBundleKey.ERROR_NAME_REQUIRED)
+                    .build());
+        }
+        if (updateRequest.getPensionType().equals(PensionTypeProto.NONE)) {
+            errorDetails.add(ErrorDetail.builder()
+                    .object(updateRequest.getClass().getSimpleName())
+                    .field(pensionTypeField)
+                    .value(updateRequest.getPensionType().name())
+                    .message("Invalid pension type")
+                    .fxErrorKey(LanguageBundleKey.ERROR_PENSION_TYPE_REQUIRED)
                     .build());
         }
         // Validate ideNumber

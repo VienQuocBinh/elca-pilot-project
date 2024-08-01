@@ -63,6 +63,7 @@ class SalaryServiceTest {
     @BeforeAll
     public static void setUp() {
         simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        simpleDateFormat.setLenient(false);
     }
 
     @BeforeEach
