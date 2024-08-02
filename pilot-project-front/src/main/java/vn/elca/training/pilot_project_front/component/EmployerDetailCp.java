@@ -180,9 +180,11 @@ public class EmployerDetailCp implements FXComponent {
                                 .setPageIndex(pgSalary.getCurrentPageIndex())
                                 .build())
                         .build());
-                if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE))
+                if (employerResponseWrapper.getActionType().equals(ActionType.UPDATE)) {
+                    actionCol.setVisible(false);
                     showSuccessAlert(ObservableResourceFactory.getProperty().getString("alert.info.title.update.employer"),
                             ObservableResourceFactory.getProperty().getString("alert.info.header.update.employer"));
+                }
             }
         } else if (message.getMessageBody() instanceof ExceptionMessage) {
             // From EmployerCallbackCp catch
