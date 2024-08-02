@@ -53,3 +53,13 @@
     -fx-border-color: #3bd3eb;
     -fx-border-width: 2px;
 }
+
+.avs-number-col .label,
+.last-number-col .label,
+.first-name-col .label {
+    -fx-alignment: CENTER_LEFT;
+}
+
+.amount-col .label {
+    -fx-alignment: CENTER_RIGHT;
+}

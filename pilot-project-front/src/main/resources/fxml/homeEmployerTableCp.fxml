@@ -21,7 +21,8 @@
         </columnConstraints>
         <TableView fx:id="tbvEmployer" GridPane.rowIndex="0" GridPane.columnIndex="0">
             <columns>
-                <TableColumn fx:id="pensionTypeCol" text="%pensionType" prefWidth="150">
+                <TableColumn fx:id="pensionTypeCol" text="%pensionType" styleClass="pension-type-col"
+                             prefWidth="150">
                     <cellValueFactory>
                         <PropertyValueFactory property="pensionType"/>
                     </cellValueFactory>
@@ -37,7 +38,7 @@
                         <FormattedTableCell alignment="CENTER"/>
                     </cellFactory>
                 </TableColumn>
-                <TableColumn fx:id="ideNumberCol" text="%ideNumber" prefWidth="150">
+                <TableColumn fx:id="ideNumberCol" text="%ideNumber" styleClass="ide-number-col" prefWidth="150">
                     <cellValueFactory>
                         <PropertyValueFactory property="ideNumber"/>
                     </cellValueFactory>
@@ -45,7 +46,7 @@
                         <FormattedTableCell alignment="LEFT"/>
                     </cellFactory>
                 </TableColumn>
-                <TableColumn fx:id="nameCol" text="%name" prefWidth="150">
+                <TableColumn fx:id="nameCol" text="%name" styleClass="name-col" prefWidth="150">
                     <cellValueFactory>
                         <PropertyValueFactory property="name"/>
                     </cellValueFactory>

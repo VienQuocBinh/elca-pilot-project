@@ -64,7 +64,7 @@
 
     <TableView fx:id="tbvSalary" GridPane.rowIndex="0" GridPane.columnIndex="0">
         <columns>
-            <TableColumn fx:id="avsNumberCol" text="%avsNumber" prefWidth="200">
+            <TableColumn fx:id="avsNumberCol" text="%avsNumber" styleClass="avs-number-col" prefWidth="200">
                 <cellValueFactory>
                     <PropertyValueFactory property="avsNumber"/>
                 </cellValueFactory>
@@ -72,7 +72,7 @@
                     <FormattedTableCell alignment="LEFT"/>
                 </cellFactory>
             </TableColumn>
-            <TableColumn fx:id="lastNameCol" text="%employee.lastName" prefWidth="150">
+            <TableColumn fx:id="lastNameCol" text="%employee.lastName" styleClass="last-number-col" prefWidth="150">
                 <cellValueFactory>
                     <PropertyValueFactory property="lastName"/>
                 </cellValueFactory>
@@ -80,7 +80,7 @@
                     <FormattedTableCell alignment="LEFT"/>
                 </cellFactory>
             </TableColumn>
-            <TableColumn fx:id="firstNameCol" text="%employee.firstName" prefWidth="150">
+            <TableColumn fx:id="firstNameCol" text="%employee.firstName" styleClass="first-name-col" prefWidth="150">
                 <cellValueFactory>
                     <PropertyValueFactory property="firstName"/>
                 </cellValueFactory>
@@ -104,7 +104,7 @@
                     <FormattedTableCell alignment="CENTER"/>
                 </cellFactory>
             </TableColumn>
-            <TableColumn fx:id="avsAmountCol" text="%avs.ai.apg" prefWidth="100">
+            <TableColumn fx:id="avsAmountCol" text="%avs.ai.apg" styleClass="amount-col" prefWidth="100">
                 <cellValueFactory>
                     <PropertyValueFactory property="avsAmount"/>
                 </cellValueFactory>
@@ -112,7 +112,7 @@
                     <FormattedTableCell alignment="RIGHT"/>
                 </cellFactory>
             </TableColumn>
-            <TableColumn fx:id="acAmountCol" text="%ac" prefWidth="70">
+            <TableColumn fx:id="acAmountCol" text="%ac" styleClass="amount-col" prefWidth="70">
                 <cellValueFactory>
                     <PropertyValueFactory property="acAmount"/>
                 </cellValueFactory>
@@ -120,7 +120,7 @@
                     <FormattedTableCell alignment="RIGHT"/>
                 </cellFactory>
             </TableColumn>
-            <TableColumn fx:id="afAmountCol" text="%af" prefWidth="70">
+            <TableColumn fx:id="afAmountCol" text="%af" styleClass="amount-col" prefWidth="70">
                 <cellValueFactory>
                     <PropertyValueFactory property="afAmount"/>
                 </cellValueFactory>
