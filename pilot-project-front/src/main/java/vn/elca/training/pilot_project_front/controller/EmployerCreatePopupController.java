@@ -158,7 +158,7 @@ public class EmployerCreatePopupController implements Initializable {
         String errorStyleClass = "error";
         String regex = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}$";
         boolean isValid = true;
-        if (tfName.getText().isEmpty()) {
+        if (tfName.getText().trim().isEmpty()) {
             tfName.getStyleClass().add(errorStyleClass);
             lbNameError.setVisible(true);
             lbNameError.setText(resourceBundle.getString("error.name.required"));

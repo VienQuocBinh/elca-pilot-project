@@ -14,3 +14,9 @@
     -fx-background-color: #ff5c33;
     -fx-text-fill: white;
 }
+
+.pension-type-col .label,
+.ide-number-col .label,
+.name-col .label {
+    -fx-alignment: CENTER_LEFT;
+}
