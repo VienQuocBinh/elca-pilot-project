@@ -78,7 +78,8 @@ public class SalaryServiceImpl implements SalaryService {
                         .thenComparing(SalaryResponseDto::getFirstName))
                 .collect(Collectors.toList());
         List<String[]> data = collect.stream().map(dto -> dto.toStringArray(simpleDateFormat)).collect(Collectors.toList());
-        return FileUtil.writeCsvFile(exportPath, exportFileName, HeaderBuild.buildSalaryHeader(), data);
+        String fileName = String.format("%s_%s_%s", employer.getName(), employer.getNumber(), exportFileName);
+        return FileUtil.writeCsvFile(exportPath, fileName, HeaderBuild.buildSalaryHeader(), data);
     }
 
     @Override

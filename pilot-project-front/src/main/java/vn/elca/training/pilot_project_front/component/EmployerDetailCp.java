@@ -149,9 +149,11 @@ public class EmployerDetailCp implements FXComponent {
             employer = message.getTypedMessageBody(Employer.class);
             lbNumberValue.setText(employer.getNumber());
             tfName.setText(employer.getName());
+            TextFieldUtil.applyAlphabeticFilter(tfName);
             tfIdeNumber.setTextFormatter(null); // Clear formatter
             tfIdeNumber.setText(employer.getIdeNumber());
             tfIdeNumber.setTextFormatter(TextFieldUtil.applyIdeNumberTextFormatter(tfIdeNumber));
+            actionCol.setVisible(!importedSalaries.isEmpty());
             PensionTypeService.getInstance().setCbPensionTypeMandatory(cbPensionType);
             PensionTypeService.getInstance().updateCbPensionType();
             cbPensionType.setValue(PensionTypeUtil.getLocalizedPensionType(employer.getPensionType()));
@@ -282,6 +284,7 @@ public class EmployerDetailCp implements FXComponent {
                                 + " " + filename + " "
                                 + ObservableResourceFactory.getProperty().getString("alert.error.header.suffix.import.salary")));
             }
+            actionCol.setVisible(!importedSalaries.isEmpty());
         });
 
         btnExport.setOnMouseClicked(e -> context.send(ComponentId.SALARY_CALLBACK_CP, EmployerId.newBuilder().setId(employer.getId()).build()));
@@ -349,7 +352,7 @@ public class EmployerDetailCp implements FXComponent {
         String regex = "^(CHE|ADM)-\\d{3}.\\d{3}.\\d{3}$";
         ResourceBundle resourceBundle = ObservableResourceFactory.getProperty();
         boolean isValid = true;
-        if (tfName.getText().isEmpty()) {
+        if (tfName.getText().trim().isEmpty()) {
             tfName.getStyleClass().add(ERROR_STYLE_CLASS);
             lbNameError.setVisible(true);
             lbNameError.setText(resourceBundle.getString("error.name.required"));
@@ -381,9 +384,28 @@ public class EmployerDetailCp implements FXComponent {
             tfIdeNumber.getStyleClass().remove(ERROR_STYLE_CLASS);
             lbIdeNumberError.setVisible(false);
         }
-        ValidationUtil.validateDateFields(dpDateCreation, dpDateExpiration,
-                lbDateCreationError, lbDateExpirationError,
-                ERROR_STYLE_CLASS, resourceBundle);
+        if (dpDateCreation.getValue() == null) {
+            dpDateCreation.getStyleClass().add(ERROR_STYLE_CLASS);
+            lbDateCreationError.setText(resourceBundle.getString("error.dateCreation.required"));
+            lbDateCreationError.setVisible(true);
+            isValid = false;
+        } else {
+            dpDateCreation.getStyleClass().remove(ERROR_STYLE_CLASS);
+            lbDateCreationError.setVisible(false);
+        }
+        if (dpDateCreation.getValue() != null && dpDateExpiration.getValue() != null) {
+            if (!dpDateCreation.getValue().isBefore(dpDateExpiration.getValue())) {
+                dpDateCreation.getStyleClass().add(ERROR_STYLE_CLASS);
+                dpDateExpiration.getStyleClass().add(ERROR_STYLE_CLASS);
+                lbDateExpirationError.setText(resourceBundle.getString("error.dateOrder"));
+                lbDateExpirationError.setVisible(true);
+                isValid = false;
+            } else {
+                dpDateCreation.getStyleClass().remove(ERROR_STYLE_CLASS);
+                dpDateExpiration.getStyleClass().remove(ERROR_STYLE_CLASS);
+                lbDateExpirationError.setVisible(false);
+            }
+        }
         return isValid;
     }
 
@@ -448,6 +470,7 @@ public class EmployerDetailCp implements FXComponent {
         tfIdeNumber.getStyleClass().remove(ERROR_STYLE_CLASS);
         lbIdeNumberError.setVisible(false);
         dpDateCreation.getStyleClass().remove(ERROR_STYLE_CLASS);
+        lbDateCreationError.setVisible(false);
         dpDateExpiration.getStyleClass().remove(ERROR_STYLE_CLASS);
         lbDateExpirationError.setVisible(false);
     }
@@ -503,6 +526,7 @@ public class EmployerDetailCp implements FXComponent {
                         tbvSalary.getItems().removeAll(importedSalaries);
                         importedSalaries.remove(salary);
                         tbvSalary.getItems().addAll(importedSalaries);
+                        actionCol.setVisible(!importedSalaries.isEmpty());
                     }
                 });
 

@@ -14,7 +14,7 @@
             <Label fx:id="lbTotalElements"/>
         </left>
         <right>
-            <Pagination fx:id="pgEmployer" visible="false"/>
+            <Pagination fx:id="pgEmployer" visible="false" minWidth="200"/>
         </right>
     </BorderPane>
 
