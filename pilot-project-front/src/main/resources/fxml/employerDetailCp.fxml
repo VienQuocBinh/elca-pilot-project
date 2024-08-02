@@ -141,6 +141,6 @@
     </BorderPane>
     <HBox alignment="CENTER_RIGHT" spacing="20">
         <Button fx:id="btnReturn" text="%return" prefWidth="100"/>
-        <Button fx:id="btnSave" text="%save" prefWidth="100"/>
+        <Button fx:id="btnSave" text="%save" styleClass="btn-save" prefWidth="100"/>
     </HBox>
 </VBox>

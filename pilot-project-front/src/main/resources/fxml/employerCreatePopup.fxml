@@ -46,7 +46,7 @@
     </VBox>
 
     <HBox alignment="CENTER_RIGHT" spacing="20">
-        <Button text="%save" onAction="#handleSave" prefWidth="100"/>
+        <Button text="%save" onAction="#handleSave" styleClass="btn-save" prefWidth="100"/>
         <Button text="%cancel" onAction="#handleCancel" prefWidth="100"/>
     </HBox>
 </VBox>
