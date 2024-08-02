@@ -20,3 +20,21 @@
     -fx-cursor: hand;
 }
 
+.btn-save {
+    -fx-background-color: linear-gradient(#2196F3, #1976D2);
+    -fx-text-fill: white;
+}
+
+.btn-save:hover {
+    -fx-background-color: linear-gradient(#64B5F6, #1E88E5);
+}
+
+.btn-save:pressed {
+    -fx-background-color: linear-gradient(#1976D2, #1565C0);
+}
+
+.btn-save:focused {
+    -fx-background-color: linear-gradient(#2196F3, #1976D2);
+    -fx-border-color: #3bd3eb;
+    -fx-border-width: 2px;
+}
