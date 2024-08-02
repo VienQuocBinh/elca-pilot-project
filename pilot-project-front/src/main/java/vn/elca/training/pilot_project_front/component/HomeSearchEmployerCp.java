@@ -4,6 +4,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import org.jacpfx.api.annotations.Resource;
 import org.jacpfx.api.annotations.component.DeclarativeView;
 import org.jacpfx.api.annotations.lifecycle.PostConstruct;
@@ -94,6 +95,9 @@ public class HomeSearchEmployerCp implements FXComponent {
         dpDateExpiration.promptTextProperty().bind(ObservableResourceFactory.getStringBinding("date.format"));
         dpDateExpiration.setConverter(TextFieldUtil.dateStringConverter());
         btnSearch.setOnMouseClicked(event -> searchEmployers());
+        btnSearch.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) searchEmployers();
+        });
         btnReset.setOnMouseClicked(event -> resetSearchFields());
         TextFieldUtil.applyIdeNumberFilter(tfIdeNumber);
         TextFieldUtil.applyNumberFilter(tfNumber);
