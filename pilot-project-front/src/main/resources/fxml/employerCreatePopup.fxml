@@ -8,35 +8,40 @@
       styleClass="popupContainer"
       stylesheets="@../style/styleEmployerPopup.css"
       prefWidth="580"
-      prefHeight="500">
-    <HBox spacing="5" alignment="CENTER_LEFT">
+      prefHeight="530">
+    <VBox spacing="5" alignment="CENTER_LEFT">
         <Label fx:id="lbNumber" text="%number.required"/>
-        <ImageView fx:id="infoNumber" pickOnBounds="true" fitWidth="16" fitHeight="16" styleClass="image-info"/>
-    </HBox>
-    <Label fx:id="lbNumberValue" style="-fx-font-weight: bold"/>
+        <Label fx:id="lbNumberValue" style="-fx-font-weight: bold"/>
+    </VBox>
     <Region styleClass="blankSpacing"/>
-    <Label fx:id="lbName" text="%name.required"/>
-    <TextField fx:id="tfName"/>
+    <VBox spacing="10">
+        <Label fx:id="lbName" text="%name.required"/>
+        <TextField fx:id="tfName"/>
+    </VBox>
     <Label fx:id="lbNameError" styleClass="error-label" visible="false"/>
 
-    <Label fx:id="lbPensionType" text="%pensionType.required"/>
-    <ComboBox fx:id="cbPensionType" prefWidth="520"/>
+    <VBox spacing="10">
+        <Label fx:id="lbPensionType" text="%pensionType.required"/>
+        <ComboBox fx:id="cbPensionType" prefWidth="520"/>
+    </VBox>
     <Label fx:id="lbPensionTypeError" styleClass="error-label" visible="false"/>
 
-    <HBox spacing="5" alignment="CENTER_LEFT">
-        <Label fx:id="lbIdeNumber" text="%ideNumber.required"/>
-        <ImageView fx:id="infoIdeNumber" pickOnBounds="true" fitWidth="16" fitHeight="16" styleClass="image-info"/>
-    </HBox>
-    <TextField fx:id="tfIdeNumber"/>
+    <VBox spacing="10">
+        <HBox spacing="5" alignment="CENTER_LEFT">
+            <Label fx:id="lbIdeNumber" text="%ideNumber.required"/>
+            <ImageView fx:id="infoIdeNumber" pickOnBounds="true" fitWidth="16" fitHeight="16" styleClass="image-info"/>
+        </HBox>
+        <TextField fx:id="tfIdeNumber"/>
+    </VBox>
     <Label fx:id="lbIdeNumberError" styleClass="error-label" visible="false"/>
 
     <VBox>
         <HBox alignment="CENTER_LEFT" spacing="20">
-            <VBox>
+            <VBox spacing="10">
                 <Label fx:id="lbDateCreation" text="%dateCreation.required"/>
                 <DatePicker fx:id="dpDateCreation" prefWidth="340"/>
             </VBox>
-            <VBox>
+            <VBox spacing="10">
                 <Label fx:id="lbDateExpiration" text="%dateExpiration"/>
                 <DatePicker fx:id="dpDateExpiration" prefWidth="340"/>
             </VBox>
