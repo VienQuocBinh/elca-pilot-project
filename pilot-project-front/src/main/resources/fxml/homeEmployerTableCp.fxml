@@ -30,7 +30,7 @@
                         <FormattedTableCell alignment="LEFT"/>
                     </cellFactory>
                 </TableColumn>
-                <TableColumn fx:id="numberCol" text="%number" prefWidth="120">
+                <TableColumn fx:id="numberCol" text="%number" styleClass="number-col" prefWidth="120">
                     <cellValueFactory>
                         <PropertyValueFactory property="number"/>
                     </cellValueFactory>
@@ -54,7 +54,7 @@
                         <FormattedTableCell alignment="LEFT"/>
                     </cellFactory>
                 </TableColumn>
-                <TableColumn fx:id="dateCreationCol" text="%dateCreation" prefWidth="100">
+                <TableColumn fx:id="dateCreationCol" text="%dateCreation" styleClass="date-col" prefWidth="100">
                     <cellValueFactory>
                         <PropertyValueFactory property="dateCreation"/>
                     </cellValueFactory>
@@ -62,7 +62,7 @@
                         <FormattedTableCell alignment="CENTER"/>
                     </cellFactory>
                 </TableColumn>
-                <TableColumn fx:id="dateExpirationCol" text="%dateExpiration" prefWidth="100">
+                <TableColumn fx:id="dateExpirationCol" text="%dateExpiration" styleClass="date-col" prefWidth="100">
                     <cellValueFactory>
                         <PropertyValueFactory property="dateExpiration"/>
                     </cellValueFactory>
