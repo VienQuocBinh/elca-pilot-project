@@ -88,7 +88,7 @@
                     <FormattedTableCell alignment="LEFT"/>
                 </cellFactory>
             </TableColumn>
-            <TableColumn fx:id="startDateCol" text="%startDate" prefWidth="100">
+            <TableColumn fx:id="startDateCol" text="%startDate" styleClass="start-date-col" prefWidth="100">
                 <cellValueFactory>
                     <PropertyValueFactory property="startDate"/>
                 </cellValueFactory>
@@ -96,7 +96,7 @@
                     <FormattedTableCell alignment="CENTER"/>
                 </cellFactory>
             </TableColumn>
-            <TableColumn fx:id="endDateCol" text="%endDate" prefWidth="100">
+            <TableColumn fx:id="endDateCol" text="%endDate" styleClass="end-date-col" prefWidth="100">
                 <cellValueFactory>
                     <PropertyValueFactory property="endDate"/>
                 </cellValueFactory>

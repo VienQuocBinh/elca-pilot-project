@@ -58,8 +58,15 @@
 .last-number-col .label,
 .first-name-col .label {
     -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
 }
 
 .amount-col .label {
     -fx-alignment: CENTER_RIGHT;
+    -fx-cursor: hand;
+}
+
+.start-date-col .label,
+.end-date-col .label{
+    -fx-cursor: hand;
 }
